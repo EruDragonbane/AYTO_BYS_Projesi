@@ -10,14 +10,14 @@ using System.Windows.Forms;
 using System.IO;
 using System.Data.SqlClient;
 using AYTO.UpdateFile;
+using AYTO.Log;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class BelgeGuncellemeEkrani : Form
     {
         UpdateFileDLL updateFileDLL = new UpdateFileDLL();
-        //StatusNameTableValue
-        private int statusValue;
+        LogDLL logDLL = new LogDLL();
         public BelgeGuncellemeEkrani()
         {
             InitializeComponent();
@@ -73,6 +73,21 @@ namespace AYTO_BYS_Projesi
             UpdateFileAddedDateTimePicker.Text = textGridTuple.Item5;
             UpdateFileStatus_ComboBox.Text = textGridTuple.Item6;
         }
+        //Combobox'u durumlar ile doldurur.
+        private void ComboboxFill()
+        {
+            Program.dataBaseConnection.Close();
+            string comboboxFilldCmdText = "SELECT drm.durumAdi FROM durumlar AS drm ORDER BY drm.durumNo ASC";
+            SqlCommand comboboxFillCmd = new SqlCommand(comboboxFilldCmdText, Program.dataBaseConnection);
+            Program.dataBaseConnection.Open();
+            SqlDataReader comboboxFillReader = comboboxFillCmd.ExecuteReader();
+            while (comboboxFillReader.Read())
+            {
+                UpdateFileStatus_ComboBox.Items.Add(comboboxFillReader["durumAdi"].ToString());
+            }
+            comboboxFillReader.Close();
+            Program.dataBaseConnection.Close();
+        }
         //Kontrol veya Güncelleme öncesinde kullanıcının yetkisini kontrol eder.
         private void UserIdCheckForPermission()
         {
@@ -92,7 +107,20 @@ namespace AYTO_BYS_Projesi
                     }
                     else
                     {
-                        OldFileCheckMethod();
+                        /* Aynı pencerede belgenin bir kaç kez değişmesine karşı önlem olarak OldFileCheckMethod yaratılmıştır.
+                         * BelgeNo üzerinden belgeyi veritabanından kontrol ederek textboxlardaki ismi ile 
+                         * veritabanındaki ismi arasında karşılaştırma yapar
+                         */
+                        string oldFileCheckReturnValue = updateFileDLL.OldFileCheck(BelgeNo, fileName, fileDirectory);
+
+                        if (oldFileCheckReturnValue == "update")
+                        {
+                            UpdateFileMethod();
+                        }
+                        else //"check"
+                        {
+                            CheckFileMethod();
+                        }
                     }
                 }
                 else
@@ -106,26 +134,6 @@ namespace AYTO_BYS_Projesi
                 UpdateFileMethod();
             }
             MessageBoxManager.Unregister();
-        }
-        /* Aynı pencerede belgenin bir kaç kez değişmesine karşı önlem olarak OldFileCheckMethod yaratılmıştır.
-         * BelgeNo üzerinden belgeyi veritabanından kontrol ederek textboxlardaki ismi ile 
-         * veritabanındaki ismi arasında karşılaştırma yapar
-         */
-        private void OldFileCheckMethod()
-        {
-            string fileName = UpdateFileName_TextBox.Text;
-            string fileDirectory = UpdateFileDirectory_TextBox.Text;
-
-            string returnValue = updateFileDLL.OldFileCheck(BelgeNo, fileName, fileDirectory);
-
-            if (returnValue == "update")
-            {
-                UpdateFileMethod();
-            }
-            else //"check"
-            {
-                CheckFileMethod();
-            }
         }
         //Belgeyi güncelleme işleminden önce bu belgenin var olup olmadığını kontrol eder. Yok ise updateFileMethod çalıştırır.
         private void CheckFileMethod()
@@ -168,90 +176,24 @@ namespace AYTO_BYS_Projesi
             }
             MessageBoxManager.Unregister();
         }
-        /*Belge eklerken kullanılan parametrelerden birisi durumNo'dur. Tablodaki "Yeni" değerini döndürülmektedir.
-         * Durum adı Yeni veya Güncellenmiş değilse OtherStatusNameTableValue metotuna geçiş yapar. 
-         */
-        private int StatusNameTableValue()
-        {
-            /*Eğer belge yeni ise kayıt yapılırken Güncellenmiş olarak kaydedilir.
-             *Güncellenme yapılırken Yeni durumu seçilirse yine Güncellenmiş olarak kaydedilir.
-             * Combobox verilerinin indeksi 0 ile başladığından dolayı SelectedIndex+1 ile kaydedilmektedirler.
-             */
-            if (UpdateFileStatus_ComboBox.SelectedItem.ToString() == "Yeni" || UpdateFileStatus_ComboBox.SelectedItem.ToString() == "Güncellenmiş")
-            {
-                Program.dataBaseConnection.Close();
-                string statusNameCmdText = "SELECT durumNo FROM durumlar WHERE durumAdi = @durumAdi";
-                SqlCommand statusNameCmd = new SqlCommand(statusNameCmdText, Program.dataBaseConnection);
-                statusNameCmd.Parameters.AddWithValue("@durumAdi", "Güncellenmiş");
-                Program.dataBaseConnection.Open();
-                SqlDataReader statusNameReader = statusNameCmd.ExecuteReader();
-                if (statusNameReader.Read())
-                {
-                    statusValue = Convert.ToInt32(statusNameReader["durumNo"]);
-                }
-                else
-                {
-                    Program.dataBaseConnection.Close();
-                    SqlCommand addNewStatusCmd = new SqlCommand("INSERT INTO durumlar (durumAdi) VALUES ('Güncellenmiş')", Program.dataBaseConnection);
-                    Program.dataBaseConnection.Open();
-                    addNewStatusCmd.ExecuteNonQuery();
-                    Program.dataBaseConnection.Close();
-                    statusNameReader.Close();
-                    StatusNameTableValue();
-                }
-                Program.dataBaseConnection.Close();
-                statusNameReader.Close();
-            }
-            else
-            {
-                OtherStatusNameTableValue();
-            }
-            Program.dataBaseConnection.Close();
-            return statusValue;
-        }
-        private int OtherStatusNameTableValue()
-        {
-            Program.dataBaseConnection.Close();
-            string statusNameCmdText = "SELECT durumNo FROM durumlar WHERE durumAdi = @durumAdi";
-            SqlCommand statusNameCmd = new SqlCommand(statusNameCmdText, Program.dataBaseConnection);
-            statusNameCmd.Parameters.AddWithValue("@durumAdi", UpdateFileStatus_ComboBox.SelectedItem);
-            Program.dataBaseConnection.Open();
-            SqlDataReader statusNameReader = statusNameCmd.ExecuteReader();
-            if (statusNameReader.Read())
-            {
-                statusValue = Convert.ToInt32(statusNameReader["durumNo"]);
-            }
-            statusNameReader.Close();
-            Program.dataBaseConnection.Close();
-            return statusValue;
-        }
-
         private void UpdateFileMethod()
         {
-            MessageBoxManager.Unregister();
-            MessageBoxManager.Register();
-            Program.dataBaseConnection.Close();
-            string updateFileCmdText = "UPDATE belgelerim SET belgeBasligi = @belgeBasligi, belgeAdi = @belgeAdi, belgeDizini = @belgeDizini, belgeAciklamasi = @belgeAciklamasi, durumNo = @durumNo, guncellenmeTarihi = @guncellenmeTarihi, sistemGuncellenmeTarihi = @sistemGuncellenmeTarihi, guncelleyenKisiNo = @guncelleyenKisiNo WHERE belgeNo = " + BelgeNo;
-            SqlCommand updateFileCmd = new SqlCommand(updateFileCmdText, Program.dataBaseConnection);
-            updateFileCmd.Parameters.AddWithValue("@belgeBasligi", UpdateFileTitle_TextBox.Text.Trim());
-            updateFileCmd.Parameters.AddWithValue("@belgeAdi", UpdateFileName_TextBox.Text.Trim());
-            updateFileCmd.Parameters.AddWithValue("@belgeDizini", UpdateFileDirectory_TextBox.Text.Trim());
-            updateFileCmd.Parameters.AddWithValue("@belgeAciklamasi", UpdateFileExplain_RichTextBox.Text.Trim());
-            updateFileCmd.Parameters.AddWithValue("@durumNo", StatusNameTableValue());
-            updateFileCmd.Parameters.AddWithValue("@guncellenmeTarihi", DateTime.Parse(UpdateFileUpdateDateTimePicker.Text));
-            updateFileCmd.Parameters.AddWithValue("@sistemGuncellenmeTarihi", DateTime.Parse(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")));
-            updateFileCmd.Parameters.AddWithValue("@guncelleyenKisiNo", WhoUpdatedId);
-            Program.dataBaseConnection.Open();
-            updateFileCmd.ExecuteNonQuery();
-            updateFileCmd.Dispose();
+            string updateFileTitle = UpdateFileTitle_TextBox.Text.Trim();
+            string updateFileName = UpdateFileName_TextBox.Text.Trim();
+            string updateFileDirectory = UpdateFileDirectory_TextBox.Text.Trim();
+            string updateFileExplain = UpdateFileExplain_RichTextBox.Text.Trim();
+            string comboboxSelectedItem = UpdateFileStatus_ComboBox.SelectedItem.ToString();
+            string updateDateTimePicker = UpdateFileUpdateDateTimePicker.Text;
+
+            updateFileDLL.UpdateFile(BelgeNo, updateFileTitle, updateFileName, updateFileDirectory, updateFileExplain, comboboxSelectedItem, updateDateTimePicker, WhoUpdatedId);
+
             //Refresh
             UpdateFileEventH?.Invoke();
             MessageBox.Show("Belge Güncellendi.");
-            Program.dataBaseConnection.Close();
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
             this.Close();
-            UpdateFileLog(UpdateFileName_TextBox.Text.Trim());
+            logDLL.UpdateFileLog(UserId3, BelgeNo, updateFileName);
         }
 
         private void BelgeGuncellemeEkrani_Load(object sender, EventArgs e)
@@ -273,7 +215,7 @@ namespace AYTO_BYS_Projesi
             //Karakter sayısı gizleme
             UpdateFileExplain_TextLength.Visible = false;
             //Combobox doldurma
-            UpdateFileStatus_ComboBox.Items.Add(updateFileDLL.ComboboxFill());
+            ComboboxFill();
 
             MessageBoxManager.Unregister();
         }
@@ -371,14 +313,5 @@ namespace AYTO_BYS_Projesi
             }
         }
         //Changed
-        
-        private void UpdateFileLog(string fileName)
-        {
-            string logFilePath = @"C:\Users\Fatih\Desktop\ServerLogKaydi\UpdateFileLog.txt";
-            string writeText = "[" + DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") + "]: Belge güncelleme işlemini yapan Kullanıcı No: " + BelgeNo + "\tBelge Adı: " + fileName;
-            FileStream adminLogFS = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-            adminLogFS.Close();
-            File.AppendAllText(logFilePath, Environment.NewLine + writeText);
-        }
     }
 }

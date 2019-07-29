@@ -9,11 +9,16 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.IO;
+using AYTO.UpdateData;
+using AYTO.Log;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class VeriGuncelle : Form
     {
+        UpdateDataDLL updateDataDLL = new UpdateDataDLL();
+        LogDLL logDLL = new LogDLL();
+
         //ComboBoxNameTableValue
         private int statusValue;
         public VeriGuncelle()
@@ -78,238 +83,73 @@ namespace AYTO_BYS_Projesi
         //AdminPanel'den gelen verinin bilgiler
         private void TextGridFromAdminPanel()
         {
-            Program.dataBaseConnection.Close();
-            string updateFileCmdText = "";
-            string columnName = "";
-            if (TableName == "durumlar")
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+            //Item1 = returnValue, Item2 = userName, Item3 = userSurname, ITem4 = userID, Item5 = userPosition, Item6 = userAuthority, Item7 = userCorp, TRest = statusPositionTuple, TRest Item1 = statusName, TRest Item2 = positionName);
+            var textGridTuple = updateDataDLL.TextGridFromAdminPanel(TableName, DataFromAdminPanel);
+            if(textGridTuple.Item1 == "error")
             {
-                columnName = "durum";
+                MessageBox.Show("Hata: VeriGuncelle-TextGrid1");
+            }
+            //
+            if (TableName == "kullanicilar")
+            {
+                UpdateUserName_CustomTextBox.Text = textGridTuple.Item2;
+                UpdateUserSurname_CustomTextBox.Text = textGridTuple.Item3;
+                UpdateUserID_CustomTextBox.Text = textGridTuple.Item4;
+                UpdateUserPosition_ComboBox.Text = textGridTuple.Item5;
+                UpdateUserAuthority_ComboBox.Text = textGridTuple.Item6;
+                UpdateUserCorp_CustomTextBox.Text = textGridTuple.Item7;
+            }
+            else if (TableName == "durumlar")
+            {
+                UpdateStatus_CustomTextBox.Text = textGridTuple.Rest.Item1;
             }
             else if (TableName == "gorevler")
             {
-                columnName = "gorev";
-            }
-            else
-            {
-                columnName = "";
-            }
-
-            if (TableName == "kullanicilar")
-            {
-                updateFileCmdText = "SELECT klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciGiris, grv.gorevAdi, ytk.yetkiAdi, klnc.kullaniciKurumu FROM kullanicilar AS klnc INNER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo INNER JOIN yetkiler AS ytk ON klnc.yetkiNo = ytk.yetkiNo WHERE kullaniciNo = @gelenVeri";
-            }
-            else if (TableName == "durumlar" || TableName == "gorevler")
-            {
-                updateFileCmdText = "SELECT " + columnName + "Adi FROM " + TableName + " WHERE " + columnName + "No = @gelenVeri";
+                UpdatePosition_CustomTextBox.Text = textGridTuple.Rest.Item2;
             }
             else
             {
                 MessageBox.Show("Hata: VeriGuncelle-TextGrid");
             }
-            SqlCommand updateFileCmd = new SqlCommand(updateFileCmdText, Program.dataBaseConnection);
-            updateFileCmd.Parameters.AddWithValue("@gelenVeri", DataFromAdminPanel);
-            Program.dataBaseConnection.Open();
-            SqlDataReader updateFileReader = updateFileCmd.ExecuteReader();
-            if (updateFileReader.Read())
-            {
-                if (TableName == "kullanicilar")
-                {
-                    UpdateUserName_CustomTextBox.Text = updateFileReader["kullaniciAdi"].ToString();
-                    UpdateUserSurname_CustomTextBox.Text = updateFileReader["kullaniciSoyadi"].ToString();
-                    UpdateUserID_CustomTextBox.Text = updateFileReader["kullaniciGiris"].ToString();
-                    UpdateUserPosition_ComboBox.Text = updateFileReader["gorevAdi"].ToString();
-                    UpdateUserAuthority_ComboBox.Text = updateFileReader["yetkiAdi"].ToString();
-                    UpdateUserCorp_CustomTextBox.Text = updateFileReader["kullaniciKurumu"].ToString();
-                }
-                else if (TableName == "durumlar")
-                {
-                    UpdateStatus_CustomTextBox.Text = updateFileReader["durumAdi"].ToString();
-                }
-                else if (TableName == "gorevler")
-                {
-                    UpdatePosition_CustomTextBox.Text = updateFileReader["gorevAdi"].ToString();
-                }
-                else
-                {
-                    MessageBox.Show("Hata: VeriGuncelle-TextGrid");
-                }
-
-            }
-            updateFileReader.Close();
-            Program.dataBaseConnection.Close();
-        }
-
-        private void CheckDataMethod()
-        {
-            string columnName = "";
-            string title1 = "";
-            if(TableName == "kullanicilar")
-            {
-                columnName = "kullanici";
-                title1 = "Kullanıcıyı";
-            }
-            else if (TableName == "durumlar")
-            {
-                columnName = "durum";
-                title1 = "Durumu";
-            }
-            else if (TableName == "gorevler")
-            {
-                columnName = "gorev";
-                title1 = "Görevi";
-            }
-            else
-            {
-                columnName = "";
-            }
-
-            MessageBoxManager.Unregister();
-            MessageBoxManager.Register();
-            string checkCmdText = "SELECT " + columnName + "  FROM " + TableName + " WHERE " + columnName + "No = @gelenVeri";
-            SqlCommand checkCmd = new SqlCommand(checkCmdText, Program.dataBaseConnection);
-            checkCmd.Parameters.AddWithValue("@gelenVeri", DataFromAdminPanel);
-            Program.dataBaseConnection.Open();
-            SqlDataReader checkCmdReader = checkCmd.ExecuteReader();
-            if(checkCmdReader.Read() == false)
-            {
-                String messageCheckData = title1 + " güncellemek istiyor musunuz?";
-                String titleCheckData = "";
-                MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
-                DialogResult yesNoResult = MessageBox.Show(messageCheckData, titleCheckData, yesNoButtons);
-                if(yesNoResult == DialogResult.Yes)
-                {
-                    UpdateDataMethod();
-                }
-                else
-                {
-                    MessageBoxManager.Unregister();
-                    this.Show();
-                }
-            }
-            else
-            {
-                MessageBox.Show("Böyle bir veri zaten var!");
-                this.Show();
-            }
-            checkCmdReader.Close();
-            Program.dataBaseConnection.Close();
             MessageBoxManager.Unregister();
         }
-        //Güncellenme durumunda değişen combobox verilerinin birincil anahtarlarını veritabanından çeker.
-        private int ComboBoxNameTableValue(int inputValue)
-        {
-            string inputTableName = "";
-            string inputColumnName = "";
-            string inputComboBoxText = "";
-            MessageBoxManager.Unregister();
-            MessageBoxManager.Register();
-            if (inputValue == 1)
-            {
-                inputTableName = "gorevler";
-                inputColumnName = "gorev";
-                inputComboBoxText = UpdateUserPosition_ComboBox.Text;
-            }
-            else if(inputValue == 2)
-            {
-                inputTableName = "yetkiler";
-                inputColumnName = "yetki";
-                inputComboBoxText = UpdateUserAuthority_ComboBox.Text;
-            }
-            else
-            {
-                inputTableName = "";
-                inputColumnName = "";
-                inputComboBoxText = "";
-                MessageBox.Show("Hata: VeriGuncelle-ComboBoxNameTableValue-1");
-            }
-            Program.dataBaseConnection.Close();
-            string inputDataCmdText = "SELECT " + inputColumnName + "No FROM " + inputTableName + " WHERE " + inputColumnName + "Adi = @gelenVeri";
-            SqlCommand inputDataCmd = new SqlCommand(inputDataCmdText, Program.dataBaseConnection);
-            inputDataCmd.Parameters.AddWithValue("@gelenVeri", inputComboBoxText);
-            Program.dataBaseConnection.Open();
-            SqlDataReader inputDataReader = inputDataCmd.ExecuteReader();
-            if (inputDataReader.Read())
-            {
-                statusValue = Convert.ToInt32(inputDataReader[inputColumnName + "No"]);
-            }
-            else
-            {
-                MessageBox.Show("Hata: VeriGuncelle-ComboBoxNameTableValue-2");
-            }
-            inputDataReader.Close();
-            Program.dataBaseConnection.Close();
-            return statusValue;
 
-        }
         private void UpdateDataMethod()
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-            Program.dataBaseConnection.Close();
 
-            string updateDataCmdText = "";
-            string updateColumnName = "";
-            string comboBoxValue = "";
-            string updateTitle = "";
-            if(TableName == "durumlar")
-            {
-                updateColumnName = "durum";
-                comboBoxValue = UpdateStatus_CustomTextBox.Text.Trim();
-                updateTitle = "Durum";
-            }
-            else if(TableName == "gorevler")
-            {
-                updateColumnName = "gorev";
-                comboBoxValue = UpdatePosition_CustomTextBox.Text.Trim();
-                updateTitle = "Görev"; 
-            }
-            else
-            {
-                updateColumnName = "";
-                updateTitle = "Kullanıcı";
-            }
+            string status = UpdateStatus_CustomTextBox.Text.Trim();
+            string position = UpdatePosition_CustomTextBox.Text.Trim();
+            string userAuthority = UpdateUserAuthority_ComboBox.Text.Trim();
+            string userName = UpdateUserName_CustomTextBox.Text.Trim();
+            string userSurname = UpdateUserSurname_CustomTextBox.Text.Trim();
+            string userID = UpdateUserID_CustomTextBox.Text.Trim();
+            string userCorp = UpdateUserCorp_CustomTextBox.Text.Trim();
 
-            SqlCommand updateDataCmd;
-            if(TableName == "kullanicilar")
+            //Item1 = updateTitle, Item2 = comboBoxValue
+            var updateDataTuple = updateDataDLL.UpdateData(TableName, status, position, userName, userSurname, userID, userAuthority, userCorp, DataFromAdminPanel);
+            if (TableName == "kullanicilar")
             {
-                updateDataCmdText = "UPDATE kullanicilar SET kullaniciAdi = @kullaniciAdi, kullaniciSoyadi = @kullaniciSoyadi, kullaniciGiris = @kullaniciGiris, gorevNo = @gorevNo, yetkiNo = @yetkiNo, kullaniciKurumu = @kullaniciKurumu WHERE kullaniciNo = @kullaniciNo";
-                updateDataCmd = new SqlCommand(updateDataCmdText, Program.dataBaseConnection);
-                updateDataCmd.Parameters.AddWithValue("@kullaniciAdi", UpdateUserName_CustomTextBox.Text.Trim());
-                updateDataCmd.Parameters.AddWithValue("@kullaniciSoyadi", UpdateUserSurname_CustomTextBox.Text.Trim());
-                updateDataCmd.Parameters.AddWithValue("@kullaniciGiris", UpdateUserID_CustomTextBox.Text.Trim());
-                updateDataCmd.Parameters.AddWithValue("@gorevNo", ComboBoxNameTableValue(1));
-                updateDataCmd.Parameters.AddWithValue("@yetkiNo", ComboBoxNameTableValue(2));
-                updateDataCmd.Parameters.AddWithValue("@kullaniciKurumu", UpdateUserCorp_CustomTextBox.Text.Trim());
-                updateDataCmd.Parameters.AddWithValue("@kullaniciNo", DataFromAdminPanel);
-                Program.dataBaseConnection.Open();
-                updateDataCmd.ExecuteNonQuery();
-                updateDataCmd.Dispose();
-                //Refrest
+                //Refresh
                 UpdateDataEventH();
-                MessageBox.Show(UpdateUserID_CustomTextBox.Text.Trim() + " kullanıcısı güncellendi.");
-                Program.dataBaseConnection.Close();
+                MessageBox.Show(userID + " kullanıcısı güncellendi.");
             }
             else if(TableName == "durumlar" || TableName == "gorevler")
             {
-                updateDataCmdText = "UPDATE " + TableName + " SET " + updateColumnName + "Adi = @gelenVeri WHERE " + updateColumnName + "No = @gelenVeriNo";
-                updateDataCmd = new SqlCommand(updateDataCmdText, Program.dataBaseConnection);
-                updateDataCmd.Parameters.AddWithValue("@gelenVeri", comboBoxValue);
-                updateDataCmd.Parameters.AddWithValue("@gelenVeriNo", DataFromAdminPanel);
-                Program.dataBaseConnection.Open();
-                updateDataCmd.ExecuteNonQuery();
-                updateDataCmd.Dispose();
-                //Refrest
+                //Refresh
                 UpdateDataEventH();
-                MessageBox.Show(updateTitle + " güncellendi.");
+                MessageBox.Show(updateDataTuple.Item1 + " güncellendi.");
                 Program.dataBaseConnection.Close();
 
             }
             else
             {
-                updateDataCmdText = "";
                 MessageBox.Show("Hata: VeriGuncelle-UpdateDataMethod");
             }
-            UpdateDataLog(updateTitle, UpdateUserName_CustomTextBox.Text.Trim(), UpdateUserSurname_CustomTextBox.Text.Trim(), comboBoxValue);
+            logDLL.UpdateDataLog(TableName, UpdateDataUserId, DataFromAdminPanel, updateDataTuple.Item1, userName, userSurname, updateDataTuple.Item2);
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
             this.Close();
@@ -489,25 +329,6 @@ namespace AYTO_BYS_Projesi
         private void AdminPage_UpdateDataButton_Click(object sender, EventArgs e)
         {
             UpdateDataMethod();
-        }
-
-        private void UpdateDataLog(string title, string kullaniciAdi, string kullaniciSoyadi, string dataName)
-        {
-            string columnNameValue = "";
-            if(TableName == "kullanicilar")
-            {
-                columnNameValue = kullaniciAdi + ' ' + kullaniciSoyadi;
-            }
-            else
-            {
-                columnNameValue = dataName;
-            }
-            string logFilePath = @"C:\Users\Fatih\Desktop\ServerLogKaydi\AdminLog\UpdateDataLog.txt";
-            string writeText = "[" + DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") + "]: Veri güncelleme yapan Yetkili No: " + UpdateDataUserId + "\tGüncellenen " + title + " No: " + DataFromAdminPanel + "\t" + title + " Adı: " + columnNameValue;
-            Console.WriteLine(writeText);
-            FileStream adminLogFS = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-            adminLogFS.Close();
-            File.AppendAllText(logFilePath, Environment.NewLine + writeText);
         }
     }
 }

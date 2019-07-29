@@ -665,7 +665,6 @@ namespace AYTO_BYS_Projesi
         }
         private void AdminPanel_DeleteButton_Click(object sender, EventArgs e)
         {
-            string currentCellValue = AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString();
 
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
@@ -689,6 +688,8 @@ namespace AYTO_BYS_Projesi
                     DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
                     if (deleteResult == DialogResult.Yes)
                     {
+                        string currentCellValue = AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString();
+
                         if (tableName == "belgelerim")
                         {
                             //Verilerin silinmesi öncesi bu veriler başka tablolara taşınır.

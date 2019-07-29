@@ -85,6 +85,9 @@
     <Reference Include="AYTO.SendFile">
       <HintPath>..\..\..\DLLs\AYTOSendFileDLL\AYTOSendFileDLL\AYTO.SendFile\bin\Debug\AYTO.SendFile.dll</HintPath>
     </Reference>
+    <Reference Include="AYTO.UpdateData">
+      <HintPath>..\..\..\DLLs\AYTOUpdateDataDLL\AYTOUpdateDataDLL\AYTO.UpdateData\bin\Debug\AYTO.UpdateData.dll</HintPath>
+    </Reference>
     <Reference Include="AYTO.UpdateFile">
       <HintPath>..\..\..\DLLs\AYTOUpdateFileDLL\AYTOUpdateFileDLL\AYTO.UpdateFile\bin\Debug\AYTO.UpdateFile.dll</HintPath>
     </Reference>
