@@ -9,12 +9,16 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
 using System.Data.SqlClient;
+using AYTO.NewFile;
+using AYTO.Log;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class YeniBelgeEkrani : Form
     {
-        public int statusValue;
+        NewFileDLL newFileDLL = new NewFileDLL();
+        LogDLL logDLL = new LogDLL();
+
         public YeniBelgeEkrani()
         {
             InitializeComponent();
@@ -46,29 +50,122 @@ namespace AYTO_BYS_Projesi
         //Belge eklerken kullanılan parametrelerden birisi durumNo'dur. Tablodaki "Yeni" değerini döndürülmektedir.
         private int StatusNameTableValue()
         {
-            Program.dataBaseConnection.Close();
-            string statusNameCmdText = "SELECT durumNo FROM durumlar WHERE durumAdi = @durumAdi";
-            SqlCommand statusNameCmd = new SqlCommand(statusNameCmdText, Program.dataBaseConnection);
-            statusNameCmd.Parameters.AddWithValue("@durumAdi", "Yeni");
-            Program.dataBaseConnection.Open();
-            SqlDataReader statusNameReader = statusNameCmd.ExecuteReader();
-            if (statusNameReader.Read())
+            return 0;
+        }
+        //Yeni bir belge eklemeden önce yapılan kontroller bütünüdür.
+        private void NewFileChecks()
+        {
+            MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
+            //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
+            MessageBoxManager.Unregister();
+            //MeesageBox Özelleştirme
+            MessageBoxManager.Register();
+
+            string fileDirectory = NewFileDirectory_TextBox.Text.Trim();
+            string fileName = NewFileName_TextBox.Text.Trim();
+            //Amaç eklenen belgenin var olup olmadığını kontrol etmektir.
+            //Item1 = returnValue, Item2 = userName, Item3 = userSurname
+            var returnChecksTuple = newFileDLL.NewFile_AddButton_Check(UserId2, fileDirectory, fileName);
+
+            if (returnChecksTuple.Item1 == "false")
             {
-                statusValue = Convert.ToInt32(statusNameReader["durumNo"]);
+                String messageNewFile = "Belgeyi eklemek istiyor musunuz?";
+                String titleNewFile = "";
+                DialogResult yesNoResult = MessageBox.Show(messageNewFile, titleNewFile, yesNoButtons);
+                if (yesNoResult == DialogResult.Yes)
+                {
+                    //BELGE KAYDETME
+                    FileInfo fileInfo = new FileInfo(NewFileDirectory_TextBox.Text.Trim());
+
+                    if (fileInfo.Length < (Math.Pow(10, 7) * 1.5))
+                    {
+                        //Dosyayı server klasörüne kaydeder.
+                        string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\" + FileTypeLabel.Text;
+                        FileStream fileStream = File.OpenRead(fileDirectory);
+                        byte[] contents = new byte[fileStream.Length];
+                        fileStream.Read(contents, 0, (int)fileStream.Length);
+                        fileStream.Close();
+                        File.WriteAllBytes(serverPath, contents);
+
+                        //Belgenin kayıt edilmesi
+                        NewFileRegister(serverPath);
+                        AddNewFileEventH();
+                        logDLL.NewFileLog(UserId2, fileName);
+
+                        String messageAnotherNewFile = "Belge başarıyla eklendi. \n\nYeni bir belge eklemek istiyor musunuz?";
+                        DialogResult anotherResult = MessageBox.Show(messageAnotherNewFile, titleNewFile, yesNoButtons);
+                        if (anotherResult == DialogResult.No)
+                        {
+                            this.Close();
+                            MessageBoxManager.Unregister();
+                        }
+                        else
+                        {
+                            NewFileTitle_TextBox.Clear();
+                            NewFileDirectory_TextBox.Clear();
+                            NewFileName_TextBox.Clear();
+                            NewFileExplain_RichTextBox.Clear();
+                            NewFileDateTimePicker.Value = DateTime.Now;
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Dosya boyutu 15MB'den büyük!");
+                    }
+                }
+                else
+                {
+                    this.Show();
+                    MessageBoxManager.Unregister();
+                }
             }
+            //Böyle bir belge adı veya dizini varsa true döndürerek işlemi iptal eder.
             else
             {
-                Program.dataBaseConnection.Close();
-                SqlCommand addNewStatusCmd = new SqlCommand("INSERT INTO durumlar (durumAdi) VALUES ('Yeni')", Program.dataBaseConnection);
-                Program.dataBaseConnection.Open();
-                addNewStatusCmd.ExecuteNonQuery();
-                Program.dataBaseConnection.Close();
-                statusNameReader.Close();
-                StatusNameTableValue();
+                if (returnChecksTuple.Item1 == "existingFile")
+                {
+                    String messageExisting = ("Böyle bir belge var. \n\nBelge Adı: " + fileName + "\n\nBelge Dizini: " + fileDirectory + "\n\nVar olan belgeyi güncellemek ister misiniz?");
+                    String titleExisting = "Uyarı!";
+                    DialogResult updateFileFormResult = MessageBox.Show(messageExisting, titleExisting, yesNoButtons);
+                    MessageBoxManager.Unregister();
+                    if (updateFileFormResult == DialogResult.Yes)
+                    {
+                        //Var olan belgenin anahtarını çeker.
+                        string updateForm_belgeNo = newFileDLL.UpdateFormActions(fileName);
+                        BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(updateForm_belgeNo, UserId2, UserId2);
+                        if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
+                        {
+                            MessageBox.Show("Belge güncelleme penceresi zaten açık! \n\nÖnce açık olan pencereyi kapatın.", "Uyarı");
+                        }
+                        else
+                        {
+                            //updateFileForm.UpdateFileEventH += Deneme;
+                            this.Close();
+                            updateFileForm.Show();
+                        }
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Bu belge " + returnChecksTuple.Item2 + " " + returnChecksTuple.Item3 + " tarafından eklendi.");
+                    MessageBoxManager.Unregister();
+                }
             }
-            Program.dataBaseConnection.Close();
-            statusNameReader.Close();
-            return statusValue;
+            MessageBoxManager.Unregister();
+        }
+        //Belgenin kayıt edilmesi
+        private void NewFileRegister(string serverPath)
+        {
+            //Veritabanına bilgileri ekle
+
+            string registerFileTitle = NewFileTitle_TextBox.Text.Trim();
+            string registerFileName = NewFileName_TextBox.Text.Trim();
+            string registerFileDirectoy = NewFileDirectory_TextBox.Text.Trim();
+            string registerFileTypeLabel = FileTypeLabel.Text.Trim();
+            string registerFileExplain = NewFileExplain_RichTextBox.Text.Trim();
+            string registerDateTime = NewFileDateTimePicker.Text;
+
+            newFileDLL.NewFile_AddButton_Register(UserId2, registerFileTitle, registerFileName, registerFileDirectoy, registerFileTypeLabel, serverPath, registerFileExplain, registerDateTime);
         }
 
         private void YeniBelgeEkrani_Load(object sender, EventArgs e)
@@ -142,140 +239,7 @@ namespace AYTO_BYS_Projesi
 
         private void NewFile_AddButton_Click(object sender, EventArgs e)
         {
-            MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
-            //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
-            MessageBoxManager.Unregister();
-            //MeesageBox Özelleştirme
-            MessageBoxManager.Register();
-            //Sistem tarihleri, kullanıcının girdiği tarihi kontrol etmek amacıyla eklenmiştir. 
-            string systemDate = DateTime.Now.ToString("dd/MM/yyyy");
-            //Veritabanı bağlantısı aktif değilse aktif yap
-            Program.dataBaseConnection.Close();
-            string checkCmdText = "SELECT blg.belgeDizini, blg.belgeAdi, blg.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi FROM belgelerim AS blg INNER JOIN kullanicilar AS klnc ON blg.kullaniciNo = klnc.kullaniciNo WHERE blg.belgeDizini = @belgeDizini AND blg.belgeAdi = @belgeAdi";
-            SqlCommand checkCmd = new SqlCommand(checkCmdText, Program.dataBaseConnection);
-            checkCmd.Parameters.AddWithValue("@belgeDizini", NewFileDirectory_TextBox.Text.Trim());
-            checkCmd.Parameters.AddWithValue("@belgeAdi", NewFileName_TextBox.Text.Trim());
-            Program.dataBaseConnection.Open();
-            SqlDataReader checkCmdReader = checkCmd.ExecuteReader();
-            //Eğer böyle bir belge adı ya da dizini yok ise false koşulu çalışır. Varsa true koşulu çalışır ve belge güncelleme ya da değiştirme seçeneği sunar.
-            if (checkCmdReader.Read() == false)
-            {
-                Program.dataBaseConnection.Close();
-                String messageNewFile = "Belgeyi eklemek istiyor musunuz?";
-                String titleNewFile = "";
-                DialogResult yesNoResult = MessageBox.Show(messageNewFile, titleNewFile, yesNoButtons);
-                if (yesNoResult == DialogResult.Yes)
-                {
-                    //BELGE KAYDETME
-                    FileInfo fileInfo = new FileInfo(NewFileDirectory_TextBox.Text.Trim());
-
-                    if (fileInfo.Length < (Math.Pow(10, 7) * 1.5))
-                    {
-                        //Dosyayı server klasörüne kaydeder.
-                        string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\" + FileTypeLabel.Text;
-                        FileStream fileStream = File.OpenRead(NewFileDirectory_TextBox.Text.Trim());
-                        byte[] contents = new byte[fileStream.Length];
-                        fileStream.Read(contents, 0, (int)fileStream.Length);
-                        fileStream.Close();
-                        File.WriteAllBytes(serverPath, contents);
-
-                        //Veritabanına bilgileri ekle
-                        Program.dataBaseConnection.Close();
-                        string registerCmdText = "INSERT INTO belgelerim (kullaniciNo, belgeBasligi, belgeAdi, belgeDizini, belgeVeriTipiveAdi, belgeServerDizini, belgeAciklamasi, eklenmeTarihi, sistemEklenmeTarihi, durumNo) values (@kullaniciNo, @belgeBasligi, @belgeAdi, @belgeDizini, @belgeVeriTipiveAdi, @belgeServerDizini, @belgeAciklamasi, @eklenmeTarihi, @sistemEklenmeTarihi, @durumNo)";
-                        SqlCommand registerCmd = new SqlCommand(registerCmdText, Program.dataBaseConnection);
-
-                        registerCmd.Parameters.AddWithValue("@kullaniciNo", UserId2);
-                        registerCmd.Parameters.AddWithValue("@belgeBasligi", NewFileTitle_TextBox.Text.Trim());
-                        registerCmd.Parameters.AddWithValue("@belgeAdi", NewFileName_TextBox.Text.Trim());
-                        registerCmd.Parameters.AddWithValue("@belgeDizini", NewFileDirectory_TextBox.Text.Trim());
-                        registerCmd.Parameters.AddWithValue("@belgeVeriTipiveAdi", FileTypeLabel.Text.Trim());
-                        registerCmd.Parameters.AddWithValue("@belgeServerDizini", serverPath);
-                        registerCmd.Parameters.AddWithValue("@belgeAciklamasi", NewFileExplain_RichTextBox.Text.Trim());
-                        registerCmd.Parameters.AddWithValue("@eklenmeTarihi", DateTime.Parse(NewFileDateTimePicker.Text));
-                        registerCmd.Parameters.AddWithValue("@sistemEklenmeTarihi", DateTime.Parse(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")));
-                        registerCmd.Parameters.AddWithValue("@durumNo", StatusNameTableValue()); //Yeni eklenen belgeler her zaman Yeni olarak işaretlenir.
-                        Program.dataBaseConnection.Open();
-                        registerCmd.ExecuteNonQuery();
-                        AddNewFileEventH();
-                        NewFileLog(NewFileName_TextBox.Text.Trim());
-
-                        String messageAnotherNewFile = "Belge başarıyla eklendi. \n\nYeni bir belge eklemek istiyor musunuz?";
-                        DialogResult anotherResult = MessageBox.Show(messageAnotherNewFile, titleNewFile, yesNoButtons);
-                        if (anotherResult == DialogResult.No)
-                        {
-                            this.Close();
-                            MessageBoxManager.Unregister();
-                        }
-                        else
-                        {
-                            NewFileTitle_TextBox.Clear();
-                            NewFileDirectory_TextBox.Clear();
-                            NewFileName_TextBox.Clear();
-                            NewFileExplain_RichTextBox.Clear();
-                            NewFileDateTimePicker.Value = DateTime.Now;
-                        }
-                    }
-                    else
-                    {
-                        MessageBox.Show("Dosya boyutu 15MB'den büyük!");
-                    }
-                    Program.dataBaseConnection.Close();
-
-                }
-                else
-                {
-                    this.Show();
-                    MessageBoxManager.Unregister();
-                }
-                Program.dataBaseConnection.Close();
-            }
-            //Böyle bir belge adı veya dizini varsa true döndürerek işlemi iptal eder.
-            else
-            {
-                if(checkCmdReader["kullaniciNo"].ToString() == UserId2.ToString())
-                {
-                    String messageExisting = ("Böyle bir belge var. \n\nBelge Adı: " + NewFileName_TextBox.Text.Trim() + "\n\nBelge Dizini: " + NewFileDirectory_TextBox.Text.Trim() + "\n\nVar olan belgeyi güncellemek ister misiniz?");
-                    String titleExisting = "Uyarı!";
-                    DialogResult updateFileFormResult = MessageBox.Show(messageExisting, titleExisting, yesNoButtons);
-                    MessageBoxManager.Unregister();
-                    if (updateFileFormResult == DialogResult.Yes)
-                    {
-                        Program.dataBaseConnection.Close();
-                        string updateFileCmdText = "SELECT blg.belgeNo FROM belgelerim AS blg WHERE blg.belgeAdi = @belgeAdi";
-                        SqlCommand updateFileCmd = new SqlCommand(updateFileCmdText, Program.dataBaseConnection);
-                        updateFileCmd.Parameters.AddWithValue("@belgeAdi", NewFileName_TextBox.Text.Trim());
-                        Program.dataBaseConnection.Open();
-                        SqlDataReader updateFormReader = updateFileCmd.ExecuteReader();
-                        if (updateFormReader.Read())
-                        {
-                            MessageBoxManager.Unregister();
-                            MessageBoxManager.Register();
-                            string updateForm_belgeNo = updateFormReader["belgeNo"].ToString();
-                            BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(updateForm_belgeNo, UserId2, UserId2);
-                            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
-                            {
-                                MessageBox.Show("Belge güncelleme penceresi zaten açık! \n\nÖnce açık olan pencereyi kapatın.", "Uyarı");
-                            }
-                            else
-                            {
-                                //updateFileForm.UpdateFileEventH += Deneme;
-                                this.Close();
-                                updateFileForm.Show();
-                            }
-                        }
-                        updateFormReader.Close();
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Bu belge " + checkCmdReader["kullaniciAdi"] + " " + checkCmdReader["kullaniciSoyadi"] + " tarafından eklendi.");
-                    MessageBoxManager.Unregister();
-                }
-
-            }
-            MessageBoxManager.Unregister();
-            checkCmdReader.Close();
-            Program.dataBaseConnection.Close();
+            NewFileChecks();
         }
         //Changed  Textboxlara veri girilmesi halinde TextControlForButton metotu çalıştırılır.
         //NewFileTitle, NewFileDirectory, NewFileName, NewFileExplain
@@ -301,28 +265,6 @@ namespace AYTO_BYS_Projesi
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
-        }
-
-        private void NewFileLog(string fileName)
-        {
-            string fileNameDB = "";
-            Program.dataBaseConnection.Close();
-            SqlCommand fileNameCmd = new SqlCommand("SELECT belgeNo FROM belgelerim WHERE belgeAdi = @belgeAdi", Program.dataBaseConnection);
-            fileNameCmd.Parameters.AddWithValue("@belgeAdi", fileName);
-            Program.dataBaseConnection.Open();
-            SqlDataReader fileNameReader = fileNameCmd.ExecuteReader();
-            if (fileNameReader.Read())
-            {
-                fileNameDB = fileNameReader["belgeNo"].ToString();
-            }
-            fileNameReader.Close();
-            Program.dataBaseConnection.Close();
-            string logFilePath = @"C:\Users\Fatih\Desktop\ServerLogKaydi\AddNewFileLog.txt";
-            string writeText = "[" + DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") + "}: Yeni belge ekleyen Kullanıcı No: " + UserId2 + "\tEklenen Belge No: " + fileNameDB + "\t Belge Adı: " + fileName;
-
-            FileStream adminLogFS = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-            adminLogFS.Close();
-            File.AppendAllText(logFilePath, Environment.NewLine + writeText);
         }
     }
 }
