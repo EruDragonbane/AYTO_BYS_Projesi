@@ -11,11 +11,16 @@ using System.Net.Mail;
 using System.Data.SqlClient;
 using System.Security.Cryptography;
 using System.IO;
+using AYTO.NewData;
+using AYTO.Log;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class YeniVerilEkle : Form
     {
+        NewDataDLL newDataDLL = new NewDataDLL();
+        LogDLL logDLL = new LogDLL();
+
         public YeniVerilEkle()
         {
             InitializeComponent();
@@ -131,30 +136,57 @@ namespace AYTO_BYS_Projesi
             }
             MessageBoxManager.Unregister();
         }
-
         //Girilen verilerin veritabanında kontrolü
-        private void CheckUserMethod()
+        private void CheckDataMethod(string checkReturnValue)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
             MessageBoxManager.Unregister();
             //MeesageBox Özelleştirme
             MessageBoxManager.Register();
 
-            Program.dataBaseConnection.Close();
-            string checkCmdText = "SELECT klnc.kullaniciAdi FROM kullanicilar AS klnc WHERE klnc.kullaniciGiris = @kullaniciGiris";
-            SqlCommand checkCmd = new SqlCommand(checkCmdText, Program.dataBaseConnection);
-            checkCmd.Parameters.AddWithValue("@kullaniciGiris", AddNewUserID_CustomTextBox.Text.Trim());
-            Program.dataBaseConnection.Open();
-            SqlDataReader checkCmdReader = checkCmd.ExecuteReader();
-            if(checkCmdReader.Read() == false)
+            string newString = "";
+            if(TableName == "kullanicilar")
             {
-                String messageCheckFile = "Yeni kullanıcıyı eklemek istiyor musunuz?";
+                newString = "kullanıcı";
+            }
+            else if(TableName == "durumlar")
+            {
+                newString = "durum";
+            }
+            else if(TableName == "gorevler")
+            {
+                newString = "görev";
+            }
+            else
+            {
+                newString = "";
+            }
+
+            if(checkReturnValue == "false")
+            {
+                String messageCheckFile = "Yeni " + newString + " eklemek istiyor musunuz?";
                 String titleCheckFile = "";
                 MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
                 DialogResult yesNoResult = MessageBox.Show(messageCheckFile, titleCheckFile, yesNoButtons);
                 if(yesNoResult == DialogResult.Yes)
                 {
-                    AddNewUserMethod();
+                    if (TableName == "kullanicilar")
+                    {
+                        AddNewUserMethod();
+                    }
+                    else if (TableName == "durumlar")
+                    {
+                        AddNewStatusMethod();
+                    }
+                    else if (TableName == "gorevler")
+                    {
+                        AddNewPositionMethod();
+                    }
+                    else
+                    {
+                        MessageBox.Show("Hata: YeniVeriEkle- CheckDataMethod");
+                    }
+
                 }
                 else
                 {
@@ -164,157 +196,29 @@ namespace AYTO_BYS_Projesi
             }
             else
             {
-                MessageBox.Show("Böyle bir kullanıcı adı zaten var!");
+                MessageBox.Show("Böyle bir " + newString + " adı zaten var!");
                 this.Show();
             }
-            checkCmdReader.Close();
-            Program.dataBaseConnection.Close();
-            MessageBoxManager.Unregister();
-        }
-        private void CheckStatusMethod()
-        {
-            //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
-            MessageBoxManager.Unregister();
-            //MeesageBox Özelleştirme
-            MessageBoxManager.Register();
-
-            Program.dataBaseConnection.Close();
-            string checkCmdText = "SELECT drm.durumAdi FROM durumlar AS drm WHERE drm.durumAdi = @durumAdi";
-            SqlCommand checkCmd = new SqlCommand(checkCmdText, Program.dataBaseConnection);
-            checkCmd.Parameters.AddWithValue("@durumAdi", AddNewStatus_CustomTextBox.Text.Trim());
-            Program.dataBaseConnection.Open();
-            SqlDataReader checkCmdReader = checkCmd.ExecuteReader();
-            if (checkCmdReader.Read() == false)
-            {
-                String messageCheckFile = "Yeni durumu eklemek istiyor musunuz?";
-                String titleCheckFile = "";
-                MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
-                DialogResult yesNoResult = MessageBox.Show(messageCheckFile, titleCheckFile, yesNoButtons);
-                if (yesNoResult == DialogResult.Yes)
-                {
-                    AddNewStatusMethod();
-                }
-                else
-                {
-                    MessageBoxManager.Unregister();
-                    this.Show();
-                }
-            }
-            else
-            {
-                MessageBox.Show("Böyle bir durum adı zaten var!");
-                this.Show();
-            }
-            checkCmdReader.Close();
-            Program.dataBaseConnection.Close();
-            MessageBoxManager.Unregister();
-        }
-        private void CheckPositionMethod()
-        {
-            //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
-            MessageBoxManager.Unregister();
-            //MeesageBox Özelleştirme
-            MessageBoxManager.Register();
-
-            Program.dataBaseConnection.Close();
-            string checkCmdText = "SELECT grv.gorevAdi FROM gorevler AS grv WHERE grv.gorevAdi = @gorevAdi";
-            SqlCommand checkCmd = new SqlCommand(checkCmdText, Program.dataBaseConnection);
-            checkCmd.Parameters.AddWithValue("@gorevAdi", AddNewPosition_CustomTextBox.Text.Trim());
-            Program.dataBaseConnection.Open();
-            SqlDataReader checkCmdReader = checkCmd.ExecuteReader();
-            if (checkCmdReader.Read() == false)
-            {
-                String messageCheckFile = "Yeni görevi eklemek istiyor musunuz?";
-                String titleCheckFile = "";
-                MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
-                DialogResult yesNoResult = MessageBox.Show(messageCheckFile, titleCheckFile, yesNoButtons);
-                if (yesNoResult == DialogResult.Yes)
-                {
-                    AddNewPositionMethod();
-                }
-                else
-                {
-                    MessageBoxManager.Unregister();
-                    this.Show();
-                }
-            }
-            else
-            {
-                MessageBox.Show("Böyle bir görev adı zaten var!");
-                this.Show();
-            }
-            checkCmdReader.Close();
-            Program.dataBaseConnection.Close();
             MessageBoxManager.Unregister();
         }
 
-        //Verilerin veritabanına kaydedilmesi
-        private string ComboboxNameTableValue(int columnNo)
-        {
-            MessageBoxManager.Unregister();
-            MessageBoxManager.Register();
-            Program.dataBaseConnection.Close();
-            if(columnNo == 1)
-            {
-                columnName = "gorev";
-                tableName = "gorevler";
-                comboItem = AddNewUserPosition_ComboBox.SelectedItem.ToString();
-            }
-            else if(columnNo == 2)
-            {
-                columnName = "yetki";
-                tableName = "yetkiler";
-                comboItem = AddNewUserAuthority_ComboBox.SelectedItem.ToString();
-            }
-            else
-            {
-                MessageBox.Show("Error: ComboboxNameTableValue 1");
-            }
-            if (columnName != string.Empty || tableName != string.Empty || comboItem != string.Empty)
-            {
-                SqlCommand itemNoCmd = new SqlCommand("SELECT " + columnName + "No FROM " + tableName + " WHERE " + columnName + "Adi = @sutunAdi", Program.dataBaseConnection);
-                itemNoCmd.Parameters.AddWithValue("@sutunAdi", comboItem);
-                Program.dataBaseConnection.Open();
-                SqlDataReader itemNoReader = itemNoCmd.ExecuteReader();
-                if (itemNoReader.Read())
-                {
-                    columnValue = itemNoReader[columnName + "No"].ToString();
-                }
-                else
-                {
-                    MessageBox.Show("Error: ComboboxNameTableValue 2");
-                }
-                itemNoReader.Close();
-            }
-            else
-            {
-                MessageBox.Show("Error: ComboboxNameTableValue 3");
-            }
-            MessageBoxManager.Unregister();
-            Program.dataBaseConnection.Close();
-            return columnValue;
-        }
         private void AddNewUserMethod()
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-            Program.dataBaseConnection.Close();
-            string addNewUserCmdText = "INSERT INTO kullanicilar (kullaniciAdi, kullaniciSoyadi, kullaniciGiris, kullaniciParola, gorevNo, sistemKayitTarihi, kullaniciKurumu, yetkiNo) VALUES (@kullaniciAdi, @kullaniciSoyadi, @kullaniciGiris, @kullaniciParola, @gorevNo, @sistemKayitTarihi, @kullaniciKurumu, @yetkiNo)";
 
-            SqlCommand addNewUserCmd = new SqlCommand(addNewUserCmdText, Program.dataBaseConnection);
+            string userName = AddNewUserName_CustomTextBox.Text.Trim();
+            string userSurname = AddNewUserSurname_CustomTextBox.Text.Trim();
+            string userID = AddNewUserID_CustomTextBox.Text.Trim();
+            string userPassword = AddNewUserPass_CustomTextBox.Text.Trim();
+            string userCorp = AddNewUserCorp_CustomTextBox.Text.Trim();
+            string positionSelectedItem = AddNewUserPosition_ComboBox.SelectedItem.ToString();
+            string authoritySelectedItem = AddNewUserAuthority_ComboBox.SelectedItem.ToString();
 
-            addNewUserCmd.Parameters.AddWithValue("@kullaniciAdi", AddNewUserName_CustomTextBox.Text.Trim());
-            addNewUserCmd.Parameters.AddWithValue("@kullaniciSoyadi", AddNewUserSurname_CustomTextBox.Text.Trim());
-            addNewUserCmd.Parameters.AddWithValue("@kullaniciGiris", AddNewUserID_CustomTextBox.Text.Trim());
-            addNewUserCmd.Parameters.AddWithValue("@kullaniciParola", Mda5Hash(AddNewUserPass_CustomTextBox.Text.Trim()));
-            addNewUserCmd.Parameters.AddWithValue("@gorevNo", ComboboxNameTableValue(1));
-            addNewUserCmd.Parameters.AddWithValue("@sistemKayitTarihi", DateTime.Parse(DateTime.Now.ToString("dd/MM/yyyy HH:mm:ss")));
-            addNewUserCmd.Parameters.AddWithValue("@kullaniciKurumu", AddNewUserCorp_CustomTextBox.Text.Trim());
-            addNewUserCmd.Parameters.AddWithValue("@yetkiNo", ComboboxNameTableValue(2));
-            Program.dataBaseConnection.Open();
-            addNewUserCmd.ExecuteNonQuery();
+            newDataDLL.AddNewUser(userName, userSurname, userID, userPassword, userCorp, positionSelectedItem, authoritySelectedItem);
             AddNewDataEventH();
-            NewDataLog("Kullanıcı", "kullanici", "kullaniciGiris", AddNewUserID_CustomTextBox.Text.Trim());
+            //Log kaydı
+            logDLL.NewDataLog(TableName, AdminUserId2, "Kullanıcı", "kullanici", "kullaniciGiris", userID);
 
             String messageAnotherNewUser = "Yeni kullanıcı başarıyla kayıt edildi. \n\nYeni bir kullanıcı eklemek istiyor musunuz?";
             String titleNewUser = "";
@@ -335,22 +239,17 @@ namespace AYTO_BYS_Projesi
                 AddNewUserPosition_ComboBox.SelectedIndex = -1;
                 AddNewUserAuthority_ComboBox.SelectedIndex = -1;
             }
-            Program.dataBaseConnection.Close();
             MessageBoxManager.Unregister();
         }
         private void AddNewStatusMethod()
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-            Program.dataBaseConnection.Close();
-            string addNewStatusCmdText = "INSERT INTO durumlar (durumAdi) VALUES (@durumAdi)";
-            SqlCommand addNewStatusCmd = new SqlCommand(addNewStatusCmdText, Program.dataBaseConnection);
 
-            addNewStatusCmd.Parameters.AddWithValue("@durumAdi", AddNewStatus_CustomTextBox.Text.Trim());
-            Program.dataBaseConnection.Open();
-            addNewStatusCmd.ExecuteNonQuery();
+            string statusName = AddNewStatus_CustomTextBox.Text.Trim();
+            newDataDLL.AddNewStatus(statusName);
             AddNewDataEventH();
-            NewDataLog("Durum", "durum", "durumAdi", AddNewStatus_CustomTextBox.Text.Trim());
+            logDLL.NewDataLog(TableName, AdminUserId2, "Durum", "durum", "durumAdi", statusName);
 
             String messageAnotherNewUser = "Yeni durum başarıyla kayıt edildi. \n\nYeni bir durum eklemek istiyor musunuz?";
             String titleNewUser = "";
@@ -374,14 +273,11 @@ namespace AYTO_BYS_Projesi
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-            Program.dataBaseConnection.Close();
-            string addNewStatusCmdText = "INSERT INTO gorevler (gorevAdi) VALUES (@gorevAdi)";
-            SqlCommand addNewStatusCmd = new SqlCommand(addNewStatusCmdText, Program.dataBaseConnection);
-            addNewStatusCmd.Parameters.AddWithValue("@gorevAdi", AddNewPosition_CustomTextBox.Text.Trim());
-            Program.dataBaseConnection.Open();
-            addNewStatusCmd.ExecuteNonQuery();
+
+            string positionName = AddNewPosition_CustomTextBox.Text.Trim();
+            newDataDLL.AddNewPosition(positionName);
             AddNewDataEventH();
-            NewDataLog("Görev", "gorev", "gorevAdi", AddNewPosition_CustomTextBox.Text.Trim());
+            logDLL.NewDataLog(TableName, AdminUserId2, "Görev", "gorev", "gorevAdi", positionName);
 
             String messageAnotherNewUser = "Yeni görev başarıyla kayıt edildi. \n\nYeni bir görev eklemek istiyor musunuz?";
             String titleNewUser = "";
@@ -401,22 +297,12 @@ namespace AYTO_BYS_Projesi
             Program.dataBaseConnection.Close();
             MessageBoxManager.Unregister();
         }
-        //Girilen parolayı md5 ile şifreleyerek veritabanına ekler
-        public static string Mda5Hash(string pass)
-        {
-            MD5CryptoServiceProvider md5 = new MD5CryptoServiceProvider();
-            StringBuilder hashString = new StringBuilder();
-            byte[] hashArray = md5.ComputeHash(Encoding.UTF8.GetBytes(pass));
-            foreach (byte byteHash in hashArray)
-                hashString.Append(byteHash.ToString("x2"));
-            return hashString.ToString();
-        }
 
         private void KullaniciEkleme_Load(object sender, EventArgs e)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
             MessageBoxManager.Unregister();
-            
+
             MessageBoxManager.Yes = "Evet";
             MessageBoxManager.No = "Hayır";
             MessageBoxManager.OK = "Tamam";
@@ -439,13 +325,8 @@ namespace AYTO_BYS_Projesi
                 MessageBox.Show("Error: AddButton");
                 this.Show();
             }
-
-
-
-
             //Textboxların boş olması durumunda ekle butonu pasif kalır.
             TextControlForButton();
-
             //Groupboxların özelleştirilmesi
             if (TableName == "kullanicilar")
             {
@@ -491,9 +372,11 @@ namespace AYTO_BYS_Projesi
             }
             else
             {
+                MessageBoxManager.Register();
                 MessageBox.Show("Tablo ismi alınamadı");
                 this.Show();
             }
+            MessageBoxManager.Unregister();
         }
 
         private void AddNewData_CancelButton_Click(object sender, EventArgs e)
@@ -502,28 +385,13 @@ namespace AYTO_BYS_Projesi
         }
         private void AdminPage_AddNewDataButton_Click(object sender, EventArgs e)
         {
-            MessageBoxManager.Unregister();
-            MessageBoxManager.Register();
-            if (TableName == "kullanicilar")
-            {
-                CheckUserMethod();
-            }
-            else if (TableName == "durumlar")
-            {
-                CheckStatusMethod();
-            }
-            else if (TableName == "gorevler")
-            {
-                CheckPositionMethod();
-            }
-            else
-            {
-                MessageBox.Show("Error: AddButton");
-                this.Show();
-            }
-            MessageBoxManager.Unregister();
+            //userID = kullaniciGiris sütunu
+            string userID = AddNewUserID_CustomTextBox.Text.Trim();
+            string statusName = AddNewStatus_CustomTextBox.Text.Trim();
+            string positionName = AddNewPosition_CustomTextBox.Text.Trim();
+            string checkReturnValue = newDataDLL.CheckUser(TableName, userID, statusName, positionName);
+            CheckDataMethod(checkReturnValue);
         }
-
         //TextChanged ve SelectedIndexChanged Eventleri
         /*AddNewUserName, AddNewUserSurname, AddNewUserID, AddNewUserPass, AddNewUserPosition, AddNewUserAuthority,
          * AddNewUserCorp, AddNewStatus, AddNewPosition
@@ -541,38 +409,5 @@ namespace AYTO_BYS_Projesi
                 e.SuppressKeyPress = true;
             }
         }
-        //User, Status, Position
-        private void NewDataLog(string title, string columnName, string whereColumnName, string inputData)
-        {
-            string dataNo = "";
-            string  columnSecondName= "";
-            if(TableName == "kullanicilar")
-            {
-                columnSecondName = " ID: ";
-            }
-            else
-            {
-                columnSecondName = " Adı: ";
-            }
-
-            Program.dataBaseConnection.Close();
-            SqlCommand dataNoNoCmd = new SqlCommand("SELECT " + columnName + "No FROM " + TableName + " WHERE " + whereColumnName + "= @gelenVeri", Program.dataBaseConnection);
-            dataNoNoCmd.Parameters.AddWithValue("@gelenVeri", inputData);
-            Program.dataBaseConnection.Open();
-            SqlDataReader dataNoReader = dataNoNoCmd.ExecuteReader();
-            if (dataNoReader.Read())
-            {
-                dataNo = dataNoReader[columnName + "No"].ToString();
-            }
-            dataNoReader.Close();
-            Program.dataBaseConnection.Close();
-            string logFilePath = @"C:\Users\Fatih\Desktop\ServerLogKaydi\AdminLog\NewDataLog.txt";
-            string writeText = "[" + DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") + "]: " + title + " ekleyen Yetkili No: " + AdminUserId2 + "\tEklenen " + title + " No: " + dataNo + "\t" + title + columnSecondName + inputData;
-
-            FileStream adminLogFS = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-            adminLogFS.Close();
-            File.AppendAllText(logFilePath, Environment.NewLine + writeText);
-        }
-
     }
 }
