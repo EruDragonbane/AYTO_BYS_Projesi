@@ -9,11 +9,13 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.IO;
+using AYTO.MainPage;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class AnaEkran : Form
     {
+        MainPageDLL mainPageDLL = new MainPageDLL();
         //OleDbConnection dataBaseCon;
         SqlDataAdapter dataBaseAdapter;
         //SqlCommand dataBaseCmd;
@@ -100,13 +102,10 @@ namespace AYTO_BYS_Projesi
 
         private void UserIdCheckForPermission()
         {
-            Program.dataBaseConnection.Close();
-            string userCheckCmdText = "SELECT blg.kullaniciNo FROM belgelerim AS blg WHERE blg.belgeAdi = @belgeAdi";
-            SqlCommand userCheckCmd = new SqlCommand(userCheckCmdText, Program.dataBaseConnection);
-            userCheckCmd.Parameters.AddWithValue("@belgeAdi", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-            Program.dataBaseConnection.Open();
-            SqlDataReader userCheckReader = userCheckCmd.ExecuteReader();
-            if (userCheckReader.Read() && userCheckReader["kullaniciNo"].ToString() == UserId.ToString())
+            string currentCellValue = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
+            string returnValue = mainPageDLL.UserIdCheckForPermissin(currentCellValue, UserId);
+
+            if (returnValue == "true")
             {
                 MyFiles_FileActions_UpdateButton.Enabled = true;
                 MyFiles_FileActions_DeleteButton.Enabled = true;
@@ -116,8 +115,6 @@ namespace AYTO_BYS_Projesi
                 MyFiles_FileActions_UpdateButton.Enabled = false;
                 MyFiles_FileActions_DeleteButton.Enabled = false;
             }
-            userCheckReader.Close();
-            Program.dataBaseConnection.Close();
         }
 
         private void AnaEkran_Load(object sender, EventArgs e)
@@ -173,38 +170,40 @@ namespace AYTO_BYS_Projesi
         }
         private void MyFiles_DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
-            string selectedRowName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
-
-            Program.dataBaseConnection.Close();
-            string detailFileCmdText = "SELECT blg.belgeNo FROM belgelerim AS blg WHERE blg.belgeAdi = @belgeAdi";
-            SqlCommand detailFileCmd = new SqlCommand(detailFileCmdText, Program.dataBaseConnection);
-            detailFileCmd.Parameters.AddWithValue("@belgeAdi", selectedRowName);
-            Program.dataBaseConnection.Open();
-            SqlDataReader detailFileReader = detailFileCmd.ExecuteReader();
-            if (detailFileReader.Read())
+            MyFiles_DataGridView.ClearSelection();
+            if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
             {
-                string selectedRowFileNo = detailFileReader["belgeNo"].ToString();
-                BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, UserId);
-                //Pencere halihazırda aktif ise yeni pencere açmak
-                //yerine varolan pencereyi açar.
-                if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
-                {
-                    Application.OpenForms.OfType<Form>().First(f => f is BelgeDetayiEkrani).Activate();
-                }
-                else
-                {
-                    //Pencere konumunu ekran merkezine taşır.
-                    updateFileForm.StartPosition = FormStartPosition.CenterScreen;
-                    updateFileForm.Show();
-                    this.Show();
-                }
+                MessageBox.Show("Herhangi bir veri yok!");
+                //return;
             }
             else
             {
-                MessageBox.Show("Belge Seçilemedi");
+                string selectedRowName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
+                //Item1 = returnValue, Item2 = fileNo
+                var cellDoubleClickTuple = mainPageDLL.CellDoubleClick(selectedRowName);
+                if (cellDoubleClickTuple.Item1 == "true")
+                {
+                    string selectedRowFileNo = cellDoubleClickTuple.Item2;
+                    BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, UserId);
+                    //Pencere halihazırda aktif ise yeni pencere açmak
+                    //yerine varolan pencereyi açar.
+                    if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
+                    {
+                        Application.OpenForms.OfType<Form>().First(f => f is BelgeDetayiEkrani).Activate();
+                    }
+                    else
+                    {
+                        //Pencere konumunu ekran merkezine taşır.
+                        updateFileForm.StartPosition = FormStartPosition.CenterScreen;
+                        updateFileForm.Show();
+                        this.Show();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Belge Seçilemedi");
+                }
             }
-            detailFileReader.Close();
-            Program.dataBaseConnection.Close();
         }
         //Columheader'a tıklandığında eylemler penceresi pasif olmaktadır.
         private void MyFiles_DataGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
@@ -279,10 +278,12 @@ namespace AYTO_BYS_Projesi
             //yerine varolan pencereyi açar.
             if (Application.OpenForms.OfType<Form>().Any(f => f is YeniBelgeEkrani))
             {
+                FileSearch_CustomTextBox.Clear();
                 Application.OpenForms.OfType<Form>().First(f => f is YeniBelgeEkrani).Activate();
             }
             else
             {
+                FileSearch_CustomTextBox.Clear();
                 //Pencere konumunu ekran merkezine taşır.
                 newFileForm.StartPosition = FormStartPosition.CenterScreen;
                 newFileForm.AddNewFileEventH += RefreshAndFillDataGrid;
@@ -294,6 +295,7 @@ namespace AYTO_BYS_Projesi
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
+
             if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
             {
                 MessageBox.Show("Belge yok!");
@@ -302,25 +304,22 @@ namespace AYTO_BYS_Projesi
             else
             {
                 string selectedRowName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
-
-                Program.dataBaseConnection.Close();
-                string selectedFileCmdText = "SELECT blg.belgeNo FROM belgelerim AS blg WHERE blg.belgeAdi = @belgeAdi";
-                SqlCommand selectedFileCmd = new SqlCommand(selectedFileCmdText, Program.dataBaseConnection);
-                selectedFileCmd.Parameters.AddWithValue("@belgeAdi", selectedRowName);
-                Program.dataBaseConnection.Open();
-                SqlDataReader selectedFileReader = selectedFileCmd.ExecuteReader();
-                if (selectedFileReader.Read())
+                //Item1 = returnValue, Item2 = fileNo
+                var sendButtonClickTuple = mainPageDLL.SendButtonClick(selectedRowName);
+                if (sendButtonClickTuple.Item1 == "true")
                 {
-                    string selectedRowFileNo = selectedFileReader["belgeNo"].ToString();
+                    string selectedRowFileNo = sendButtonClickTuple.Item2;
                     BelgeGondermeEkrani sendFileForm = new BelgeGondermeEkrani(selectedRowFileNo, UserId);
                     //Pencere halihazırda aktif ise yeni pencere açmak
                     //yerine varolan pencereyi açar.
                     if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGondermeEkrani))
                     {
+                        FileSearch_CustomTextBox.Clear();
                         Application.OpenForms.OfType<Form>().First(f => f is BelgeGondermeEkrani).Activate();
                     }
                     else
                     {
+                        FileSearch_CustomTextBox.Clear();
                         //Pencere konumunu ekran merkezine taşır.
                         sendFileForm.StartPosition = FormStartPosition.CenterScreen;
                         sendFileForm.Show();
@@ -330,116 +329,135 @@ namespace AYTO_BYS_Projesi
                 {
                     MessageBox.Show("Belge Seçilemedi");
                 }
-                selectedFileReader.Close();
                 //return;
             }
             MessageBoxManager.Unregister();
-            Program.dataBaseConnection.Close();
         }
         private void MyFiles_FileActions_UpdateButton_Click(object sender, EventArgs e)
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-            if (MyFiles_DataGridView.CurrentRow.Cells[0] == null || MyFiles_DataGridView.CurrentRow.Cells[0].Value == DBNull.Value || string.IsNullOrWhiteSpace(MyFiles_DataGridView.CurrentRow.Cells[0].ToString()))
+            if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
             {
-                MessageBox.Show("Belge Seçilemedi");
+                MessageBox.Show("Herhangi bir veri yok!");
                 //return;
             }
             else
             {
-                string selectedRowName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
-
-                Program.dataBaseConnection.Close();
-                string selectedFileCmdText = "SELECT blg.belgeNo FROM belgelerim AS blg WHERE blg.belgeAdi = @belgeAdi";
-                SqlCommand selectedFileCmd = new SqlCommand(selectedFileCmdText, Program.dataBaseConnection);
-                selectedFileCmd.Parameters.AddWithValue("@belgeAdi", selectedRowName);
-                Program.dataBaseConnection.Open();
-                SqlDataReader selectedFileReader = selectedFileCmd.ExecuteReader();
-                if (selectedFileReader.Read())
+                if (MyFiles_DataGridView.CurrentRow.Cells[0] == null || MyFiles_DataGridView.CurrentRow.Cells[0].Value == DBNull.Value || string.IsNullOrWhiteSpace(MyFiles_DataGridView.CurrentRow.Cells[0].ToString()))
                 {
-                    string selectedRowFileNo = selectedFileReader["belgeNo"].ToString();
-                    BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(selectedRowFileNo, UserId, UserId);
-                    //Pencere halihazırda aktif ise yeni pencere açmak
-                    //yerine varolan pencereyi açar.
-                    if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
-                    {
-                        Application.OpenForms.OfType<Form>().First(f => f is BelgeGuncellemeEkrani).Activate();
-                    }
-                    else
-                    {
-                        //Pencere konumunu ekran merkezine taşır.
-                        updateFileForm.StartPosition = FormStartPosition.CenterScreen;
-                        updateFileForm.UpdateFileEventH += RefreshAndFillDataGrid;
-                        updateFileForm.Show();
-                        this.Show();
-                    }
+                    MessageBox.Show("Belge Seçilemedi");
+                    //return;
                 }
                 else
                 {
-                    MessageBox.Show("Belge Seçilemedi");
+                    string selectedRowName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
+
+                    Program.dataBaseConnection.Close();
+                    string selectedFileCmdText = "SELECT blg.belgeNo FROM belgelerim AS blg WHERE blg.belgeAdi = @belgeAdi";
+                    SqlCommand selectedFileCmd = new SqlCommand(selectedFileCmdText, Program.dataBaseConnection);
+                    selectedFileCmd.Parameters.AddWithValue("@belgeAdi", selectedRowName);
+                    Program.dataBaseConnection.Open();
+                    SqlDataReader selectedFileReader = selectedFileCmd.ExecuteReader();
+                    if (selectedFileReader.Read())
+                    {
+                        string selectedRowFileNo = selectedFileReader["belgeNo"].ToString();
+                        BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(selectedRowFileNo, UserId, UserId);
+                        //Pencere halihazırda aktif ise yeni pencere açmak
+                        //yerine varolan pencereyi açar.
+                        if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
+                        {
+                            FileSearch_CustomTextBox.Clear();
+                            Application.OpenForms.OfType<Form>().First(f => f is BelgeGuncellemeEkrani).Activate();
+                        }
+                        else
+                        {
+                            FileSearch_CustomTextBox.Clear();
+                            //Pencere konumunu ekran merkezine taşır.
+                            updateFileForm.StartPosition = FormStartPosition.CenterScreen;
+                            updateFileForm.UpdateFileEventH += RefreshAndFillDataGrid;
+                            updateFileForm.Show();
+                            this.Show();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Belge Seçilemedi");
+                    }
+                    selectedFileReader.Close();
+                    //return;
                 }
-                selectedFileReader.Close();
-                //return;
+                MessageBoxManager.Unregister();
+                Program.dataBaseConnection.Close();
             }
-            MessageBoxManager.Unregister();
-            Program.dataBaseConnection.Close();
         }
         //Belge Silme
         private void MyFiles_FileActions_DeleteButton_Click(object sender, EventArgs e)
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-            if (MyFiles_DataGridView.CurrentRow.Cells[0].Value == null || MyFiles_DataGridView.CurrentRow.Cells[0].Value == DBNull.Value || string.IsNullOrWhiteSpace(MyFiles_DataGridView.CurrentRow.Cells[0].ToString()))
+
+            if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
             {
-                MessageBox.Show("Belge Seçilemedi");
+                MessageBox.Show("Herhangi bir veri yok!");
                 //return;
             }
             else
             {
-                if (MyFiles_DataGridView.CurrentRow.Cells[0].Value.ToString() == string.Empty)
+                if (MyFiles_DataGridView.CurrentRow.Cells[0].Value == null || MyFiles_DataGridView.CurrentRow.Cells[0].Value == DBNull.Value || string.IsNullOrWhiteSpace(MyFiles_DataGridView.CurrentRow.Cells[0].ToString()))
                 {
-                    MessageBox.Show("Lütfen bir belge seçiniz.");
+                    MessageBox.Show("Belge Seçilemedi");
+                    //return;
                 }
                 else
                 {
-                    String deleteMessage = "Belgeyi silmek istediğinize emin misiniz?";
-                    String deleteTitle = "Uyarı!";
-                    MessageBoxButtons deleteButtons = MessageBoxButtons.YesNo;
-                    DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
-                    if (deleteResult == DialogResult.Yes)
+                    if (MyFiles_DataGridView.CurrentRow.Cells[0].Value.ToString() == string.Empty)
                     {
-                        string deletedFileInsertCmdText = "INSERT INTO silinenBelgeler (silinenKullaniciNo, silinenBelgeNo, silinenBelgeBasligi, silinenBelgeAdi, silinenBelgeDizini, silinenBelgeVeriTipiveAdi, silinenBelgeServerDizini, silinenBelgeAciklamasi, silinenEklenmeTarihi, silinenSistemEklenmeTarihi, silinenGuncellenmeTarihi, silinenSistemGuncellenmeTarihi, silinenGuncelleyenKisiNo, silinenDurumNo) SELECT kullaniciNo, belgeNo, belgeBasligi, belgeAdi, belgeDizini, belgeVeriTipiveAdi, belgeServerDizini, belgeAciklamasi, eklenmeTarihi, sistemEklenmeTarihi, guncellenmeTarihi, sistemGuncellenmeTarihi, guncelleyenKisiNo, durumNo FROM belgelerim WHERE belgeAdi = @gelenVeri";
-
-                        string deletedByCmdText = "UPDATE silinenBelgeler SET silenKisi = @silenKisi WHERE silinenBelgeAdi = @gelenVeri";
-
-                        string deleteFileCmdText = "DELETE FROM belgelerim WHERE belgeAdi = @belgeAdi";
-
-                        SqlCommand deletedFileInsertCmd = new SqlCommand(deletedFileInsertCmdText, Program.dataBaseConnection);
-                        deletedFileInsertCmd.Parameters.AddWithValue("@gelenVeri", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-                        Program.dataBaseConnection.Open();
-                        deletedFileInsertCmd.ExecuteNonQuery();
-                        Program.dataBaseConnection.Close();
-
-                        SqlCommand deletedByCmd = new SqlCommand(deletedByCmdText, Program.dataBaseConnection);
-                        deletedByCmd.Parameters.AddWithValue("@silenKisi", UserId);
-                        deletedByCmd.Parameters.AddWithValue("@gelenVeri", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-                        Program.dataBaseConnection.Open();
-                        deletedByCmd.ExecuteNonQuery();
-                        Program.dataBaseConnection.Close();
-
-                        SqlCommand deleteFileCmd = new SqlCommand(deleteFileCmdText, Program.dataBaseConnection);
-                        deleteFileCmd.Parameters.AddWithValue("@belgeAdi", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-                        Program.dataBaseConnection.Open();
-                        deleteFileCmd.ExecuteNonQuery();
-
-                        NormalUserLog("delete", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-                        RefreshAndFillDataGrid();
+                        MessageBox.Show("Lütfen bir belge seçiniz.");
                     }
+                    else
+                    {
+                        String deleteMessage = "Belgeyi silmek istediğinize emin misiniz?";
+                        String deleteTitle = "Uyarı!";
+                        MessageBoxButtons deleteButtons = MessageBoxButtons.YesNo;
+                        DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
+                        if (deleteResult == DialogResult.Yes)
+                        {
+                            string deletedFileInsertCmdText = "INSERT INTO silinenBelgeler (silinenKullaniciNo, silinenBelgeNo, silinenBelgeBasligi, silinenBelgeAdi, silinenBelgeDizini, silinenBelgeVeriTipiveAdi, silinenBelgeServerDizini, silinenBelgeAciklamasi, silinenEklenmeTarihi, silinenSistemEklenmeTarihi, silinenGuncellenmeTarihi, silinenSistemGuncellenmeTarihi, silinenGuncelleyenKisiNo, silinenDurumNo) SELECT kullaniciNo, belgeNo, belgeBasligi, belgeAdi, belgeDizini, belgeVeriTipiveAdi, belgeServerDizini, belgeAciklamasi, eklenmeTarihi, sistemEklenmeTarihi, guncellenmeTarihi, sistemGuncellenmeTarihi, guncelleyenKisiNo, durumNo FROM belgelerim WHERE belgeAdi = @gelenVeri";
+
+                            string deletedByCmdText = "UPDATE silinenBelgeler SET silenKisi = @silenKisi WHERE silinenBelgeAdi = @gelenVeri";
+
+                            string deleteFileCmdText = "DELETE FROM belgelerim WHERE belgeAdi = @belgeAdi";
+
+                            SqlCommand deletedFileInsertCmd = new SqlCommand(deletedFileInsertCmdText, Program.dataBaseConnection);
+                            deletedFileInsertCmd.Parameters.AddWithValue("@gelenVeri", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
+                            Program.dataBaseConnection.Open();
+                            deletedFileInsertCmd.ExecuteNonQuery();
+                            Program.dataBaseConnection.Close();
+
+                            SqlCommand deletedByCmd = new SqlCommand(deletedByCmdText, Program.dataBaseConnection);
+                            deletedByCmd.Parameters.AddWithValue("@silenKisi", UserId);
+                            deletedByCmd.Parameters.AddWithValue("@gelenVeri", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
+                            Program.dataBaseConnection.Open();
+                            deletedByCmd.ExecuteNonQuery();
+                            Program.dataBaseConnection.Close();
+
+                            SqlCommand deleteFileCmd = new SqlCommand(deleteFileCmdText, Program.dataBaseConnection);
+                            deleteFileCmd.Parameters.AddWithValue("@belgeAdi", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
+                            Program.dataBaseConnection.Open();
+                            deleteFileCmd.ExecuteNonQuery();
+
+                            NormalUserLog("delete", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
+                            RefreshAndFillDataGrid();
+                        }
+                    }
+                    //return;
                 }
-                //return;
+                UserIdCheckForPermission();
+                MyFiles_DataGridView.ClearSelection();
+                MessageBoxManager.Unregister();
+                Program.dataBaseConnection.Close();
             }
-            MessageBoxManager.Unregister();
-            Program.dataBaseConnection.Close();
         }
         //Eylemler Penceresi İptal Etme
         private void MyFiles_FileActions_CancelButton_Click(object sender, EventArgs e)
@@ -462,7 +480,7 @@ namespace AYTO_BYS_Projesi
             MyFiles_FileActions_UpdateButton.Enabled = false;
             MyFiles_FileActions_DeleteButton.Enabled = false;
             MyFiles_FileActions_CancelButton.Enabled = false;
-
+            FileSearch_CustomTextBox.Clear();
             MyFiles_DataGridView.ClearSelection();
         }
         //Arama ve Filtreleme

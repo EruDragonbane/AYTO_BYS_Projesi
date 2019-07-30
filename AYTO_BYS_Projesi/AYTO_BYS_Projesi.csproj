@@ -82,6 +82,9 @@
     <Reference Include="AYTO.Login">
       <HintPath>..\..\..\DLLs\AYTOLoginDLL\AYTOLoginDLL\AYTO.Login\bin\Debug\AYTO.Login.dll</HintPath>
     </Reference>
+    <Reference Include="AYTO.MainPage">
+      <HintPath>..\..\..\DLLs\AYTOMainPageDLL\AYTOMainPageDLL\AYTO.MainPage\bin\Debug\AYTO.MainPage.dll</HintPath>
+    </Reference>
     <Reference Include="AYTO.NewData">
       <HintPath>..\..\..\DLLs\AYTONewDataDLL\AYTONewDataDLL\AYTO.NewData\bin\Debug\AYTO.NewData.dll</HintPath>
     </Reference>

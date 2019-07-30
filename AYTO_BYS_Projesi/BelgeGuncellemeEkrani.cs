@@ -71,7 +71,8 @@ namespace AYTO_BYS_Projesi
             UpdateFileName_TextBox.Text = textGridTuple.Item3;
             UpdateFileExplain_RichTextBox.Text = textGridTuple.Item4;
             UpdateFileAddedDateTimePicker.Text = textGridTuple.Item5;
-            UpdateFileStatus_ComboBox.Text = textGridTuple.Item6;
+            UpdateFileStatus_ComboBox.SelectedItem = textGridTuple.Item6;
+
         }
         //Combobox'u durumlar ile doldurur.
         private void ComboboxFill()
