@@ -218,6 +218,7 @@
             this.AdminPage_DataGridView.Size = new System.Drawing.Size(972, 336);
             this.AdminPage_DataGridView.TabIndex = 1;
             this.AdminPage_DataGridView.TabStop = false;
+            this.AdminPage_DataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.AdminPage_DataGridView_CellDoubleClick);
             // 
             // tableLayoutPanel3
             // 

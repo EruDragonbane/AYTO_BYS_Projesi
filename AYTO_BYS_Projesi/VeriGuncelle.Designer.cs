@@ -348,6 +348,7 @@
             this.UpdateData_CancelButton.TabIndex = 12;
             this.UpdateData_CancelButton.Text = "İptal Et";
             this.UpdateData_CancelButton.UseVisualStyleBackColor = true;
+            this.UpdateData_CancelButton.Click += new System.EventHandler(this.UpdateData_CancelButton_Click);
             // 
             // AdminPage_UpdateDataButton
             // 

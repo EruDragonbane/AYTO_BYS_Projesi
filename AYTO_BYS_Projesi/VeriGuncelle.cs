@@ -122,7 +122,7 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Register();
 
             string status = UpdateStatus_CustomTextBox.Text.Trim();
-            string position = UpdatePosition_CustomTextBox.Text.Trim();
+            string position = UpdateUserPosition_ComboBox.Text.Trim();
             string userAuthority = UpdateUserAuthority_ComboBox.Text.Trim();
             string userName = UpdateUserName_CustomTextBox.Text.Trim();
             string userSurname = UpdateUserSurname_CustomTextBox.Text.Trim();
@@ -329,6 +329,11 @@ namespace AYTO_BYS_Projesi
         private void AdminPage_UpdateDataButton_Click(object sender, EventArgs e)
         {
             UpdateDataMethod();
+        }
+
+        private void UpdateData_CancelButton_Click(object sender, EventArgs e)
+        {
+            this.Close();
         }
     }
 }

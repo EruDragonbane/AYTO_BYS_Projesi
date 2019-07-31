@@ -243,7 +243,6 @@
             this.UpdateFileStatus_ComboBox.Name = "UpdateFileStatus_ComboBox";
             this.UpdateFileStatus_ComboBox.Size = new System.Drawing.Size(120, 28);
             this.UpdateFileStatus_ComboBox.TabIndex = 8;
-            this.UpdateFileStatus_ComboBox.TabStop = false;
             this.UpdateFileStatus_ComboBox.SelectedIndexChanged += new System.EventHandler(this.TextBoxTextChanged_ComboboxSelectedIndexChanged);
             // 
             // UpdateFileUpdateDateTimePicker

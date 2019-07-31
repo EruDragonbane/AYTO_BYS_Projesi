@@ -172,6 +172,9 @@ namespace AYTO_BYS_Projesi
         }
         private void MyFiles_DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+
             MyFiles_DataGridView.ClearSelection();
             if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
             {
@@ -206,6 +209,7 @@ namespace AYTO_BYS_Projesi
                     MessageBox.Show("Belge Seçilemedi");
                 }
             }
+            MessageBoxManager.Unregister();
         }
         //Columheader'a tıklandığında eylemler penceresi pasif olmaktadır.
         private void MyFiles_DataGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)

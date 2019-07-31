@@ -78,6 +78,7 @@ namespace AYTO_BYS_Projesi
             filesListAdapter.Fill(dataSet, "belgelerim");
             AdminPage_DataGridView.DataSource = dataSet.Tables["belgelerim"];
             filesListAdapter.Dispose();
+            
             // Data Sütun İsimlendirme
             AdminPage_DataGridView.Columns[0].HeaderText = "Başlık";
             AdminPage_DataGridView.Columns[1].HeaderText = "Belge Adı";
@@ -141,7 +142,7 @@ namespace AYTO_BYS_Projesi
         private void DeletedUserList()
         {
             Program.dataBaseConnection.Close();
-            string deletedUserListAdapterText = "SELECT  klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLklnc.silinenKullaniciNo, SLklnc.silinenKullaniciAdi + ' ' +SLklnc.silinenKullaniciSoyadi AS SLklncAdSoyad, grv.gorevAdi, SLklnc.silinenKullaniciKurumu FROM (silinenKullanicilar AS SLklnc INNER JOIN gorevler AS grv ON SLklnc.silinenGorevNo = grv.gorevNo) INNER JOIN kullanicilar AS klnc ON SLklnc.silenKisi = klnc.kullaniciNo ORDER BY SLklnc.silinenKullaniciNo";
+            string deletedUserListAdapterText = "SELECT  klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLklnc.silinenKullaniciNo, SLklnc.silinenKullaniciAdi + ' ' +SLklnc.silinenKullaniciSoyadi AS SLklncAdSoyad, grv.gorevAdi, SLklnc.silinenKullaniciKurumu, SLklnc.silinmeTarihi FROM (silinenKullanicilar AS SLklnc INNER JOIN gorevler AS grv ON SLklnc.silinenGorevNo = grv.gorevNo) INNER JOIN kullanicilar AS klnc ON SLklnc.silenKisi = klnc.kullaniciNo ORDER BY SLklnc.silinenKullaniciNo";
 
             SqlDataAdapter deletedUserListAdapter = new SqlDataAdapter(deletedUserListAdapterText, Program.dataBaseConnection);
             Program.dataBaseConnection.Open();
@@ -155,6 +156,7 @@ namespace AYTO_BYS_Projesi
             AdminPage_DataGridView.Columns[2].HeaderText = "Silinen Kullanıcı";
             AdminPage_DataGridView.Columns[3].HeaderText = "Görevi";
             AdminPage_DataGridView.Columns[4].HeaderText = "Kurumu";
+            AdminPage_DataGridView.Columns[5].HeaderText = "Silinme Tarihi";
             AdminPage_DataGridView.Columns[0].HeaderCell.Style.Font = new Font("Microsoft Sans Serif",9F,FontStyle.Bold);
 
             Program.dataBaseConnection.Close();
@@ -167,7 +169,7 @@ namespace AYTO_BYS_Projesi
         private void DeletedFilesList()
         {
             Program.dataBaseConnection.Close();
-            string deletedfilesListAdapterText = "SELECT klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLblg.silinenBelgeNo, SLblg.silinenBelgeAdi, SLblg.silinenSistemEklenmeTarihi, SLblg.silinenSistemGuncellenmeTarihi FROM silinenBelgeler AS SLblg INNER JOIN kullanicilar AS klnc ON SLblg.silenKisi = klnc.kullaniciNo ORDER BY SLblg.silinenBelgeNo";
+            string deletedfilesListAdapterText = "SELECT klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLblg.silinenBelgeNo, SLblg.silinenBelgeAdi, SLblg.silinenSistemEklenmeTarihi, SLblg.silinenSistemGuncellenmeTarihi, SLblg.silinmeTarihi FROM silinenBelgeler AS SLblg INNER JOIN kullanicilar AS klnc ON SLblg.silenKisi = klnc.kullaniciNo ORDER BY SLblg.silinenBelgeNo";
 
             SqlDataAdapter deletedFilesListAdapter = new SqlDataAdapter(deletedfilesListAdapterText, Program.dataBaseConnection);
             Program.dataBaseConnection.Open();
@@ -181,6 +183,7 @@ namespace AYTO_BYS_Projesi
             AdminPage_DataGridView.Columns[2].HeaderText = "Silinen Belge Adı";
             AdminPage_DataGridView.Columns[3].HeaderText = "Eklenme Tarihi";
             AdminPage_DataGridView.Columns[4].HeaderText = "Güncellenme Tarihi";
+            AdminPage_DataGridView.Columns[5].HeaderText = "Silinme Tarihi";
             AdminPage_DataGridView.Columns[0].HeaderCell.Style.Font =new Font("Microsoft Sans Seris", 9F, FontStyle.Bold);
 
             Program.dataBaseConnection.Close();
@@ -305,7 +308,7 @@ namespace AYTO_BYS_Projesi
                 }
                 else
                 {
-                    MessageBox.Show("Hata: AdminPanel - SearchandFillDataGrid");
+                    this.Show();
                 }
             }
             else
@@ -448,6 +451,54 @@ namespace AYTO_BYS_Projesi
             //    Application.Exit();
             //}   
         }
+        private void AdminPage_DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+
+            if (tableName == "belgelerim")
+            {
+                AdminPage_DataGridView.ClearSelection();
+                if (AdminPage_DataGridView.Rows == null || AdminPage_DataGridView.Rows.Count == 0)
+                {
+                    MessageBox.Show("Herhangi bir veri yok!");
+                    //return;
+                }
+                else
+                {
+                    string selectedRowName = AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString();
+                    //Item1 = returnValue, Item2 = fileNo
+                    var cellDoubleClickTuple = adminPageDLL.CellDoubleClick(selectedRowName);
+                    if (cellDoubleClickTuple.Item1 == "true")
+                    {
+                        string selectedRowFileNo = cellDoubleClickTuple.Item2;
+                        BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, AdminUserId);
+                        //Pencere halihazırda aktif ise yeni pencere açmak
+                        //yerine varolan pencereyi açar.
+                        if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
+                        {
+                            Application.OpenForms.OfType<Form>().First(f => f is BelgeDetayiEkrani).Activate();
+                        }
+                        else
+                        {
+                            //Pencere konumunu ekran merkezine taşır.
+                            updateFileForm.StartPosition = FormStartPosition.CenterScreen;
+                            updateFileForm.Show();
+                            this.Show();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Belge Seçilemedi");
+                    }
+                }
+                MessageBoxManager.Unregister();
+            }
+            else
+            {
+                this.Show();
+            }
+        }
         private void SignOutToolStripMenuItem_Click(object sender, EventArgs e)
         {
             GirisEkrani loginForm = new GirisEkrani();
@@ -464,11 +515,13 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Ad Soyad");
             AdminPanelSearch_ComboBox.Items.Add("Görev");
             AdminPanelSearch_ComboBox.Items.Add("Kurum");
+            AdminPanelSearch_ComboBox.SelectedIndex = 0;
             AdminPanelSearch_ComboBox.Enabled = true;
             InactiveOrActiveUser_Button.Enabled = true;
             InactiveOrActiveUser_Button.Visible = true;
             EnabledVisibleTrueItems();
             UsersList();
+            AdminPage_DataGridView.ClearSelection();
         }
 
         private void BelgelerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -479,11 +532,13 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Başlık");
             AdminPanelSearch_ComboBox.Items.Add("Belge Adı");
             AdminPanelSearch_ComboBox.Items.Add("Belge Sahibi");
+            AdminPanelSearch_ComboBox.SelectedIndex = 0;
             AdminPanelSearch_ComboBox.Enabled = true;
             InactiveOrActiveUser_Button.Enabled = false;
             InactiveOrActiveUser_Button.Visible = false;
             EnabledVisibleTrueItems();
             FilesList();
+            AdminPage_DataGridView.ClearSelection();
         }
 
         private void DurumlarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -495,6 +550,7 @@ namespace AYTO_BYS_Projesi
             InactiveOrActiveUser_Button.Visible = false;
             EnabledVisibleTrueItems();
             FileStatusList();
+            AdminPage_DataGridView.ClearSelection();
         }
 
         private void GörevlerToolStripMenuItem_Click(object sender, EventArgs e)
@@ -506,6 +562,7 @@ namespace AYTO_BYS_Projesi
             InactiveOrActiveUser_Button.Visible = false;
             EnabledVisibleTrueItems();
             PositionList();
+            AdminPage_DataGridView.ClearSelection();
         }
         //Silinen Veriler
         private void SilinenKullanıcılarToolStripMenuItem_Click(object sender, EventArgs e)
@@ -517,6 +574,7 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Silen Kişi");
             DeletedDataEnabledVisibleItems();
             DeletedUserList();
+            AdminPage_DataGridView.ClearSelection();
         }
 
         private void SilinenBelgelerToolStripMenuItem1_Click(object sender, EventArgs e)
@@ -528,6 +586,7 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Silen Kişi");
             DeletedDataEnabledVisibleItems();
             DeletedFilesList();
+            AdminPage_DataGridView.ClearSelection();
         }
 
         private void AdminPanel_AddButton_Click(object sender, EventArgs e)
@@ -576,7 +635,6 @@ namespace AYTO_BYS_Projesi
         }
         private void AdminPanel_UpdateButton_Click(object sender, EventArgs e)
         {
-            string currentCellValue = AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString();
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
             if (AdminPage_DataGridView.Rows == null || AdminPage_DataGridView.Rows.Count == 0)
@@ -586,10 +644,11 @@ namespace AYTO_BYS_Projesi
             }
             else
             {
+                string currentCellValue = AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString();
                 if (tableName == "belgelerim")
                 {
                     //Item1 = returnValue, Item2 = selectedRowFileNo, Item3 = selectedRowUserNo
-                    var updateFileTuple = adminPageDLL.AdminUpdateFile(AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString());
+                    var updateFileTuple = adminPageDLL.AdminUpdateFile(currentCellValue);
                     if(updateFileTuple.Item1 == "true")
                     {
                         BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(updateFileTuple.Item2, updateFileTuple.Item3, AdminUserId);
