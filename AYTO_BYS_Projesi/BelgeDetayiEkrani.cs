@@ -9,14 +9,16 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.IO;
-using System.Data.SqlClient;
-using AYTO.SendFile;
+using AYTO.FileDetail;
+using AYTO.Log;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class BelgeDetayiEkrani : Form
     {
-        SendFileDLL sendFileDLL = new SendFileDLL();
+        FileDetailDLL fileDetailDLL = new FileDetailDLL();
+        LogDLL logDLL = new LogDLL();
+
         public BelgeDetayiEkrani()
         {
             InitializeComponent();
@@ -31,13 +33,14 @@ namespace AYTO_BYS_Projesi
         public int UserId5 { get; set; }
         private void LabelGridFromDataGridView()
         {
-            var labelGridTuple = sendFileDLL.LabelGridFromDataGridView(BelgeNo);
+            //Item1 = fileTitle, Item2 = fileName, Item3 = fileExplain, Item4 = fileDate, Item5 = addedFromUser
+            var labelGridTuple = fileDetailDLL.LabelGridFromDataGridView(BelgeNo);
             
             DetailFile_FileTitleLabel.Text = labelGridTuple.Item1;
             DetailFile_FileNameLinkLabel.Text = labelGridTuple.Item2;
             DetailFile_FileExplain_RichTextBox.Text = labelGridTuple.Item3;
             DetailFile_FileDateLabel.Text = labelGridTuple.Item4;
-            DetailFile_SendFromUserLabel.Text = labelGridTuple.Item5;
+            DetailFile_AddedFromUserLabel.Text = labelGridTuple.Item5;
         }
         private void DetailFileForm_SendFileButton_Click(object sender, EventArgs e)
         {
@@ -74,7 +77,7 @@ namespace AYTO_BYS_Projesi
 
         private void DetailFile_FileNameLinkLabel_LinkClicked(object sender, LinkLabelLinkClickedEventArgs e)
         {
-            sendFileDLL.LinkClicked_OpenFileEvent(BelgeNo);
+            fileDetailDLL.LinkClicked_OpenFileEvent(BelgeNo);
         }
 
         private void DetailFileForm_CancelButton_Click(object sender, EventArgs e)
@@ -86,44 +89,31 @@ namespace AYTO_BYS_Projesi
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-            Program.dataBaseConnection.Close();
-            string fileNameCmdText = "SELECT blg.belgeAdi, klnc.kullaniciGiris, blg.belgeVeriTipiveAdi, blg.belgeServerDizini FROM belgelerim AS blg INNER JOIN kullanicilar AS klnc ON blg.kullaniciNo = klnc.kullaniciNo WHERE belgeNo = @belgeNo";
-            SqlCommand fileNameCmd = new SqlCommand(fileNameCmdText, Program.dataBaseConnection);
-            fileNameCmd.Parameters.AddWithValue("@belgeNo", BelgeNo);
-            Program.dataBaseConnection.Open();
-            SqlDataReader fileNameCmdReader = fileNameCmd.ExecuteReader();
-            if(fileNameCmdReader.Read())
+            //Item1 = returnValue, Item2 = fileTypeAndName, Item3 = fileDirectory
+            var downloadFileTuple = fileDetailDLL.DownloadButtonClick(BelgeNo);
+            if(downloadFileTuple.Item1 == "true")
             {
-                SaveFileDialog saveFileFromServer = new SaveFileDialog();
-                saveFileFromServer.CreatePrompt = true;
-                saveFileFromServer.RestoreDirectory = true;
-                saveFileFromServer.Filter = "All files (*.*)|*.*";
-                saveFileFromServer.FileName = fileNameCmdReader["belgeVeriTipiveAdi"].ToString();
+                SaveFileDialog saveFileFromServer = new SaveFileDialog
+                {
+                    CreatePrompt = true,
+                    RestoreDirectory = true,
+                    Filter = "All files (*.*)|*.*",
+                    FileName = downloadFileTuple.Item2
+                };
 
                 if (saveFileFromServer.ShowDialog() == DialogResult.OK)
                 {
                     //Dosyayı, kullanıcının seçtiği konuma kaydeder.
-                    string serverPath = fileNameCmdReader["belgeServerDizini"].ToString();
+                    string serverPath = downloadFileTuple.Item3;
                     FileStream saveFileStream = File.OpenRead(serverPath);
                     byte[] contents = new byte[saveFileStream.Length];
                     saveFileStream.Read(contents, 0, (int)saveFileStream.Length);
                     saveFileStream.Close();
                     File.WriteAllBytes(saveFileFromServer.FileName, contents);
                 }
-                DownloadLog(fileNameCmdReader["belgeVeriTipiveAdi"].ToString(), fileNameCmdReader["kullaniciGiris"].ToString());
+                logDLL.DownloadLog(UserId5, BelgeNo, downloadFileTuple.Item2);
             }
             MessageBoxManager.Unregister();
-            fileNameCmdReader.Close();
-            Program.dataBaseConnection.Close();
-        }
-
-        private void DownloadLog(string fileName, string userIdName)
-        {
-            string logFilePath = @"C:\Users\Fatih\Desktop\ServerLogKaydi\DownloadFileLog.txt";
-            string writeText = "[" + DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") + "]: Dosyayı indiren Kullanıcı No: " + UserId5 + "\tKullanıcı ID: " + userIdName + "\t İndirilen Dosya No: " + BelgeNo + "\tBelge Adı: " + fileName;
-            FileStream adminLogFS = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-            adminLogFS.Close();
-            File.AppendAllText(logFilePath, Environment.NewLine + writeText);
         }
     }
 }

@@ -33,7 +33,7 @@
             this.DetailFile_FileTitleLabel = new System.Windows.Forms.Label();
             this.DetailFileForm_CancelButton = new System.Windows.Forms.Button();
             this.DetailFile_FileDateLabel = new System.Windows.Forms.Label();
-            this.DetailFile_SendFromUserLabel = new System.Windows.Forms.Label();
+            this.DetailFile_AddedFromUserLabel = new System.Windows.Forms.Label();
             this.DetailFile_FileExplain_RichTextBox = new System.Windows.Forms.RichTextBox();
             this.label1 = new System.Windows.Forms.Label();
             this.label2 = new System.Windows.Forms.Label();
@@ -91,14 +91,14 @@
             this.DetailFile_FileDateLabel.TabIndex = 7;
             this.DetailFile_FileDateLabel.Text = "Gün İsmi, Gün/Ay/Yıl, Saat";
             // 
-            // DetailFile_SendFromUserLabel
+            // DetailFile_AddedFromUserLabel
             // 
-            this.DetailFile_SendFromUserLabel.AutoSize = true;
-            this.DetailFile_SendFromUserLabel.Location = new System.Drawing.Point(12, 71);
-            this.DetailFile_SendFromUserLabel.Name = "DetailFile_SendFromUserLabel";
-            this.DetailFile_SendFromUserLabel.Size = new System.Drawing.Size(73, 13);
-            this.DetailFile_SendFromUserLabel.TabIndex = 8;
-            this.DetailFile_SendFromUserLabel.Text = "Gönderen Kişi";
+            this.DetailFile_AddedFromUserLabel.AutoSize = true;
+            this.DetailFile_AddedFromUserLabel.Location = new System.Drawing.Point(12, 71);
+            this.DetailFile_AddedFromUserLabel.Name = "DetailFile_AddedFromUserLabel";
+            this.DetailFile_AddedFromUserLabel.Size = new System.Drawing.Size(64, 13);
+            this.DetailFile_AddedFromUserLabel.TabIndex = 8;
+            this.DetailFile_AddedFromUserLabel.Text = "Ekleyen Kişi";
             // 
             // DetailFile_FileExplain_RichTextBox
             // 
@@ -155,7 +155,7 @@
             this.Controls.Add(this.label2);
             this.Controls.Add(this.label1);
             this.Controls.Add(this.DetailFile_FileExplain_RichTextBox);
-            this.Controls.Add(this.DetailFile_SendFromUserLabel);
+            this.Controls.Add(this.DetailFile_AddedFromUserLabel);
             this.Controls.Add(this.DetailFile_FileDateLabel);
             this.Controls.Add(this.DetailFileForm_CancelButton);
             this.Controls.Add(this.DetailFile_FileTitleLabel);
@@ -179,7 +179,7 @@
         private System.Windows.Forms.Label DetailFile_FileTitleLabel;
         private System.Windows.Forms.Button DetailFileForm_CancelButton;
         private System.Windows.Forms.Label DetailFile_FileDateLabel;
-        private System.Windows.Forms.Label DetailFile_SendFromUserLabel;
+        private System.Windows.Forms.Label DetailFile_AddedFromUserLabel;
         private System.Windows.Forms.RichTextBox DetailFile_FileExplain_RichTextBox;
         private System.Windows.Forms.Label label1;
         private System.Windows.Forms.Label label2;

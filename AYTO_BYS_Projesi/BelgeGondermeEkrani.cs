@@ -8,11 +8,14 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
+using AYTO.SendFile;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class BelgeGondermeEkrani : Form
     {
+        SendFileDLL sendFileDLL = new SendFileDLL();
+
         public BelgeGondermeEkrani()
         {
             InitializeComponent();
@@ -36,23 +39,6 @@ namespace AYTO_BYS_Projesi
             {
                 SendFile_SendButton.Enabled = false;
             }
-        }
-        private void TextGridFromAnaEkran()
-        {
-            Program.dataBaseConnection.Close();
-            string sendFileCmdText = "SELECT blg.belgeDizini, blg.belgeAdi FROM belgelerim AS blg INNER JOIN kullanicilar AS klnc ON blg.kullaniciNo = klnc.kullaniciNo WHERE belgeNo = @belgeNo";
-            SqlCommand sendFileCmd = new SqlCommand(sendFileCmdText, Program.dataBaseConnection);
-            sendFileCmd.Parameters.AddWithValue("@belgeNo", BelgeNo);
-            Program.dataBaseConnection.Open();
-            SqlDataReader sendFileReader = sendFileCmd.ExecuteReader();
-            if (sendFileReader.Read())
-            {
-                SendFileName_CustomTextBox.Text = sendFileReader["belgeAdi"].ToString();
-                SendFileDirectory_CustomTextBox.Text = sendFileReader["belgeDizini"].ToString();
-
-            }
-            sendFileReader.Close();
-            Program.dataBaseConnection.Close();
         }
         //CheckComboBox doldurma
         private void CheckComboBoxFillMethod()
@@ -82,8 +68,9 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.OK = "Tamam";
             MessageBoxManager.Register();
 
-            TextGridFromAnaEkran();
-            TextGridFromAnaEkran();
+            var textGridTuple = sendFileDLL.TextGridFromMainPage(BelgeNo);
+            SendFileName_CustomTextBox.Text = textGridTuple.Item1;
+            SendFileDirectory_CustomTextBox.Text = textGridTuple.Item2; 
 
             //Checkcombobox içeriği
             CheckComboBoxFillMethod();

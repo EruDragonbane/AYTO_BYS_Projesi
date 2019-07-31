@@ -76,6 +76,9 @@
     <Reference Include="AYTO.AdminPage">
       <HintPath>..\..\..\DLLs\AdminPageDLL\AdminPageDLL\AYTO.AdminPage\bin\Debug\AYTO.AdminPage.dll</HintPath>
     </Reference>
+    <Reference Include="AYTO.FileDetail">
+      <HintPath>..\..\..\DLLs\AYTOFileDetailDLL\AYTOFileDetailDLL\AYTO.FileDetail\bin\Debug\AYTO.FileDetail.dll</HintPath>
+    </Reference>
     <Reference Include="AYTO.Log">
       <HintPath>..\..\..\DLLs\AYTOLogDLL\AYTOLogDLL\AYTO.Log\bin\Debug\AYTO.Log.dll</HintPath>
     </Reference>

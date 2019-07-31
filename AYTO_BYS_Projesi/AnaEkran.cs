@@ -10,12 +10,15 @@ using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.IO;
 using AYTO.MainPage;
+using AYTO.Log;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class AnaEkran : Form
     {
         MainPageDLL mainPageDLL = new MainPageDLL();
+        LogDLL logDLL = new LogDLL();
+
         //OleDbConnection dataBaseCon;
         SqlDataAdapter dataBaseAdapter;
         //SqlCommand dataBaseCmd;
@@ -32,7 +35,6 @@ namespace AYTO_BYS_Projesi
             UserId = LoginId;
         }
         public int UserId { get; set; }
-
         //Belgelerim veritabanını çağırmak için bir metottur.Aynı zamanda veritabanını yeniler.
         private void RefreshAndFillDataGrid()
         {
@@ -242,7 +244,7 @@ namespace AYTO_BYS_Projesi
             DialogResult exitDialog = MessageBox.Show("Çıkış yapmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
             if (exitDialog == DialogResult.Yes)
             {
-                NormalUserLog("exit", "");
+                logDLL.NormalUserLog("exit", "", UserId);
                 Application.Exit();
             }
         }
@@ -252,7 +254,7 @@ namespace AYTO_BYS_Projesi
             GirisEkrani loginForm = new GirisEkrani();
             this.Close();
             loginForm.Show();
-            NormalUserLog("exit", "");
+            logDLL.NormalUserLog("exit", "", UserId);
         }
         //Mesajlar penceresi ve butonları aktif eder.
         private void MessagesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -260,7 +262,6 @@ namespace AYTO_BYS_Projesi
             groupBox1.Visible = true;
             button1.Enabled = true;
         }
-
         //Mesajlar penceresini gizler ve butonları pasifleştirir.
         //İstemsiz eylemlerin engellenmesi sağlanmaktadır. 
         /////////////////////DÜZENLE
@@ -305,7 +306,7 @@ namespace AYTO_BYS_Projesi
             {
                 string selectedRowName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
                 //Item1 = returnValue, Item2 = fileNo
-                var sendButtonClickTuple = mainPageDLL.SendButtonClick(selectedRowName);
+                var sendButtonClickTuple = mainPageDLL.SendUpdateButtonsClickForBelgeNo(selectedRowName);
                 if (sendButtonClickTuple.Item1 == "true")
                 {
                     string selectedRowFileNo = sendButtonClickTuple.Item2;
@@ -352,16 +353,11 @@ namespace AYTO_BYS_Projesi
                 else
                 {
                     string selectedRowName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
-
-                    Program.dataBaseConnection.Close();
-                    string selectedFileCmdText = "SELECT blg.belgeNo FROM belgelerim AS blg WHERE blg.belgeAdi = @belgeAdi";
-                    SqlCommand selectedFileCmd = new SqlCommand(selectedFileCmdText, Program.dataBaseConnection);
-                    selectedFileCmd.Parameters.AddWithValue("@belgeAdi", selectedRowName);
-                    Program.dataBaseConnection.Open();
-                    SqlDataReader selectedFileReader = selectedFileCmd.ExecuteReader();
-                    if (selectedFileReader.Read())
+                    //Item1 = returnValue, Item2 = fileNo
+                    var updateButtonClickTuple = mainPageDLL.SendUpdateButtonsClickForBelgeNo(selectedRowName);
+                    if (updateButtonClickTuple.Item1 == "true")
                     {
-                        string selectedRowFileNo = selectedFileReader["belgeNo"].ToString();
+                        string selectedRowFileNo = updateButtonClickTuple.Item2;
                         BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(selectedRowFileNo, UserId, UserId);
                         //Pencere halihazırda aktif ise yeni pencere açmak
                         //yerine varolan pencereyi açar.
@@ -384,11 +380,9 @@ namespace AYTO_BYS_Projesi
                     {
                         MessageBox.Show("Belge Seçilemedi");
                     }
-                    selectedFileReader.Close();
                     //return;
                 }
                 MessageBoxManager.Unregister();
-                Program.dataBaseConnection.Close();
             }
         }
         //Belge Silme
@@ -423,31 +417,10 @@ namespace AYTO_BYS_Projesi
                         DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
                         if (deleteResult == DialogResult.Yes)
                         {
-                            string deletedFileInsertCmdText = "INSERT INTO silinenBelgeler (silinenKullaniciNo, silinenBelgeNo, silinenBelgeBasligi, silinenBelgeAdi, silinenBelgeDizini, silinenBelgeVeriTipiveAdi, silinenBelgeServerDizini, silinenBelgeAciklamasi, silinenEklenmeTarihi, silinenSistemEklenmeTarihi, silinenGuncellenmeTarihi, silinenSistemGuncellenmeTarihi, silinenGuncelleyenKisiNo, silinenDurumNo) SELECT kullaniciNo, belgeNo, belgeBasligi, belgeAdi, belgeDizini, belgeVeriTipiveAdi, belgeServerDizini, belgeAciklamasi, eklenmeTarihi, sistemEklenmeTarihi, guncellenmeTarihi, sistemGuncellenmeTarihi, guncelleyenKisiNo, durumNo FROM belgelerim WHERE belgeAdi = @gelenVeri";
+                            string currentCellValue = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
+                            mainPageDLL.InsertFileBeforeDelete(currentCellValue, UserId);
 
-                            string deletedByCmdText = "UPDATE silinenBelgeler SET silenKisi = @silenKisi WHERE silinenBelgeAdi = @gelenVeri";
-
-                            string deleteFileCmdText = "DELETE FROM belgelerim WHERE belgeAdi = @belgeAdi";
-
-                            SqlCommand deletedFileInsertCmd = new SqlCommand(deletedFileInsertCmdText, Program.dataBaseConnection);
-                            deletedFileInsertCmd.Parameters.AddWithValue("@gelenVeri", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-                            Program.dataBaseConnection.Open();
-                            deletedFileInsertCmd.ExecuteNonQuery();
-                            Program.dataBaseConnection.Close();
-
-                            SqlCommand deletedByCmd = new SqlCommand(deletedByCmdText, Program.dataBaseConnection);
-                            deletedByCmd.Parameters.AddWithValue("@silenKisi", UserId);
-                            deletedByCmd.Parameters.AddWithValue("@gelenVeri", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-                            Program.dataBaseConnection.Open();
-                            deletedByCmd.ExecuteNonQuery();
-                            Program.dataBaseConnection.Close();
-
-                            SqlCommand deleteFileCmd = new SqlCommand(deleteFileCmdText, Program.dataBaseConnection);
-                            deleteFileCmd.Parameters.AddWithValue("@belgeAdi", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
-                            Program.dataBaseConnection.Open();
-                            deleteFileCmd.ExecuteNonQuery();
-
-                            NormalUserLog("delete", MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString());
+                            logDLL.NormalUserLog("delete", currentCellValue, UserId);
                             RefreshAndFillDataGrid();
                         }
                     }
@@ -496,46 +469,6 @@ namespace AYTO_BYS_Projesi
                 e.Handled = true;
                 e.SuppressKeyPress = true;
             }
-        }
-        //Delete, Exit
-        private void NormalUserLog(string value, string fileName)
-        {
-            string fileNoinDB = "";
-            Program.dataBaseConnection.Close();
-            SqlCommand fileNoCmd = new SqlCommand("SELECT silinenBelgeNo FROM silinenBelgeler WHERE silinenBelgeAdi = @belgeAdi", Program.dataBaseConnection);
-            fileNoCmd.Parameters.AddWithValue("@belgeAdi", fileName);
-            Program.dataBaseConnection.Open();
-            SqlDataReader fileNoReader = fileNoCmd.ExecuteReader();
-            if (fileNoReader.Read())
-            {
-                fileNoinDB = fileNoReader["silinenBelgeNo"].ToString();
-            }
-            else
-            {
-                fileNoinDB = "";
-            }
-            fileNoReader.Close();
-            Program.dataBaseConnection.Close();
-
-            string logFilePath = "";
-            string writeText = "";
-            if(value == "delete")
-            {
-                logFilePath = @"C:\Users\Fatih\Desktop\ServerLogKaydi\NormalUserDeleteFileLog.txt";
-                writeText = "[" + DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") + "]: Belge silme işlemini yapan Kullanıcı No: " + UserId + "\tSilinen Belge No: " + fileNoinDB + "\tBelge Adı: " + fileName;
-            }
-            else if(value == "exit")
-            {
-                logFilePath = @"C:\Users\Fatih\Desktop\ServerLogKaydi\UserExitLog.txt";
-                writeText = "[" + DateTime.Now.ToString("dddd, dd MMMM yyyy HH:mm:ss") + "]: Çıkış yapan Kullanıcı No: " + UserId;
-            }
-            else
-            {
-                MessageBox.Show("Hata: AnaEkran - NormalUserLog");
-            }
-            FileStream adminLogFS = new FileStream(logFilePath, FileMode.OpenOrCreate, FileAccess.Write);
-            adminLogFS.Close();
-            File.AppendAllText(logFilePath, Environment.NewLine + writeText);
         }
     }
 }
