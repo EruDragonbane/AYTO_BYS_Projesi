@@ -19,8 +19,6 @@ namespace AYTO_BYS_Projesi
         UpdateDataDLL updateDataDLL = new UpdateDataDLL();
         LogDLL logDLL = new LogDLL();
 
-        //ComboBoxNameTableValue
-        private int statusValue;
         public VeriGuncelle()
         {
             InitializeComponent();
