@@ -61,6 +61,8 @@ namespace AYTO_BYS_Projesi
             {
                 AddNewUserAuthority_ComboBox.Items.Add(authorityFillReader["yetkiAdi"]);
             }
+            AddNewUserPosition_ComboBox.SelectedIndex = 0;
+            AddNewUserAuthority_ComboBox.SelectedIndex = 0;
             authorityFillReader.Close();
             Program.dataBaseConnection.Close();
         }
@@ -75,6 +77,7 @@ namespace AYTO_BYS_Projesi
             {
                 AddNewStatus_ComboBox.Items.Add(statusFillReader["durumAdi"]);
             }
+            AddNewStatus_ComboBox.SelectedIndex = 0;
             statusFillReader.Close();
             Program.dataBaseConnection.Close();
         }
@@ -236,8 +239,8 @@ namespace AYTO_BYS_Projesi
                 AddNewUserID_CustomTextBox.Clear();
                 AddNewUserPass_CustomTextBox.Clear();
                 AddNewUserCorp_CustomTextBox.Clear();
-                AddNewUserPosition_ComboBox.SelectedIndex = -1;
-                AddNewUserAuthority_ComboBox.SelectedIndex = -1;
+                AddNewUserPosition_ComboBox.SelectedIndex = 0;
+                AddNewUserAuthority_ComboBox.SelectedIndex = 0;
             }
             MessageBoxManager.Unregister();
         }
@@ -294,6 +297,7 @@ namespace AYTO_BYS_Projesi
                 NewPositionComboBoxFillMethod();
                 AddNewPosition_CustomTextBox.Clear();
             }
+            AddNewPosition_ComboBox.SelectedIndex = 0;
             Program.dataBaseConnection.Close();
             MessageBoxManager.Unregister();
         }
@@ -385,12 +389,27 @@ namespace AYTO_BYS_Projesi
         }
         private void AdminPage_AddNewDataButton_Click(object sender, EventArgs e)
         {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+
+            string checkReturnValue = "";
+
             //userID = kullaniciGiris sütunu
             string userID = AddNewUserID_CustomTextBox.Text.Trim();
             string statusName = AddNewStatus_CustomTextBox.Text.Trim();
             string positionName = AddNewPosition_CustomTextBox.Text.Trim();
-            string checkReturnValue = newDataDLL.CheckUser(TableName, userID, statusName, positionName);
-            CheckDataMethod(checkReturnValue);
+
+            bool spaceString = userID.Contains(" ");
+            if (spaceString == true)
+            {
+                MessageBox.Show("Kullanıcı adınızda boş karakter olamaz!", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            }
+            else
+            {
+                checkReturnValue = newDataDLL.CheckUser(TableName, userID, statusName, positionName);
+                CheckDataMethod(checkReturnValue);
+            }
+            MessageBoxManager.Unregister();
         }
         //TextChanged ve SelectedIndexChanged Eventleri
         /*AddNewUserName, AddNewUserSurname, AddNewUserID, AddNewUserPass, AddNewUserPosition, AddNewUserAuthority,

@@ -392,24 +392,55 @@ namespace AYTO_BYS_Projesi
             AdminPage_DataGridView.ClearSelection();
         }
         //Açılan tablolara göre belirli öğeler açılır.
-        private void EnabledVisibleTrueItems()
+        private void ElementsEnabledActivity(string enabledStatus)
         {
-            tableLayoutPanel1.Enabled = true;
-            tableLayoutPanel1.Visible = true;
-            AdminPanel_AddButton.Enabled = true;
-            AdminPanel_UpdateButton.Enabled = true;
+            if(enabledStatus == "tableLayoutWithAddAndUpdateTrue")
+            {
+                tableLayoutPanel1.Enabled = true;
+                tableLayoutPanel1.Visible = true;
+                AdminPanel_AddButton.Enabled = true;
+                AdminPanel_UpdateButton.Enabled = true;
+            }
+            else if(enabledStatus == "tableLayoutWithAddAndUpdateFalse")
+            {
+                tableLayoutPanel1.Enabled = false;
+                tableLayoutPanel1.Visible = false;
+                AdminPanel_AddButton.Enabled = false;
+                AdminPanel_UpdateButton.Enabled = false;
+            }
+            else if (enabledStatus == "DeletedDataEnabledVisibleItems")
+            {
+                AdminPanelSearch_ComboBox.Enabled = true;
+                tableLayoutPanel1.Enabled = true;
+                tableLayoutPanel1.Visible = true;
+                AdminPanel_AddButton.Enabled = false;
+                AdminPanel_UpdateButton.Enabled = false;
+                InactiveOrActiveUser_Button.Enabled = false;
+                InactiveOrActiveUser_Button.Visible = false;
+            }
+            else if(enabledStatus == "ComboboxAndUserActiveTrue")
+            {
+                AdminPanelSearch_ComboBox.Enabled = true;
+                InactiveOrActiveUser_Button.Enabled = true;
+                InactiveOrActiveUser_Button.Visible = true;
+            }
+            else if(enabledStatus == "ComboboxTrueAndUserActiveFalse")
+            {
+                AdminPanelSearch_ComboBox.Enabled = true;
+                InactiveOrActiveUser_Button.Enabled = false;
+                InactiveOrActiveUser_Button.Visible = false;
+            }
+            else if(enabledStatus == "ComboboxAndUserActiveFalse")
+            {
+                AdminPanelSearch_ComboBox.Enabled = false;
+                InactiveOrActiveUser_Button.Enabled = false;
+                InactiveOrActiveUser_Button.Visible = false;
+            }
+            else
+            {
+                return;
+            }
         }
-        private void DeletedDataEnabledVisibleItems()
-        {
-            AdminPanelSearch_ComboBox.Enabled = true;
-            tableLayoutPanel1.Enabled = true;
-            tableLayoutPanel1.Visible = true;
-            AdminPanel_AddButton.Enabled = false;
-            AdminPanel_UpdateButton.Enabled = false;
-            InactiveOrActiveUser_Button.Enabled = false;
-            InactiveOrActiveUser_Button.Visible = false;
-        }
-
         private void AdminPanel_Load(object sender, EventArgs e)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
@@ -419,11 +450,7 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.No = "Hayır";
             MessageBoxManager.OK = "Tamam";
 
-            tableLayoutPanel1.Enabled = false;
-            tableLayoutPanel1.Visible = false;
-
-            AdminPanel_AddButton.Enabled = false;
-            AdminPanel_UpdateButton.Enabled = false;
+            ElementsEnabledActivity("tableLayoutWithAddAndUpdateFalse");
         }
 
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -516,10 +543,8 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Görev");
             AdminPanelSearch_ComboBox.Items.Add("Kurum");
             AdminPanelSearch_ComboBox.SelectedIndex = 0;
-            AdminPanelSearch_ComboBox.Enabled = true;
-            InactiveOrActiveUser_Button.Enabled = true;
-            InactiveOrActiveUser_Button.Visible = true;
-            EnabledVisibleTrueItems();
+            ElementsEnabledActivity("ComboboxAndUserActiveTrue");
+            ElementsEnabledActivity("tableLayoutWithAddAndUpdateTrue");
             UsersList();
             AdminPage_DataGridView.ClearSelection();
         }
@@ -533,10 +558,8 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Belge Adı");
             AdminPanelSearch_ComboBox.Items.Add("Belge Sahibi");
             AdminPanelSearch_ComboBox.SelectedIndex = 0;
-            AdminPanelSearch_ComboBox.Enabled = true;
-            InactiveOrActiveUser_Button.Enabled = false;
-            InactiveOrActiveUser_Button.Visible = false;
-            EnabledVisibleTrueItems();
+            ElementsEnabledActivity("ComboboxTrueAndUserActiveFalse");
+            ElementsEnabledActivity("tableLayoutWithAddAndUpdateTrue");
             FilesList();
             AdminPage_DataGridView.ClearSelection();
         }
@@ -545,10 +568,8 @@ namespace AYTO_BYS_Projesi
         {
             AdminPanelSearch_CustomTextBox.Clear();
             AdminPanelSearch_ComboBox.Items.Clear();
-            AdminPanelSearch_ComboBox.Enabled = false;
-            InactiveOrActiveUser_Button.Enabled = false;
-            InactiveOrActiveUser_Button.Visible = false;
-            EnabledVisibleTrueItems();
+            ElementsEnabledActivity("ComboboxAndUserActiveFalse");
+            ElementsEnabledActivity("tableLayoutWithAddAndUpdateTrue");
             FileStatusList();
             AdminPage_DataGridView.ClearSelection();
         }
@@ -557,10 +578,8 @@ namespace AYTO_BYS_Projesi
         {
             AdminPanelSearch_CustomTextBox.Clear();
             AdminPanelSearch_ComboBox.Items.Clear();
-            AdminPanelSearch_ComboBox.Enabled = false;
-            InactiveOrActiveUser_Button.Enabled = false;
-            InactiveOrActiveUser_Button.Visible = false;
-            EnabledVisibleTrueItems();
+            ElementsEnabledActivity("ComboboxAndUserActiveFalse");
+            ElementsEnabledActivity("tableLayoutWithAddAndUpdateTrue");
             PositionList();
             AdminPage_DataGridView.ClearSelection();
         }
@@ -572,11 +591,11 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Tümü");
             AdminPanelSearch_ComboBox.Items.Add("Ad Soyad");
             AdminPanelSearch_ComboBox.Items.Add("Silen Kişi");
-            DeletedDataEnabledVisibleItems();
+            AdminPanelSearch_ComboBox.SelectedIndex = 0;
+            ElementsEnabledActivity("DeletedDataEnabledVisibleItems");
             DeletedUserList();
             AdminPage_DataGridView.ClearSelection();
         }
-
         private void SilinenBelgelerToolStripMenuItem1_Click(object sender, EventArgs e)
         {
             AdminPanelSearch_CustomTextBox.Clear();
@@ -584,10 +603,12 @@ namespace AYTO_BYS_Projesi
             AdminPanelSearch_ComboBox.Items.Add("Tümü");
             AdminPanelSearch_ComboBox.Items.Add("Belge Adı");
             AdminPanelSearch_ComboBox.Items.Add("Silen Kişi");
-            DeletedDataEnabledVisibleItems();
+            AdminPanelSearch_ComboBox.SelectedIndex = 0;
+            ElementsEnabledActivity("DeletedDataEnabledVisibleItems");
             DeletedFilesList();
             AdminPage_DataGridView.ClearSelection();
         }
+        //Silinen Veriler
 
         private void AdminPanel_AddButton_Click(object sender, EventArgs e)
         {
@@ -747,6 +768,15 @@ namespace AYTO_BYS_Projesi
                     DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
                     if (deleteResult == DialogResult.Yes)
                     {
+                        if(Application.OpenForms.OfType<Form>().Any(f => f is YeniVerilEkle))
+                        {
+                            Application.OpenForms.OfType<Form>().First(f => f is YeniVerilEkle).Close();
+                        }
+                        if (Application.OpenForms.OfType<Form>().Any(f => f is VeriGuncelle))
+                        {
+                            Application.OpenForms.OfType<Form>().First(f => f is VeriGuncelle).Close();
+                        }
+
                         string currentCellValue = AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString();
 
                         if (tableName == "belgelerim")

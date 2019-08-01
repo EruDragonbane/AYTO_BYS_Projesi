@@ -61,10 +61,7 @@ namespace AYTO_BYS_Projesi
                 {
                     if (dataGridRow.Cells[i].Value == null || dataGridRow.Cells[i].Value == DBNull.Value || string.IsNullOrWhiteSpace(dataGridRow.Cells[i].Value.ToString()))
                     {
-                        MyFiles_FileActions_SendButton.Enabled = false;
-                        MyFiles_FileActions_UpdateButton.Enabled = false;
-                        MyFiles_FileActions_DeleteButton.Enabled = false;
-                        MyFiles_FileActions_CancelButton.Enabled = false;
+                        ActionsGroupBoxEnabledActivity("allElementsFalse");
                         return;
                     }
                 }
@@ -101,24 +98,85 @@ namespace AYTO_BYS_Projesi
             }
             MyFiles_DataGridView.ClearSelection();
         }
-
+        //Belge üzerinde eylem yapmak isteyen kullanıcının yetkilerini kontrol eder.
         private void UserIdCheckForPermission()
         {
-            string currentCellValue = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
-            string returnValue = mainPageDLL.UserIdCheckForPermissin(currentCellValue, UserId);
+            if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
+            {
+                ActionsGroupBoxEnabledActivity("allElementsFalse");
+            }
+            else
+            {
+                string currentCellValue = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
+                string returnValue = mainPageDLL.UserIdCheckForPermissin(currentCellValue, UserId);
 
-            if (returnValue == "true")
+                if (returnValue == "true")
+                {
+                    ActionsGroupBoxEnabledActivity("updateAndDeleteTrue");
+                }
+                else
+                {
+                    ActionsGroupBoxEnabledActivity("updateAndDeleteFalse");
+                }
+            }
+        }
+        //Formların aktifliğini kontrol ederek kapatır.
+        private void FormActivityCheck()
+        {
+            //Formların aktifliği kontrol ederek kapatır.
+            if (Application.OpenForms.OfType<Form>().Any(f => f is YeniBelgeEkrani))
+            {
+                Application.OpenForms.OfType<Form>().First(f => f is YeniBelgeEkrani).Close();
+            }
+            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGondermeEkrani))
+            {
+                Application.OpenForms.OfType<Form>().First(f => f is BelgeGondermeEkrani).Close();
+            }
+            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
+            {
+                Application.OpenForms.OfType<Form>().First(f => f is BelgeGuncellemeEkrani).Close();
+            }
+            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
+            {
+                Application.OpenForms.OfType<Form>().First(f => f is BelgeDetayiEkrani).Close();
+            }
+        }
+        //Eylemler penceresi etkinliği --Tamamı pasif
+        private void ActionsGroupBoxEnabledActivity(string enabledStatus)
+        {
+            if(enabledStatus == "allElementsFalse")
+            {
+                MyFiles_FileActions_SendButton.Enabled = false;
+                MyFiles_FileActions_UpdateButton.Enabled = false;
+                MyFiles_FileActions_DeleteButton.Enabled = false;
+                MyFiles_FileActions_CancelButton.Enabled = false;
+            }
+            else if(enabledStatus == "updateAndDeleteTrue")
             {
                 MyFiles_FileActions_UpdateButton.Enabled = true;
                 MyFiles_FileActions_DeleteButton.Enabled = true;
             }
-            else
+            else if(enabledStatus == "updateAndDeleteFalse")
             {
                 MyFiles_FileActions_UpdateButton.Enabled = false;
                 MyFiles_FileActions_DeleteButton.Enabled = false;
             }
-        }
+            else if(enabledStatus == "sendAndCancelTrue")
+            {
+                MyFiles_FileActions_SendButton.Enabled = true;
+                MyFiles_FileActions_CancelButton.Enabled = true;
+            }
+            else if(enabledStatus == "sendAndCancelFalse")
+            {
+                MyFiles_FileActions_SendButton.Enabled = false;
+                MyFiles_FileActions_CancelButton.Enabled = false;
+            }
+            else
+            {
+                return;
+            }
 
+        }
         private void AnaEkran_Load(object sender, EventArgs e)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
@@ -135,10 +193,7 @@ namespace AYTO_BYS_Projesi
             //Eylemler penceresi, veritabanı içindeki herhangi
             //bir veriye tıklanıldığı zaman aktif olmaktadır.
             //Başlangıçta pasiftir.
-            MyFiles_FileActions_SendButton.Enabled = false;
-            MyFiles_FileActions_UpdateButton.Enabled = false;
-            MyFiles_FileActions_DeleteButton.Enabled = false;
-            MyFiles_FileActions_CancelButton.Enabled = false;
+            ActionsGroupBoxEnabledActivity("allElementsFalse");
             //Veritabanları sadece okunulabilir haldedir.
             MyFiles_DataGridView.ReadOnly = true;
             ReceivedFiles_DataGridView.ReadOnly = true;
@@ -154,19 +209,13 @@ namespace AYTO_BYS_Projesi
 
             if (MyFiles_DataGridView.Rows.Count == 0 || MyFiles_DataGridView.Rows == null)
             {
-                MyFiles_FileActions_UpdateButton.Enabled = false;
-                MyFiles_FileActions_DeleteButton.Enabled = false;
-                MyFiles_FileActions_SendButton.Enabled = false;
-                MyFiles_FileActions_CancelButton.Enabled = false;
+                ActionsGroupBoxEnabledActivity("allElementsFalse");
                 //return;
             }
             else
             {
                 UserIdCheckForPermission();
-                //MyFiles_FileActions_UpdateButton.Enabled = true;
-                //MyFiles_FileActions_DeleteButton.Enabled = true;
-                MyFiles_FileActions_SendButton.Enabled = true;
-                MyFiles_FileActions_CancelButton.Enabled = true;
+                ActionsGroupBoxEnabledActivity("sendAndCancelTrue");
                 //return;
             }
         }
@@ -175,7 +224,6 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
 
-            MyFiles_DataGridView.ClearSelection();
             if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
             {
                 MessageBox.Show("Herhangi bir veri yok!");
@@ -220,24 +268,19 @@ namespace AYTO_BYS_Projesi
                 if (MyFiles_DataGridView.CurrentRow.Cells[1] == null || MyFiles_DataGridView.CurrentRow.Cells[1].Value == DBNull.Value || string.IsNullOrWhiteSpace(MyFiles_DataGridView.CurrentRow.Cells[1].ToString()))
                 {
                     UserIdCheckForPermission();
-                    MyFiles_FileActions_SendButton.Enabled = false;
-                    MyFiles_FileActions_CancelButton.Enabled = false;
+                    ActionsGroupBoxEnabledActivity("sendAndCancelFalse");
                     //return;
                 }
                 else
                 {
                     UserIdCheckForPermission();
-                    MyFiles_FileActions_SendButton.Enabled = true;
-                    MyFiles_FileActions_CancelButton.Enabled = true;
+                    ActionsGroupBoxEnabledActivity("sendAndCancelTrue");
                     //return;
                 }
             }
             else
             {
-                MyFiles_FileActions_SendButton.Enabled = false;
-                MyFiles_FileActions_UpdateButton.Enabled = false;
-                MyFiles_FileActions_DeleteButton.Enabled = false;
-                MyFiles_FileActions_CancelButton.Enabled = false;
+                ActionsGroupBoxEnabledActivity("allElementsFalse");
             }
         }
         //Çıkış Eylemi
@@ -426,11 +469,20 @@ namespace AYTO_BYS_Projesi
 
                             logDLL.NormalUserLog("delete", currentCellValue, UserId);
                             RefreshAndFillDataGrid();
+                            FormActivityCheck();
+
+                            if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
+                            {
+                                ActionsGroupBoxEnabledActivity("allElementsFalse");
+                            }
+                        }
+                        else
+                        {
+                            ActionsGroupBoxEnabledActivity("allElementsFalse");
                         }
                     }
                     //return;
                 }
-                UserIdCheckForPermission();
                 MyFiles_DataGridView.ClearSelection();
                 MessageBoxManager.Unregister();
                 Program.dataBaseConnection.Close();
@@ -439,24 +491,9 @@ namespace AYTO_BYS_Projesi
         //Eylemler Penceresi İptal Etme
         private void MyFiles_FileActions_CancelButton_Click(object sender, EventArgs e)
         {
-            //Formların aktifliği kontrol ederek kapatır.
-            if (Application.OpenForms.OfType<Form>().Any(f => f is YeniBelgeEkrani))
-            {
-                Application.OpenForms.OfType<Form>().First(f => f is YeniBelgeEkrani).Close();
-            }
-            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGondermeEkrani))
-            {
-                Application.OpenForms.OfType<Form>().First(f => f is BelgeGondermeEkrani).Close();
-            }
-            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
-            {
-                Application.OpenForms.OfType<Form>().First(f => f is BelgeGuncellemeEkrani).Close();
-            }
+            FormActivityCheck();
             //Veritabanı eylem penceresini iptal edilmesi durumunda pasifleştirir.
-            MyFiles_FileActions_SendButton.Enabled = false;
-            MyFiles_FileActions_UpdateButton.Enabled = false;
-            MyFiles_FileActions_DeleteButton.Enabled = false;
-            MyFiles_FileActions_CancelButton.Enabled = false;
+            ActionsGroupBoxEnabledActivity("allElementsFalse");
             FileSearch_CustomTextBox.Clear();
             MyFiles_DataGridView.ClearSelection();
         }
