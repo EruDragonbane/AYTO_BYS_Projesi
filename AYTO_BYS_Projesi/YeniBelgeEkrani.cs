@@ -139,8 +139,7 @@ namespace AYTO_BYS_Projesi
                         }
                         else
                         {
-                            //updateFileForm.UpdateFileEventH += Deneme;
-                            this.Close();
+                            this.Hide();
                             updateFileForm.Show();
                         }
                     }

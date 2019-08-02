@@ -159,6 +159,12 @@
     <Compile Include="GirisEkrani.Designer.cs">
       <DependentUpon>GirisEkrani.cs</DependentUpon>
     </Compile>
+    <Compile Include="KullaniciProfili.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="KullaniciProfili.Designer.cs">
+      <DependentUpon>KullaniciProfili.cs</DependentUpon>
+    </Compile>
     <Compile Include="VeriGuncelle.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -197,6 +203,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="GirisEkrani.resx">
       <DependentUpon>GirisEkrani.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="KullaniciProfili.resx">
+      <DependentUpon>KullaniciProfili.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="VeriGuncelle.resx">
       <DependentUpon>VeriGuncelle.cs</DependentUpon>

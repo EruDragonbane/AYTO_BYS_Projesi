@@ -61,8 +61,11 @@ namespace AYTO_BYS_Projesi
             {
                 AddNewUserAuthority_ComboBox.Items.Add(authorityFillReader["yetkiAdi"]);
             }
-            AddNewUserPosition_ComboBox.SelectedIndex = 0;
-            AddNewUserAuthority_ComboBox.SelectedIndex = 0;
+            if (AddNewUserPosition_ComboBox.Items.Count != 0 || AddNewUserAuthority_ComboBox.Items.Count != 0)
+            {
+                AddNewUserPosition_ComboBox.SelectedIndex = 0;
+                AddNewUserAuthority_ComboBox.SelectedIndex = 0;
+            }
             authorityFillReader.Close();
             Program.dataBaseConnection.Close();
         }
@@ -77,7 +80,10 @@ namespace AYTO_BYS_Projesi
             {
                 AddNewStatus_ComboBox.Items.Add(statusFillReader["durumAdi"]);
             }
-            AddNewStatus_ComboBox.SelectedIndex = 0;
+            if(AddNewStatus_ComboBox.Items.Count != 0)
+            {
+                AddNewStatus_ComboBox.SelectedIndex = 0;
+            }
             statusFillReader.Close();
             Program.dataBaseConnection.Close();
         }
@@ -91,6 +97,10 @@ namespace AYTO_BYS_Projesi
             while (positionFillReader.Read())
             {
                 AddNewPosition_ComboBox.Items.Add(positionFillReader["gorevAdi"]);
+            }
+            if(AddNewPosition_ComboBox.Items.Count != 0)
+            {
+                AddNewPosition_ComboBox.SelectedIndex = 0;
             }
             positionFillReader.Close();
             Program.dataBaseConnection.Close();

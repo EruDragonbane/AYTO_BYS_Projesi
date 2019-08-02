@@ -441,6 +441,21 @@ namespace AYTO_BYS_Projesi
                 return;
             }
         }
+        //Çıkış Eylemi
+        private void FormClosingEvent()
+        {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+            DialogResult exitDialog = MessageBox.Show("Çıkış yapmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
+            if (exitDialog == DialogResult.Yes)
+            {
+                //parentGirisEkrani.Close();
+                //this.Close();
+                logDLL.AdminLog("exit", "", "", AdminUserId, "", "");
+                this.FormClosing -= AdminPanel_FormClosing;
+                Application.Exit();
+            }
+        }
         private void AdminPanel_Load(object sender, EventArgs e)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
@@ -451,32 +466,6 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.OK = "Tamam";
 
             ElementsEnabledActivity("tableLayoutWithAddAndUpdateFalse");
-        }
-
-        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            MessageBoxManager.Unregister();
-            MessageBoxManager.Register();
-            DialogResult exitDialog = MessageBox.Show("Çıkış yapmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
-            if (exitDialog == DialogResult.Yes)
-            {
-                //parentGirisEkrani.Close();
-                //this.Close();
-                Application.Exit();
-                logDLL.AdminLog("exit", "", "", AdminUserId, "", "");
-            }
-        }
-        private void AdminPanel_FormClosing(object sender, FormClosingEventArgs e)
-        {
-            //MessageBoxManager.Unregister();
-            //MessageBoxManager.Register();
-            //DialogResult exitDialog = MessageBox.Show("Çıkış yapmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
-            //if (exitDialog == DialogResult.Yes)
-            //{
-            //    //parentGirisEkrani.Close();
-            //    //this.Close();
-            //    Application.Exit();
-            //}   
         }
         private void AdminPage_DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
         {
@@ -526,12 +515,28 @@ namespace AYTO_BYS_Projesi
                 this.Show();
             }
         }
+        //Çıkış eylemleri
+        private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            FormClosingEvent();
+        }
+        private void AdminPanel_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            FormClosingEvent();
+        }
         private void SignOutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GirisEkrani loginForm = new GirisEkrani();
-            this.Close();
-            loginForm.Show();
-            logDLL.AdminLog("exit", "", "", AdminUserId, "", "");
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+            DialogResult exitDialog = MessageBox.Show("Hesaptan çıkmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
+            if (exitDialog == DialogResult.Yes)
+            {
+                this.FormClosing -= AdminPanel_FormClosing;
+                GirisEkrani loginForm = new GirisEkrani();
+                logDLL.AdminLog("exit", "", "", AdminUserId, "", "");
+                this.Close();
+                loginForm.Show();
+            }
         }
         //Veriler
         private void UsersToolStripMenuItem_Click(object sender, EventArgs e)

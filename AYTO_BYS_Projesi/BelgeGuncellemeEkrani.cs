@@ -193,6 +193,8 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
             this.Close();
+            YeniBelgeEkrani newFileForm = new YeniBelgeEkrani();
+            newFileForm.Close();
             logDLL.UpdateFileLog(UserId3, BelgeNo, updateFileName);
         }
 

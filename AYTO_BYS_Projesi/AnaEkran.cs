@@ -177,6 +177,19 @@ namespace AYTO_BYS_Projesi
             }
 
         }
+        //Çıkış Eylemi
+        private void FormClosingEvent()
+        {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+            DialogResult exitDialog = MessageBox.Show("Çıkış yapmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
+            if (exitDialog == DialogResult.Yes)
+            {
+                this.FormClosing -= AnaEkran_FormClosing;
+                logDLL.NormalUserLog("exit", "", UserId);
+                Application.Exit();
+            }
+        }
         private void AnaEkran_Load(object sender, EventArgs e)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
@@ -286,22 +299,27 @@ namespace AYTO_BYS_Projesi
         //Çıkış Eylemi
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            MessageBoxManager.Unregister();
-            MessageBoxManager.Register();
-            DialogResult exitDialog = MessageBox.Show("Çıkış yapmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
-            if (exitDialog == DialogResult.Yes)
-            {
-                logDLL.NormalUserLog("exit", "", UserId);
-                Application.Exit();
-            }
+            FormClosingEvent();
+        }
+        private void AnaEkran_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            FormClosingEvent();
         }
         //Oturum Kapatma Eylemi
         private void SignOutToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            GirisEkrani loginForm = new GirisEkrani();
-            this.Close();
-            loginForm.Show();
-            logDLL.NormalUserLog("exit", "", UserId);
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+            DialogResult exitDialog = MessageBox.Show("Hesaptan çıkmak istediğinizden emin misiniz?", "Çıkış", MessageBoxButtons.YesNo);
+            if (exitDialog == DialogResult.Yes)
+            {
+                this.FormClosing -= AnaEkran_FormClosing;
+                GirisEkrani loginForm = new GirisEkrani();
+                logDLL.NormalUserLog("exit", "", UserId);
+                this.Close();
+                loginForm.Show();
+            }
+            MessageBoxManager.Unregister();
         }
         //Mesajlar penceresi ve butonları aktif eder.
         private void MessagesToolStripMenuItem_Click(object sender, EventArgs e)
