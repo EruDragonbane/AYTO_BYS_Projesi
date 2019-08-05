@@ -305,6 +305,23 @@ namespace AYTO_BYS_Projesi
         {
             FormClosingEvent();
         }
+        //Profil Penceresi
+        private void profileToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            KullaniciProfili userProfileForm = new KullaniciProfili(UserId);
+            //Pencere halihazırda aktif ise yeni pencere açmak
+            //yerine varolan pencereyi açar.
+            if (Application.OpenForms.OfType<Form>().Any(f => f is KullaniciProfili))
+            {
+                Application.OpenForms.OfType<Form>().First(f => f is KullaniciProfili).Activate();
+            }
+            else
+            {
+                //Pencere konumunu ekran merkezine taşır.
+                userProfileForm.StartPosition = FormStartPosition.CenterScreen;
+                userProfileForm.Show();
+            }
+        }
         //Oturum Kapatma Eylemi
         private void SignOutToolStripMenuItem_Click(object sender, EventArgs e)
         {

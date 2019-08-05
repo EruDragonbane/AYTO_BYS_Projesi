@@ -106,6 +106,7 @@
             this.profileToolStripMenuItem.Name = "profileToolStripMenuItem";
             this.profileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
             this.profileToolStripMenuItem.Text = "Profil";
+            this.profileToolStripMenuItem.Click += new System.EventHandler(this.profileToolStripMenuItem_Click);
             // 
             // signOutToolStripMenuItem
             // 
@@ -154,7 +155,7 @@
             this.MyFiles_Groupbox.Controls.Add(this.MyFiles_DataGridView);
             this.MyFiles_Groupbox.Location = new System.Drawing.Point(3, 3);
             this.MyFiles_Groupbox.Name = "MyFiles_Groupbox";
-            this.MyFiles_Groupbox.Size = new System.Drawing.Size(523, 640);
+            this.MyFiles_Groupbox.Size = new System.Drawing.Size(522, 640);
             this.MyFiles_Groupbox.TabIndex = 0;
             this.MyFiles_Groupbox.TabStop = false;
             this.MyFiles_Groupbox.Text = "Belgelerim";
@@ -174,7 +175,7 @@
             this.BYS_ActionsTableLayoutPanel3.Name = "BYS_ActionsTableLayoutPanel3";
             this.BYS_ActionsTableLayoutPanel3.RowCount = 1;
             this.BYS_ActionsTableLayoutPanel3.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.BYS_ActionsTableLayoutPanel3.Size = new System.Drawing.Size(514, 70);
+            this.BYS_ActionsTableLayoutPanel3.Size = new System.Drawing.Size(513, 70);
             this.BYS_ActionsTableLayoutPanel3.TabIndex = 3;
             // 
             // MyFiles_FileActionsGroupBox
@@ -331,7 +332,7 @@
             this.MyFiles_DataGridView.ReadOnly = true;
             this.MyFiles_DataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
             this.MyFiles_DataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.MyFiles_DataGridView.Size = new System.Drawing.Size(517, 539);
+            this.MyFiles_DataGridView.Size = new System.Drawing.Size(516, 539);
             this.MyFiles_DataGridView.TabIndex = 0;
             this.MyFiles_DataGridView.TabStop = false;
             this.MyFiles_DataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.MyFiles_DataGridView_CellDoubleClick);
@@ -345,12 +346,12 @@
             this.MainPageTableLayoutPanel2.Controls.Add(this.SentFiles_GroupBox, 0, 1);
             this.MainPageTableLayoutPanel2.Controls.Add(this.ReceivedFiles_GroupBox, 0, 0);
             this.MainPageTableLayoutPanel2.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.MainPageTableLayoutPanel2.Location = new System.Drawing.Point(532, 3);
+            this.MainPageTableLayoutPanel2.Location = new System.Drawing.Point(531, 3);
             this.MainPageTableLayoutPanel2.Name = "MainPageTableLayoutPanel2";
             this.MainPageTableLayoutPanel2.RowCount = 2;
             this.MainPageTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
             this.MainPageTableLayoutPanel2.RowStyles.Add(new System.Windows.Forms.RowStyle(System.Windows.Forms.SizeType.Percent, 50F));
-            this.MainPageTableLayoutPanel2.Size = new System.Drawing.Size(522, 640);
+            this.MainPageTableLayoutPanel2.Size = new System.Drawing.Size(521, 640);
             this.MainPageTableLayoutPanel2.TabIndex = 3;
             // 
             // SentFiles_GroupBox
@@ -361,7 +362,7 @@
             this.SentFiles_GroupBox.Controls.Add(this.SentFiles_DataGridView);
             this.SentFiles_GroupBox.Location = new System.Drawing.Point(3, 323);
             this.SentFiles_GroupBox.Name = "SentFiles_GroupBox";
-            this.SentFiles_GroupBox.Size = new System.Drawing.Size(516, 314);
+            this.SentFiles_GroupBox.Size = new System.Drawing.Size(515, 314);
             this.SentFiles_GroupBox.TabIndex = 2;
             this.SentFiles_GroupBox.TabStop = false;
             this.SentFiles_GroupBox.Text = "Gönderilenler";
@@ -386,7 +387,7 @@
             this.SentFiles_DataGridView.Name = "SentFiles_DataGridView";
             this.SentFiles_DataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
             this.SentFiles_DataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.SentFiles_DataGridView.Size = new System.Drawing.Size(505, 289);
+            this.SentFiles_DataGridView.Size = new System.Drawing.Size(504, 289);
             this.SentFiles_DataGridView.TabIndex = 2;
             this.SentFiles_DataGridView.TabStop = false;
             // 
@@ -423,7 +424,7 @@
             this.ReceivedFiles_GroupBox.Controls.Add(this.ReceivedFiles_DataGridView);
             this.ReceivedFiles_GroupBox.Location = new System.Drawing.Point(3, 3);
             this.ReceivedFiles_GroupBox.Name = "ReceivedFiles_GroupBox";
-            this.ReceivedFiles_GroupBox.Size = new System.Drawing.Size(516, 314);
+            this.ReceivedFiles_GroupBox.Size = new System.Drawing.Size(515, 314);
             this.ReceivedFiles_GroupBox.TabIndex = 1;
             this.ReceivedFiles_GroupBox.TabStop = false;
             this.ReceivedFiles_GroupBox.Text = "Gelenler";
@@ -448,7 +449,7 @@
             this.ReceivedFiles_DataGridView.Name = "ReceivedFiles_DataGridView";
             this.ReceivedFiles_DataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
             this.ReceivedFiles_DataGridView.SelectionMode = System.Windows.Forms.DataGridViewSelectionMode.FullRowSelect;
-            this.ReceivedFiles_DataGridView.Size = new System.Drawing.Size(505, 289);
+            this.ReceivedFiles_DataGridView.Size = new System.Drawing.Size(504, 289);
             this.ReceivedFiles_DataGridView.TabIndex = 1;
             this.ReceivedFiles_DataGridView.TabStop = false;
             // 
@@ -481,10 +482,10 @@
             // 
             this.groupBox1.Controls.Add(this.button1);
             this.groupBox1.Dock = System.Windows.Forms.DockStyle.Fill;
-            this.groupBox1.Location = new System.Drawing.Point(1060, 3);
+            this.groupBox1.Location = new System.Drawing.Point(1058, 3);
             this.groupBox1.MinimumSize = new System.Drawing.Size(300, 530);
             this.groupBox1.Name = "groupBox1";
-            this.groupBox1.Size = new System.Drawing.Size(360, 640);
+            this.groupBox1.Size = new System.Drawing.Size(362, 640);
             this.groupBox1.TabIndex = 4;
             this.groupBox1.TabStop = false;
             this.groupBox1.Text = "Mesajlar";
@@ -492,7 +493,7 @@
             // button1
             // 
             this.button1.Anchor = ((System.Windows.Forms.AnchorStyles)((System.Windows.Forms.AnchorStyles.Top | System.Windows.Forms.AnchorStyles.Right)));
-            this.button1.Location = new System.Drawing.Point(246, 19);
+            this.button1.Location = new System.Drawing.Point(248, 19);
             this.button1.Name = "button1";
             this.button1.Size = new System.Drawing.Size(75, 23);
             this.button1.TabIndex = 0;

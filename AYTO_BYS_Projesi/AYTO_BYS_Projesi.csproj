@@ -103,6 +103,9 @@
     <Reference Include="AYTO.UpdateFile">
       <HintPath>..\..\..\DLLs\AYTOUpdateFileDLL\AYTOUpdateFileDLL\AYTO.UpdateFile\bin\Debug\AYTO.UpdateFile.dll</HintPath>
     </Reference>
+    <Reference Include="AYTO.UserProfile">
+      <HintPath>..\..\..\DLLs\AYTOUserProfileDLL\AYTOUserProfileDLL\AYTO.UserProfile\bin\Debug\AYTO.UserProfile.dll</HintPath>
+    </Reference>
     <Reference Include="CheckComboBox, Version=1.0.0.0, Culture=neutral, processorArchitecture=MSIL">
       <HintPath>..\packages\Common.CheckComboBox.1.0.0\lib\CheckComboBox.dll</HintPath>
     </Reference>
@@ -165,6 +168,11 @@
     <Compile Include="KullaniciProfili.Designer.cs">
       <DependentUpon>KullaniciProfili.cs</DependentUpon>
     </Compile>
+    <Compile Include="Properties\Resources.Designer.cs">
+      <AutoGen>True</AutoGen>
+      <DesignTime>True</DesignTime>
+      <DependentUpon>Resources.resx</DependentUpon>
+    </Compile>
     <Compile Include="VeriGuncelle.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -215,14 +223,9 @@
     </EmbeddedResource>
     <EmbeddedResource Include="Properties\Resources.resx">
       <Generator>ResXFileCodeGenerator</Generator>
-      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
       <SubType>Designer</SubType>
+      <LastGenOutput>Resources.Designer.cs</LastGenOutput>
     </EmbeddedResource>
-    <Compile Include="Properties\Resources.Designer.cs">
-      <AutoGen>True</AutoGen>
-      <DependentUpon>Resources.resx</DependentUpon>
-      <DesignTime>True</DesignTime>
-    </Compile>
     <EmbeddedResource Include="YeniBelgeEkrani.resx">
       <DependentUpon>YeniBelgeEkrani.cs</DependentUpon>
     </EmbeddedResource>
@@ -241,10 +244,13 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="Resources\Backward_16x.png" />
+    <WCFMetadata Include="Connected Services\" />
   </ItemGroup>
   <ItemGroup>
-    <WCFMetadata Include="Connected Services\" />
+    <None Include="Resources\MV5BMTY1NzMyODc3Nl5BMl5BanBnXkFtZTgwNzE2MzA1NDM%40._V1_UY317_CR87,0,214,317_AL_.jpg" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Resources\ChangePictureIcon1.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
