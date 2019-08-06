@@ -46,6 +46,7 @@
             // 
             // ChangePictureButton
             // 
+            this.ChangePictureButton.BackgroundImage = global::AYTO_BYS_Projesi.Properties.Resources.ChangePictureIcon__Green_;
             this.ChangePictureButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChangePictureButton.Location = new System.Drawing.Point(12, 162);
             this.ChangePictureButton.MaximumSize = new System.Drawing.Size(100, 100);
@@ -96,7 +97,7 @@
             this.USerProfile_UpdateButton.TabIndex = 10;
             this.USerProfile_UpdateButton.Text = "Güncelle";
             this.USerProfile_UpdateButton.UseVisualStyleBackColor = true;
-            this.USerProfile_UpdateButton.Click += new System.EventHandler(this.USerProfile_UpdateButton_Click);
+            this.USerProfile_UpdateButton.Click += new System.EventHandler(this.UserProfile_UpdateButton_Click);
             // 
             // UserProfile_CancelButton
             // 
@@ -123,6 +124,7 @@
             // 
             // UserProfile_UserPictureBox
             // 
+            this.UserProfile_UserPictureBox.Image = global::AYTO_BYS_Projesi.Properties.Resources.ayto_transparent;
             this.UserProfile_UserPictureBox.Location = new System.Drawing.Point(12, 12);
             this.UserProfile_UserPictureBox.MaximumSize = new System.Drawing.Size(200, 200);
             this.UserProfile_UserPictureBox.MinimumSize = new System.Drawing.Size(200, 200);

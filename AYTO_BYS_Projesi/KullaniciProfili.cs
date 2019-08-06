@@ -8,6 +8,7 @@ using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AYTO.UserProfile;
+using System.IO;
 
 namespace AYTO_BYS_Projesi
 {
@@ -16,6 +17,7 @@ namespace AYTO_BYS_Projesi
         UserProfileDLL userProfileDLL = new UserProfileDLL();
         //Şifre eylemini gerçekleştirdiğimiz textboxların görünürlük ve aktifliği için kullanılan bir değişkendir.
         private int showDialogValue = 0;
+        private string imageLocation = "";
         public KullaniciProfili(int UserIdOtherForm)
         {
             InitializeComponent();
@@ -32,6 +34,14 @@ namespace AYTO_BYS_Projesi
             UserId6 = UserIdOtherForm;
         }
         public int UserId6 { get; set; }
+        //Gereksiz işlemleri atmak
+        private void DisposeEvent()
+        {
+            if (UserProfile_UserPictureBox.Image != null)
+                UserProfile_UserPictureBox.Image.Dispose();
+            if (ChangePictureButton.BackgroundImage != null)
+                ChangePictureButton.BackgroundImage.Dispose();
+        }
         //Şifre textboxlarının görünürlük-eylem aktifliği değiştirme
         private void PasswordTextBoxEnabledAndVisible(bool boolValue)
         {
@@ -59,30 +69,16 @@ namespace AYTO_BYS_Projesi
             UserProfile_UserCorpLabel.Text = infoAboutUserTuple.Item2;
             UserProfile_UserPositionLabel.Text = infoAboutUserTuple.Item3;
         }
-
-        private void KullaniciProfili_Load(object sender, EventArgs e)
+        //Kaydetme Öncesi kullanıcının istekleri kontrol edilir.
+        private void UpdateWithPassword()
         {
-            InformationAboutUser();
-            PasswordTextBoxEnabledAndVisible(false);
-            //UserProfile_UserPictureBox.Enabled = false;
-        }
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
 
-        private void ChangePictureButton_Click(object sender, EventArgs e)
-        {
-            MessageBox.Show("yoaoaoao");
-        }
-
-        private void UserProfile_CancelButton_Click(object sender, EventArgs e)
-        {
-            UserProfile_UserPictureBox.Controls.Remove(ChangePictureButton);
-            this.Close();
-        }
-
-        private void USerProfile_UpdateButton_Click(object sender, EventArgs e)
-        {
             string currentPassword = UserProfile_CurrentPassword_CustomTextbox.Text.Trim();
             string newPassword = UserProfile_NewPassword_CustomTextBox.Text.Trim();
             string confirmPassword = UserProfile_ConfirmNewPassword_CustomTextBox.Text.Trim();
+
             if (showDialogValue == 0)
             {
                 PasswordTextBoxEnabledAndVisible(true);
@@ -101,15 +97,7 @@ namespace AYTO_BYS_Projesi
                     {
                         if (newPassword == confirmPassword)
                         {
-                            String messageCheckFile = "Güncellemek istiyor musunuz?";
-                            String titleCheckFile = "";
-                            MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
-                            DialogResult yesNoResult = MessageBox.Show(messageCheckFile, titleCheckFile, yesNoButtons);
-                            if (yesNoResult == DialogResult.Yes)
-                            {
-                                userProfileDLL.ChangePassword(UserId6, newPassword);
-                                this.Close();
-                            }
+                            UpdateProfile(newPassword);
                         }
                         else
                         {
@@ -121,8 +109,87 @@ namespace AYTO_BYS_Projesi
                 else
                 {
                     MessageBox.Show("Boş kısım olamaz!");
-                } 
+                }
             }
+            MessageBoxManager.Unregister();
+        }
+                        
+        //Kaydetme
+        private void UpdateProfile(string newPasword)
+        {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+
+            String messageCheckFile = "Güncellemek istiyor musunuz?";
+            String titleCheckFile = "";
+            MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
+            DialogResult yesNoResult = MessageBox.Show(messageCheckFile, titleCheckFile, yesNoButtons);
+            if (yesNoResult == DialogResult.Yes)
+            {
+                //userProfileDLL.ChangePassword(UserId6, newPassword);
+                UpdateImage();
+                //this.Close();
+            }
+            MessageBoxManager.Unregister();
+        }
+        //Resmi Kaydetme
+        private void UpdateImage()
+        {
+            //Item4 = kullaniciNo 
+            var userNameSurnameTuple = userProfileDLL.InformationAbourtUser(UserId6);
+            //Dosyayı servere kullanıcının adı-soyadı ile kaydeder.
+            string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\KullaniciResimleri\" + userNameSurnameTuple.Item4 + ".jpg";
+            FileStream fileStream = File.OpenRead(imageLocation);
+            byte[] contents = new byte[fileStream.Length];
+            fileStream.Read(contents, 0, (int)fileStream.Length);
+            fileStream.Close();
+            File.WriteAllBytes(serverPath, contents);
+        }
+        private void KullaniciProfili_Load(object sender, EventArgs e)
+        {
+            InformationAboutUser();
+            PasswordTextBoxEnabledAndVisible(false);
+            //UserProfile_UserPictureBox.Enabled = false;
+        }
+
+        private void ChangePictureButton_Click(object sender, EventArgs e)
+        {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+
+            OpenFileDialog images = new OpenFileDialog();
+            //Yeni dosya formatları eklemek için
+            //" Format İsmi |*.formattürü " şeklinde ekle
+            images.Filter = "Görüntü Dosyaları |*.jpg;*.jpeg;*.bmp;*.wmf;*.png|" +
+                "Tüm Dosyalar |*.*";
+            images.RestoreDirectory = true;
+            if (images.ShowDialog() == DialogResult.OK)
+            {
+                imageLocation = images.FileName;
+                FileInfo fileInfo = new FileInfo(imageLocation);
+
+                if (fileInfo.Length < (Math.Pow(10, 6)))
+                {
+                    UserProfile_UserPictureBox.Text = imageLocation;
+                    UserProfile_UserPictureBox.ImageLocation = imageLocation;
+                }
+                else
+                {
+                    MessageBox.Show("Resmin boyutu 1MB'den büyüktür.");
+                }
+            }
+        }
+
+        private void UserProfile_CancelButton_Click(object sender, EventArgs e)
+        {
+            UserProfile_UserPictureBox.Controls.Remove(ChangePictureButton);
+            DisposeEvent();
+            this.Close();
+        }
+
+        private void UserProfile_UpdateButton_Click(object sender, EventArgs e)
+        {
+            UpdateWithPassword();
         }
         //Enter tuşu Textboxlar üzerinde pasif
         private void KeyDownEvent(object sender, KeyEventArgs e)

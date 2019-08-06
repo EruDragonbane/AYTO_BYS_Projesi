@@ -251,7 +251,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Images\ayto_transparent.png" />
+    <None Include="Images\ChangePictureIcon %28Green%29.png" />
     <Content Include="Images\ChangePictureIcon.png" />
+    <None Include="Images\ChangePictureIconWhite.png" />
   </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

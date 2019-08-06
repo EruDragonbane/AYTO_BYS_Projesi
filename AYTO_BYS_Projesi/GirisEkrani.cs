@@ -67,6 +67,7 @@ namespace AYTO_BYS_Projesi
             if(returnTuple.Item1 == "yetkili")
             {
                 AdminPanel adminFormLogin = new AdminPanel(returnTuple.Item2);
+                pictureBox1.Image.Dispose();
                 this.Hide();
                 adminFormLogin.Show();
                 logDLL.LoginLog(returnTuple.Item2, returnTuple.Item3, returnTuple.Item4, returnTuple.Item5);
@@ -74,6 +75,7 @@ namespace AYTO_BYS_Projesi
             else if(returnTuple.Item1 == "kullanici")
             {
                 AnaEkran mainFormLogin = new AnaEkran(Convert.ToInt32(returnTuple.Item2));
+                pictureBox1.Image.Dispose();
                 this.Hide();
                 mainFormLogin.Show();
                 logDLL.LoginLog(returnTuple.Item2, returnTuple.Item3, returnTuple.Item4, returnTuple.Item5);

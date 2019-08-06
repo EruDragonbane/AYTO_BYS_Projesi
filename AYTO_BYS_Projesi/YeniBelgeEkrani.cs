@@ -75,7 +75,7 @@ namespace AYTO_BYS_Projesi
                 if (yesNoResult == DialogResult.Yes)
                 {
                     //BELGE KAYDETME
-                    FileInfo fileInfo = new FileInfo(NewFileDirectory_TextBox.Text.Trim());
+                    FileInfo fileInfo = new FileInfo(fileDirectory);
 
                     if (fileInfo.Length < (Math.Pow(10, 7) * 1.5))
                     {

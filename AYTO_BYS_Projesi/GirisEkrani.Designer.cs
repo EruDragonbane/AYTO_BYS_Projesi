@@ -40,6 +40,7 @@
             // 
             // pictureBox1
             // 
+            this.pictureBox1.Image = global::AYTO_BYS_Projesi.Properties.Resources.ayto_transparent;
             resources.ApplyResources(this.pictureBox1, "pictureBox1");
             this.pictureBox1.Name = "pictureBox1";
             this.pictureBox1.TabStop = false;
