@@ -15,11 +15,6 @@ namespace AYTO_BYS_Projesi
     public partial class BelgeGondermeEkrani : Form
     {
         SendFileDLL sendFileDLL = new SendFileDLL();
-
-        public BelgeGondermeEkrani()
-        {
-            InitializeComponent();
-        }
         public BelgeGondermeEkrani(string sendForm_belgeNo, int send_UserId)
         {
             InitializeComponent();

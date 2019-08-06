@@ -16,19 +16,9 @@ namespace AYTO_BYS_Projesi
         UserProfileDLL userProfileDLL = new UserProfileDLL();
         //Şifre eylemini gerçekleştirdiğimiz textboxların görünürlük ve aktifliği için kullanılan bir değişkendir.
         private int showDialogValue = 0;
-        public KullaniciProfili()
-        {
-            InitializeComponent();            
-        }
         public KullaniciProfili(int UserIdOtherForm)
         {
             InitializeComponent();
-            UserId6 = UserIdOtherForm;
-        }
-        public int UserId6 { get; set; }
-        //PictureBox içine butonu ekler.
-        private void ChangePictureEvent()
-        {
             UserProfile_UserPictureBox.Controls.Add(ChangePictureButton);
             ChangePictureButton.Width = 100;
             ChangePictureButton.Height = 100;
@@ -39,60 +29,26 @@ namespace AYTO_BYS_Projesi
             ChangePictureButton.FlatAppearance.MouseOverBackColor = Color.Transparent;
             ChangePictureButton.FlatAppearance.BorderSize = 0;
             ChangePictureButton.Cursor = Cursors.Hand;
+            UserId6 = UserIdOtherForm;
         }
-        //Şifre göster/gizle
-        private void PasswordTextChangedEvent()
-        {
-            UserProfile_CurrentPassword_CustomTextbox.ForeColor = Color.Black;
-            UserProfile_NewPassword_CustomTextBox.ForeColor = Color.Black;
-            UserProfile_ConfirmNewPassword_CustomTextBox.ForeColor = Color.Black;
-
-            if (UserProfile_ShowPassword_CheckBox.Checked)
-            {
-                UserProfile_CurrentPassword_CustomTextbox.PasswordChar = '\0';
-                UserProfile_NewPassword_CustomTextBox.PasswordChar = '\0';
-                UserProfile_ConfirmNewPassword_CustomTextBox.PasswordChar = '\0';
-            }
-            else
-            {
-                UserProfile_CurrentPassword_CustomTextbox.PasswordChar = '*';
-                UserProfile_NewPassword_CustomTextBox.PasswordChar = '*';
-                UserProfile_ConfirmNewPassword_CustomTextBox.PasswordChar = '*';
-            }
-        }
+        public int UserId6 { get; set; }
         //Şifre textboxlarının görünürlük-eylem aktifliği değiştirme
         private void PasswordTextBoxEnabledAndVisible(bool boolValue)
         {
-            UserProfile_CurrentPassword_CustomTextbox.Enabled = boolValue;
-            UserProfile_CurrentPassword_CustomTextbox.Visible = boolValue;
-            UserProfile_NewPassword_CustomTextBox.Enabled = boolValue;
-            UserProfile_NewPassword_CustomTextBox.Visible = boolValue;
-            UserProfile_ConfirmNewPassword_CustomTextBox.Enabled = boolValue;
-            UserProfile_ConfirmNewPassword_CustomTextBox.Visible = boolValue;
+            foreach(Control item in this.Controls)
+            {
+                if(item is CustomTextBox)
+                {
+                    CustomTextBox txtBox = (CustomTextBox)item;
+                    txtBox.Enabled = boolValue;
+                    txtBox.Visible = boolValue;
+                }
+            }
             UserProfile_ShowPassword_CheckBox.Enabled = boolValue;
             UserProfile_ShowPassword_CheckBox.Visible = boolValue;
             ChangePictureButton.Enabled = boolValue;
             ChangePictureButton.Visible = boolValue;
 
-        }
-        //Başarılı bir şifre değiştirme sonrası yapılacaklar
-        private void AfterChangedPassword()
-        {
-            PasswordTextBoxEnabledAndVisible(false);
-            UserProfile_UserPictureBox.Controls.Remove(ChangePictureButton);
-            UserProfile_CurrentPassword_CustomTextbox.ForeColor = Color.Black;
-            UserProfile_NewPassword_CustomTextBox.ForeColor = Color.Black;
-            UserProfile_ConfirmNewPassword_CustomTextBox.ForeColor = Color.Black;
-            showDialogValue = 0;
-        }
-        //Enter tuşu Textboxlar üzerinde pasif
-        private void KeyDownEvent(object sender, KeyEventArgs e)
-        {
-            if (e.KeyCode == Keys.Enter)
-            {
-                e.Handled = true;
-                e.SuppressKeyPress = true;
-            }
         }
         //Kullanıcının bilgilerini çeker.
         private void InformationAboutUser()
@@ -118,6 +74,7 @@ namespace AYTO_BYS_Projesi
 
         private void UserProfile_CancelButton_Click(object sender, EventArgs e)
         {
+            UserProfile_UserPictureBox.Controls.Remove(ChangePictureButton);
             this.Close();
         }
 
@@ -129,7 +86,6 @@ namespace AYTO_BYS_Projesi
             if (showDialogValue == 0)
             {
                 PasswordTextBoxEnabledAndVisible(true);
-                ChangePictureEvent();
                 showDialogValue = 1;
             }
             else
@@ -152,7 +108,6 @@ namespace AYTO_BYS_Projesi
                             if (yesNoResult == DialogResult.Yes)
                             {
                                 userProfileDLL.ChangePassword(UserId6, newPassword);
-                                AfterChangedPassword();
                                 this.Close();
                             }
                         }
@@ -169,23 +124,34 @@ namespace AYTO_BYS_Projesi
                 } 
             }
         }
-        //TextChanged
-        private void UserProfile_CurrentPassword_CustomTextbox_TextChanged(object sender, EventArgs e)
+        //Enter tuşu Textboxlar üzerinde pasif
+        private void KeyDownEvent(object sender, KeyEventArgs e)
         {
-            PasswordTextChangedEvent();
+            if (e.KeyCode == Keys.Enter)
+            {
+                e.Handled = true;
+                e.SuppressKeyPress = true;
+            }
         }
-        private void UserProfile_NewPassword_CustomTextBox_TextChanged(object sender, EventArgs e)
+        //Şifre göster/gizle //TextChanged CheckedChanged
+        private void PasswordTextChangedEvent(object sender, EventArgs e)
         {
-            PasswordTextChangedEvent();
+            UserProfile_CurrentPassword_CustomTextbox.ForeColor = Color.Black;
+            UserProfile_NewPassword_CustomTextBox.ForeColor = Color.Black;
+            UserProfile_ConfirmNewPassword_CustomTextBox.ForeColor = Color.Black;
+
+            if (UserProfile_ShowPassword_CheckBox.Checked)
+            {
+                UserProfile_CurrentPassword_CustomTextbox.PasswordChar = '\0';
+                UserProfile_NewPassword_CustomTextBox.PasswordChar = '\0';
+                UserProfile_ConfirmNewPassword_CustomTextBox.PasswordChar = '\0';
+            }
+            else
+            {
+                UserProfile_CurrentPassword_CustomTextbox.PasswordChar = '*';
+                UserProfile_NewPassword_CustomTextBox.PasswordChar = '*';
+                UserProfile_ConfirmNewPassword_CustomTextBox.PasswordChar = '*';
+            }
         }
-        private void UserProfile_ConfirmNewPassword_CustomTextBox_TextChanged(object sender, EventArgs e)
-        {
-            PasswordTextChangedEvent();
-        }
-        private void UserProfile_ShowPassword_CheckBox_CheckedChanged(object sender, EventArgs e)
-        {
-            PasswordTextChangedEvent();
-        }
-        //TextChanged
     }
 }

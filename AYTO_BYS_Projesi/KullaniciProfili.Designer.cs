@@ -29,37 +29,23 @@
         private void InitializeComponent()
         {
             this.components = new System.ComponentModel.Container();
-            System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(KullaniciProfili));
-            this.UserProfile_UserPictureBox = new System.Windows.Forms.PictureBox();
-            this.ChangePictureButton = new System.Windows.Forms.Button();
             this.toolTip1 = new System.Windows.Forms.ToolTip(this.components);
+            this.ChangePictureButton = new System.Windows.Forms.Button();
             this.UserProfile_UserNameSurnameLabel = new System.Windows.Forms.Label();
             this.UserProfile_UserCorpLabel = new System.Windows.Forms.Label();
             this.UserProfile_UserPositionLabel = new System.Windows.Forms.Label();
             this.USerProfile_UpdateButton = new System.Windows.Forms.Button();
             this.UserProfile_CancelButton = new System.Windows.Forms.Button();
             this.UserProfile_ShowPassword_CheckBox = new System.Windows.Forms.CheckBox();
+            this.UserProfile_UserPictureBox = new System.Windows.Forms.PictureBox();
             this.UserProfile_ConfirmNewPassword_CustomTextBox = new AYTO_BYS_Projesi.CustomTextBox();
             this.UserProfile_NewPassword_CustomTextBox = new AYTO_BYS_Projesi.CustomTextBox();
             this.UserProfile_CurrentPassword_CustomTextbox = new AYTO_BYS_Projesi.CustomTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.UserProfile_UserPictureBox)).BeginInit();
             this.SuspendLayout();
             // 
-            // UserProfile_UserPictureBox
-            // 
-            this.UserProfile_UserPictureBox.Image = ((System.Drawing.Image)(resources.GetObject("UserProfile_UserPictureBox.Image")));
-            this.UserProfile_UserPictureBox.Location = new System.Drawing.Point(12, 12);
-            this.UserProfile_UserPictureBox.MaximumSize = new System.Drawing.Size(200, 200);
-            this.UserProfile_UserPictureBox.MinimumSize = new System.Drawing.Size(200, 200);
-            this.UserProfile_UserPictureBox.Name = "UserProfile_UserPictureBox";
-            this.UserProfile_UserPictureBox.Size = new System.Drawing.Size(200, 200);
-            this.UserProfile_UserPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.StretchImage;
-            this.UserProfile_UserPictureBox.TabIndex = 2;
-            this.UserProfile_UserPictureBox.TabStop = false;
-            // 
             // ChangePictureButton
             // 
-            this.ChangePictureButton.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("ChangePictureButton.BackgroundImage")));
             this.ChangePictureButton.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Zoom;
             this.ChangePictureButton.Location = new System.Drawing.Point(12, 162);
             this.ChangePictureButton.MaximumSize = new System.Drawing.Size(100, 100);
@@ -133,7 +119,18 @@
             this.UserProfile_ShowPassword_CheckBox.TabIndex = 12;
             this.UserProfile_ShowPassword_CheckBox.Text = "Şifreyi göster";
             this.UserProfile_ShowPassword_CheckBox.UseVisualStyleBackColor = true;
-            this.UserProfile_ShowPassword_CheckBox.CheckedChanged += new System.EventHandler(this.UserProfile_ShowPassword_CheckBox_CheckedChanged);
+            this.UserProfile_ShowPassword_CheckBox.CheckedChanged += new System.EventHandler(this.PasswordTextChangedEvent);
+            // 
+            // UserProfile_UserPictureBox
+            // 
+            this.UserProfile_UserPictureBox.Location = new System.Drawing.Point(12, 12);
+            this.UserProfile_UserPictureBox.MaximumSize = new System.Drawing.Size(200, 200);
+            this.UserProfile_UserPictureBox.MinimumSize = new System.Drawing.Size(200, 200);
+            this.UserProfile_UserPictureBox.Name = "UserProfile_UserPictureBox";
+            this.UserProfile_UserPictureBox.Size = new System.Drawing.Size(200, 200);
+            this.UserProfile_UserPictureBox.SizeMode = System.Windows.Forms.PictureBoxSizeMode.Zoom;
+            this.UserProfile_UserPictureBox.TabIndex = 2;
+            this.UserProfile_UserPictureBox.TabStop = false;
             // 
             // UserProfile_ConfirmNewPassword_CustomTextBox
             // 
@@ -149,7 +146,7 @@
             this.UserProfile_ConfirmNewPassword_CustomTextBox.Name = "UserProfile_ConfirmNewPassword_CustomTextBox";
             this.UserProfile_ConfirmNewPassword_CustomTextBox.Size = new System.Drawing.Size(150, 25);
             this.UserProfile_ConfirmNewPassword_CustomTextBox.TabIndex = 8;
-            this.UserProfile_ConfirmNewPassword_CustomTextBox.TextChanged += new System.EventHandler(this.UserProfile_ConfirmNewPassword_CustomTextBox_TextChanged);
+            this.UserProfile_ConfirmNewPassword_CustomTextBox.TextChanged += new System.EventHandler(this.PasswordTextChangedEvent);
             this.UserProfile_ConfirmNewPassword_CustomTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDownEvent);
             // 
             // UserProfile_NewPassword_CustomTextBox
@@ -166,7 +163,7 @@
             this.UserProfile_NewPassword_CustomTextBox.Name = "UserProfile_NewPassword_CustomTextBox";
             this.UserProfile_NewPassword_CustomTextBox.Size = new System.Drawing.Size(150, 25);
             this.UserProfile_NewPassword_CustomTextBox.TabIndex = 7;
-            this.UserProfile_NewPassword_CustomTextBox.TextChanged += new System.EventHandler(this.UserProfile_NewPassword_CustomTextBox_TextChanged);
+            this.UserProfile_NewPassword_CustomTextBox.TextChanged += new System.EventHandler(this.PasswordTextChangedEvent);
             this.UserProfile_NewPassword_CustomTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDownEvent);
             // 
             // UserProfile_CurrentPassword_CustomTextbox
@@ -183,7 +180,7 @@
             this.UserProfile_CurrentPassword_CustomTextbox.Name = "UserProfile_CurrentPassword_CustomTextbox";
             this.UserProfile_CurrentPassword_CustomTextbox.Size = new System.Drawing.Size(150, 25);
             this.UserProfile_CurrentPassword_CustomTextbox.TabIndex = 1;
-            this.UserProfile_CurrentPassword_CustomTextbox.TextChanged += new System.EventHandler(this.UserProfile_CurrentPassword_CustomTextbox_TextChanged);
+            this.UserProfile_CurrentPassword_CustomTextbox.TextChanged += new System.EventHandler(this.PasswordTextChangedEvent);
             this.UserProfile_CurrentPassword_CustomTextbox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDownEvent);
             // 
             // KullaniciProfili

@@ -19,10 +19,6 @@ namespace AYTO_BYS_Projesi
         FileDetailDLL fileDetailDLL = new FileDetailDLL();
         LogDLL logDLL = new LogDLL();
 
-        public BelgeDetayiEkrani()
-        {
-            InitializeComponent();
-        }
         public BelgeDetayiEkrani(string mainForm_belgeNo, int detailForm_UserId)
         {
             InitializeComponent();

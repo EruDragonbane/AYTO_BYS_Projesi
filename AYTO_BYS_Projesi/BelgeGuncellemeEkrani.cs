@@ -18,10 +18,6 @@ namespace AYTO_BYS_Projesi
     {
         UpdateFileDLL updateFileDLL = new UpdateFileDLL();
         LogDLL logDLL = new LogDLL();
-        public BelgeGuncellemeEkrani()
-        {
-            InitializeComponent();
-        }
         //Belgenin güncellenmesi sonrası AnaEkran formunu yeniler. UpdateFileMethod metotunda sonunda döndürür.
         public delegate void UpdateFileEventHandler();
         public event UpdateFileEventHandler UpdateFileEventH;

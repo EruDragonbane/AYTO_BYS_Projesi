@@ -38,7 +38,7 @@ namespace AYTO_BYS_Projesi
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
             MessageBoxManager.Unregister();
-
+            //Path C:\Users\Fatih\Desktop\AYTOProjesiSQL\AYTO_BYS_Projesi\AYTO_BYS_Projesi\Images\ayto_transparent.png"
             MessageBoxManager.Yes = "Evet";
             MessageBoxManager.No = "Hayır";
             MessageBoxManager.OK = "Tamam";

@@ -20,11 +20,6 @@ namespace AYTO_BYS_Projesi
     {
         NewDataDLL newDataDLL = new NewDataDLL();
         LogDLL logDLL = new LogDLL();
-
-        public YeniVerilEkle()
-        {
-            InitializeComponent();
-        }
         //AdminPanel formundan tablonun ismini alır.
         public YeniVerilEkle(string adminPanel_tableName, int adminPage_UserId)
         {

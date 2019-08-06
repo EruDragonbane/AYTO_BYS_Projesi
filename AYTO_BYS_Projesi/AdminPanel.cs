@@ -25,10 +25,6 @@ namespace AYTO_BYS_Projesi
         private string columnSecondName = "";
         private string columnTitle = "";
         DataSet dataSet;
-        public AdminPanel()
-        {
-            InitializeComponent();
-        }
         public string BelgeNo { get; set; }
         public AdminPanel(int admin_UserId)
         {

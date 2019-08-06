@@ -23,11 +23,6 @@ namespace AYTO_BYS_Projesi
         SqlDataAdapter dataBaseAdapter;
         //SqlCommand dataBaseCmd;
         DataSet dataSet;
-
-        public AnaEkran()
-        {
-            InitializeComponent();
-        }
         //Giriş ekranında kullanıcının kullaniciGiris anahtarını alır.
         public AnaEkran(int LoginId)
         {

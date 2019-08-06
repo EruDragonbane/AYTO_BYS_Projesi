@@ -19,11 +19,6 @@ namespace AYTO_BYS_Projesi
         UpdateDataDLL updateDataDLL = new UpdateDataDLL();
         LogDLL logDLL = new LogDLL();
 
-        public VeriGuncelle()
-        {
-            InitializeComponent();
-        }
-
         public delegate void AddUpdateDataEventHandler();
         public event AddUpdateDataEventHandler UpdateDataEventH;
         public VeriGuncelle(string adminPanel_dataName, string adminPanel_tableName, int AdminUserId)
