@@ -15,9 +15,10 @@ namespace AYTO_BYS_Projesi
     public partial class KullaniciProfili : Form
     {
         UserProfileDLL userProfileDLL = new UserProfileDLL();
+        private static object lockObject = new object();
         //Şifre eylemini gerçekleştirdiğimiz textboxların görünürlük ve aktifliği için kullanılan bir değişkendir.
-        private int showDialogValue = 0;
         private string imageLocation = "";
+        private int checkForUpdateImageButton = 0;
         public KullaniciProfili(int UserIdOtherForm)
         {
             InitializeComponent();
@@ -56,6 +57,11 @@ namespace AYTO_BYS_Projesi
             }
             UserProfile_ShowPassword_CheckBox.Enabled = boolValue;
             UserProfile_ShowPassword_CheckBox.Visible = boolValue;
+            //Butonlar
+            USerProfile_UpdateButton.Enabled = !boolValue;
+            USerProfile_UpdateButton.Visible = !boolValue;
+            UserProfile_SaveChangesButton.Enabled = boolValue;
+            UserProfile_SaveChangesButton.Visible = boolValue;
             ChangePictureButton.Enabled = boolValue;
             ChangePictureButton.Visible = boolValue;
 
@@ -63,11 +69,12 @@ namespace AYTO_BYS_Projesi
         //Kullanıcının bilgilerini çeker.
         private void InformationAboutUser()
         {
-            //Item1 = userNameSurname, Item2 = userCorp, Item3 = userPosition
+            //Item1 = userNameSurname, Item2 = userCorp, Item3 = userPosition, Item4 = UserID
             var infoAboutUserTuple = userProfileDLL.InformationAbourtUser(UserId6);
             UserProfile_UserNameSurnameLabel.Text = infoAboutUserTuple.Item1;
             UserProfile_UserCorpLabel.Text = infoAboutUserTuple.Item2;
             UserProfile_UserPositionLabel.Text = infoAboutUserTuple.Item3;
+            UserProfile_UserPictureBox.Image = Image.FromFile(@"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg");
         }
         //Kaydetme Öncesi kullanıcının istekleri kontrol edilir.
         private void UpdateWithPassword()
@@ -79,16 +86,16 @@ namespace AYTO_BYS_Projesi
             string newPassword = UserProfile_NewPassword_CustomTextBox.Text.Trim();
             string confirmPassword = UserProfile_ConfirmNewPassword_CustomTextBox.Text.Trim();
 
-            if (showDialogValue == 0)
+            string returnValue = userProfileDLL.CheckPasswordBeforeChange(currentPassword, UserId6);
+            if(checkForUpdateImageButton == 0)
             {
-                PasswordTextBoxEnabledAndVisible(true);
-                showDialogValue = 1;
-            }
-            else
-            {
-                if (!string.IsNullOrEmpty(currentPassword) && !string.IsNullOrEmpty(newPassword) && !string.IsNullOrEmpty(confirmPassword))
+                if (checkForUpdateImageButton == 0 && string.IsNullOrEmpty(currentPassword) && string.IsNullOrEmpty(newPassword) && string.IsNullOrEmpty(confirmPassword))
                 {
-                    string returnValue = userProfileDLL.CheckPasswordBeforeChange(currentPassword, UserId6);
+                    DisposeEvent();
+                    this.Close();
+                }
+                else if (checkForUpdateImageButton == 0 && !string.IsNullOrEmpty(currentPassword) && !string.IsNullOrEmpty(newPassword) && !string.IsNullOrEmpty(confirmPassword))
+                {
                     if (returnValue == "false")
                     {
                         UserProfile_CurrentPassword_CustomTextbox.ForeColor = Color.Red;
@@ -97,7 +104,7 @@ namespace AYTO_BYS_Projesi
                     {
                         if (newPassword == confirmPassword)
                         {
-                            UpdateProfile(newPassword);
+                            UpdateProfilePassword(newPassword);
                         }
                         else
                         {
@@ -106,16 +113,59 @@ namespace AYTO_BYS_Projesi
                         }
                     }
                 }
+            }
+            else
+            {
+                if (checkForUpdateImageButton == 1 && string.IsNullOrEmpty(newPassword) && string.IsNullOrEmpty(confirmPassword))
+                {
+                    if (!string.IsNullOrEmpty(currentPassword))
+                    {
+                        if (returnValue == "false")
+                        {
+                            UserProfile_CurrentPassword_CustomTextbox.ForeColor = Color.Red;
+                        }
+                        else
+                        {
+                            UpdateImage();
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Değişiklik için şifreniz gereklidir.");
+                    }
+                }
                 else
                 {
-                    MessageBox.Show("Boş kısım olamaz!");
+                    if (checkForUpdateImageButton == 1 && !string.IsNullOrEmpty(currentPassword) && !string.IsNullOrEmpty(newPassword) && !string.IsNullOrEmpty(confirmPassword))
+                    {
+                        if (returnValue == "false")
+                        {
+                            UserProfile_CurrentPassword_CustomTextbox.ForeColor = Color.Red;
+                        }
+                        else
+                        {
+                            if (newPassword == confirmPassword)
+                            {
+                                UpdateProfilePassword(newPassword);
+                                UpdateImage();
+                            }
+                            else
+                            {
+                                UserProfile_NewPassword_CustomTextBox.ForeColor = Color.Red;
+                                UserProfile_ConfirmNewPassword_CustomTextBox.ForeColor = Color.Red;
+                            }
+                        }
+                    }
+                    else
+                    {
+                        MessageBox.Show("Boş kısım olamaz!");
+                    }
                 }
             }
             MessageBoxManager.Unregister();
-        }
-                        
+        }              
         //Kaydetme
-        private void UpdateProfile(string newPasword)
+        private void UpdateProfilePassword(string newPassword)
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
@@ -126,9 +176,9 @@ namespace AYTO_BYS_Projesi
             DialogResult yesNoResult = MessageBox.Show(messageCheckFile, titleCheckFile, yesNoButtons);
             if (yesNoResult == DialogResult.Yes)
             {
-                //userProfileDLL.ChangePassword(UserId6, newPassword);
-                UpdateImage();
-                //this.Close();
+                userProfileDLL.ChangePassword(UserId6, newPassword);
+                MessageBox.Show("Değişiklikler kaydedildi!");
+                this.Close();
             }
             MessageBoxManager.Unregister();
         }
@@ -137,13 +187,26 @@ namespace AYTO_BYS_Projesi
         {
             //Item4 = kullaniciNo 
             var userNameSurnameTuple = userProfileDLL.InformationAbourtUser(UserId6);
-            //Dosyayı servere kullanıcının adı-soyadı ile kaydeder.
-            string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\KullaniciResimleri\" + userNameSurnameTuple.Item4 + ".jpg";
-            FileStream fileStream = File.OpenRead(imageLocation);
-            byte[] contents = new byte[fileStream.Length];
-            fileStream.Read(contents, 0, (int)fileStream.Length);
-            fileStream.Close();
-            File.WriteAllBytes(serverPath, contents);
+            //Dosyayı servere kullanıcının anahtar numarası ile kaydeder.
+            string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\KullaniciResimleri\";
+            string newFileName = serverPath + userNameSurnameTuple.Item4 + ".jpg";
+            if (!Directory.Exists(serverPath))
+                Directory.CreateDirectory(serverPath);
+            lock (lockObject)
+            {
+                using (FileStream fileStream = File.Open(imageLocation, FileMode.Open))
+                {
+                    byte[] contents = new byte[fileStream.Length];
+                    fileStream.Read(contents, 0, (int)fileStream.Length);
+                    //fileStream.Close();
+                    //File.WriteAllBytes(newFileName, contents);
+                }
+            }
+
+
+            //File.Copy(imageLocation, newFileName, true);
+            //DisposeEvent();
+            //this.Close();
         }
         private void KullaniciProfili_Load(object sender, EventArgs e)
         {
@@ -157,27 +220,33 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
 
-            OpenFileDialog images = new OpenFileDialog();
-            //Yeni dosya formatları eklemek için
-            //" Format İsmi |*.formattürü " şeklinde ekle
-            images.Filter = "Görüntü Dosyaları |*.jpg;*.jpeg;*.bmp;*.wmf;*.png|" +
-                "Tüm Dosyalar |*.*";
-            images.RestoreDirectory = true;
-            if (images.ShowDialog() == DialogResult.OK)
+            using (OpenFileDialog images = new OpenFileDialog())
             {
-                imageLocation = images.FileName;
-                FileInfo fileInfo = new FileInfo(imageLocation);
-
-                if (fileInfo.Length < (Math.Pow(10, 6)))
+                //Yeni dosya formatları eklemek için
+                //" Format İsmi |*.formattürü " şeklinde ekle
+                images.Filter = "Görüntü Dosyaları |*.jpg;*.jpeg;*.bmp;*.wmf;*.png|" +
+                    "Tüm Dosyalar |*.*";
+                images.RestoreDirectory = true;
+                if (images.ShowDialog() == DialogResult.OK)
                 {
-                    UserProfile_UserPictureBox.Text = imageLocation;
-                    UserProfile_UserPictureBox.ImageLocation = imageLocation;
-                }
-                else
-                {
-                    MessageBox.Show("Resmin boyutu 1MB'den büyüktür.");
+                    imageLocation = images.FileName;
+                    FileInfo fileInfo = new FileInfo(imageLocation);
+                    if (fileInfo.Exists)
+                    {
+                        if (fileInfo.Length < (Math.Pow(10, 6)))
+                        {
+                            UserProfile_UserPictureBox.Text = imageLocation;
+                            UserProfile_UserPictureBox.ImageLocation = imageLocation;
+                            checkForUpdateImageButton = 1;
+                        }
+                        else
+                        {
+                            MessageBox.Show("Resmin boyutu 1MB'den büyüktür.");
+                        }
+                    }
                 }
             }
+            MessageBoxManager.Unregister();
         }
 
         private void UserProfile_CancelButton_Click(object sender, EventArgs e)
@@ -188,6 +257,13 @@ namespace AYTO_BYS_Projesi
         }
 
         private void UserProfile_UpdateButton_Click(object sender, EventArgs e)
+        {
+            UserProfile_SaveChangesButton.Top = 218;
+            UserProfile_SaveChangesButton.Left = 176;
+            PasswordTextBoxEnabledAndVisible(true);
+        }
+
+        private void UserProfile_SaveChangesButton_Click(object sender, EventArgs e)
         {
             UpdateWithPassword();
         }
@@ -219,6 +295,11 @@ namespace AYTO_BYS_Projesi
                 UserProfile_NewPassword_CustomTextBox.PasswordChar = '*';
                 UserProfile_ConfirmNewPassword_CustomTextBox.PasswordChar = '*';
             }
+        }
+
+        private void KullaniciProfili_FormClosing(object sender, FormClosingEventArgs e)
+        {
+            //DisposeEvent();
         }
     }
 }

@@ -74,14 +74,17 @@ namespace AYTO_BYS_Projesi
         {
             Program.dataBaseConnection.Close();
             string comboboxFilldCmdText = "SELECT drm.durumAdi FROM durumlar AS drm ORDER BY drm.durumNo ASC";
-            SqlCommand comboboxFillCmd = new SqlCommand(comboboxFilldCmdText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            SqlDataReader comboboxFillReader = comboboxFillCmd.ExecuteReader();
-            while (comboboxFillReader.Read())
+            using (SqlCommand comboboxFillCmd = new SqlCommand(comboboxFilldCmdText, Program.dataBaseConnection))
             {
-                UpdateFileStatus_ComboBox.Items.Add(comboboxFillReader["durumAdi"].ToString());
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader comboboxFillReader = comboboxFillCmd.ExecuteReader())
+                {
+                    while (comboboxFillReader.Read())
+                    {
+                        UpdateFileStatus_ComboBox.Items.Add(comboboxFillReader["durumAdi"].ToString());
+                    }
+                }
             }
-            comboboxFillReader.Close();
             Program.dataBaseConnection.Close();
         }
         //Kontrol veya Güncelleme öncesinde kullanıcının yetkisini kontrol eder.
@@ -121,7 +124,7 @@ namespace AYTO_BYS_Projesi
                 }
                 else
                 {
-                    MessageBox.Show("Bu belge üzerinde yetkiniz yok!");
+                    MessageBox.Show("Bu belge başkası tarafından eklenmiştir.");
                 }
             }
             //Böyle bir belge yoksa
@@ -188,10 +191,8 @@ namespace AYTO_BYS_Projesi
             MessageBox.Show("Belge Güncellendi.");
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
-            this.Close();
-            YeniBelgeEkrani newFileForm = new YeniBelgeEkrani();
-            newFileForm.Close();
             logDLL.UpdateFileLog(UserId3, BelgeNo, updateFileName);
+            this.Close();
         }
 
         private void BelgeGuncellemeEkrani_Load(object sender, EventArgs e)

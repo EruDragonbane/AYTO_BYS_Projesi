@@ -36,32 +36,35 @@ namespace AYTO_BYS_Projesi
             //Veritabanı bağlantısı aktif değilse aktif yap
             Program.dataBaseConnection.Close();
             string dataBaseAdapterText = "SELECT DISTINCT blg.belgeBasligi, blg.belgeAdi, blg.eklenmeTarihi, blg.guncellenmeTarihi, drm.durumAdi, klnc.kullaniciAdi+' '+klnc.kullaniciSoyadi AS klncAdSoyad FROM belgelerim AS blg, durumlar AS drm, kullanicilar AS klnc WHERE blg.durumNo = drm.durumNo AND klnc.kullaniciNo = blg.kullaniciNo ORDER BY blg.eklenmeTarihi DESC";
-            dataBaseAdapter = new SqlDataAdapter(dataBaseAdapterText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            dataSet = new DataSet();
-            dataBaseAdapter.Fill(dataSet, "belgelerim");
-            MyFiles_DataGridView.DataSource = dataSet.Tables["belgelerim"];
-            dataBaseAdapter.Dispose();
-            // Data Sutün İsimlendirme
-            MyFiles_DataGridView.Columns[0].HeaderText = "Başlık";
-            MyFiles_DataGridView.Columns[1].HeaderText = "Belge Adı";
-            MyFiles_DataGridView.Columns[2].HeaderText = "Eklenme Tarihi";
-            MyFiles_DataGridView.Columns[3].HeaderText = "Güncellenme Tarihi";
-            MyFiles_DataGridView.Columns[4].HeaderText = "Belge Durumu";
-            MyFiles_DataGridView.Columns[5].HeaderText = "Belge Sahibi";
-
-            foreach (DataGridViewRow dataGridRow in this.MyFiles_DataGridView.Rows)
+            using (dataBaseAdapter = new SqlDataAdapter(dataBaseAdapterText, Program.dataBaseConnection))
             {
-                for (int i = 0; i < dataGridRow.Cells.Count; i++)
+                Program.dataBaseConnection.Open();
+                dataSet = new DataSet();
+                dataBaseAdapter.Fill(dataSet, "belgelerim");
+                MyFiles_DataGridView.DataSource = dataSet.Tables["belgelerim"];
+                dataBaseAdapter.Dispose();
+                // Data Sutün İsimlendirme
+                MyFiles_DataGridView.Columns[0].HeaderText = "Başlık";
+                MyFiles_DataGridView.Columns[1].HeaderText = "Belge Adı";
+                MyFiles_DataGridView.Columns[2].HeaderText = "Eklenme Tarihi";
+                MyFiles_DataGridView.Columns[3].HeaderText = "Güncellenme Tarihi";
+                MyFiles_DataGridView.Columns[4].HeaderText = "Belge Durumu";
+                MyFiles_DataGridView.Columns[5].HeaderText = "Belge Sahibi";
+
+                foreach (DataGridViewRow dataGridRow in this.MyFiles_DataGridView.Rows)
                 {
-                    if (dataGridRow.Cells[i].Value == null || dataGridRow.Cells[i].Value == DBNull.Value || string.IsNullOrWhiteSpace(dataGridRow.Cells[i].Value.ToString()))
+                    for (int i = 0; i < dataGridRow.Cells.Count; i++)
                     {
-                        ActionsGroupBoxEnabledActivity("allElementsFalse");
-                        return;
+                        if (dataGridRow.Cells[i].Value == null || dataGridRow.Cells[i].Value == DBNull.Value || string.IsNullOrWhiteSpace(dataGridRow.Cells[i].Value.ToString()))
+                        {
+                            ActionsGroupBoxEnabledActivity("allElementsFalse");
+                            return;
+                        }
                     }
                 }
+                Program.dataBaseConnection.Close();
             }
-            Program.dataBaseConnection.Close();
+
         }
         //Belgeler veritabanında arama ve listeleme amacıyla kullanılır.
         private void SearchAndFillDataGrid()
@@ -103,7 +106,7 @@ namespace AYTO_BYS_Projesi
             else
             {
                 string currentCellValue = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
-                string returnValue = mainPageDLL.UserIdCheckForPermissin(currentCellValue, UserId);
+                string returnValue = mainPageDLL.UserIdCheckForPermission(currentCellValue, UserId);
 
                 if (returnValue == "true")
                 {
@@ -515,7 +518,6 @@ namespace AYTO_BYS_Projesi
                 }
                 MyFiles_DataGridView.ClearSelection();
                 MessageBoxManager.Unregister();
-                Program.dataBaseConnection.Close();
             }
         }
         //Eylemler Penceresi İptal Etme

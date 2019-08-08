@@ -101,11 +101,13 @@ namespace AYTO_BYS_Projesi
                 {
                     //Dosyayı, kullanıcının seçtiği konuma kaydeder.
                     string serverPath = downloadFileTuple.Item3;
-                    FileStream saveFileStream = File.OpenRead(serverPath);
-                    byte[] contents = new byte[saveFileStream.Length];
-                    saveFileStream.Read(contents, 0, (int)saveFileStream.Length);
-                    saveFileStream.Close();
-                    File.WriteAllBytes(saveFileFromServer.FileName, contents);
+                    using (FileStream saveFileStream = File.OpenRead(serverPath))
+                    {
+                        byte[] contents = new byte[saveFileStream.Length];
+                        saveFileStream.Read(contents, 0, (int)saveFileStream.Length);
+                        saveFileStream.Close();
+                        File.WriteAllBytes(saveFileFromServer.FileName, contents);
+                    }
                 }
                 logDLL.DownloadLog(UserId5, BelgeNo, downloadFileTuple.Item2);
             }

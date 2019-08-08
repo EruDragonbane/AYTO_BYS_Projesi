@@ -40,14 +40,17 @@ namespace AYTO_BYS_Projesi
         {
             Program.dataBaseConnection.Close();
             string checkComboCmdText = "SELECT klnc.kullaniciAdi, klnc.kullaniciSoyadi FROM kullanicilar AS klnc ORDER BY klnc.kullaniciNo";
-            SqlCommand checkComboCmd = new SqlCommand(checkComboCmdText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            SqlDataReader checkComboReader = checkComboCmd.ExecuteReader();
-            while (checkComboReader.Read())
+            using (SqlCommand checkComboCmd = new SqlCommand(checkComboCmdText, Program.dataBaseConnection))
             {
-                SendFilePerson_CheckComboBox.Items.Add(checkComboReader["kullaniciAdi"] + " " + checkComboReader["kullaniciSoyadi"]);
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader checkComboReader = checkComboCmd.ExecuteReader())
+                {
+                    while (checkComboReader.Read())
+                    {
+                        SendFilePerson_CheckComboBox.Items.Add(checkComboReader["kullaniciAdi"] + " " + checkComboReader["kullaniciSoyadi"]);
+                    }
+                }
             }
-            checkComboReader.Close();
             Program.dataBaseConnection.Close();
         }
 

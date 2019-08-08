@@ -38,6 +38,7 @@
             this.UserProfile_CancelButton = new System.Windows.Forms.Button();
             this.UserProfile_ShowPassword_CheckBox = new System.Windows.Forms.CheckBox();
             this.UserProfile_UserPictureBox = new System.Windows.Forms.PictureBox();
+            this.UserProfile_SaveChangesButton = new System.Windows.Forms.Button();
             this.UserProfile_ConfirmNewPassword_CustomTextBox = new AYTO_BYS_Projesi.CustomTextBox();
             this.UserProfile_NewPassword_CustomTextBox = new AYTO_BYS_Projesi.CustomTextBox();
             this.UserProfile_CurrentPassword_CustomTextbox = new AYTO_BYS_Projesi.CustomTextBox();
@@ -134,6 +135,17 @@
             this.UserProfile_UserPictureBox.TabIndex = 2;
             this.UserProfile_UserPictureBox.TabStop = false;
             // 
+            // UserProfile_SaveChangesButton
+            // 
+            this.UserProfile_SaveChangesButton.Location = new System.Drawing.Point(12, 218);
+            this.UserProfile_SaveChangesButton.Name = "UserProfile_SaveChangesButton";
+            this.UserProfile_SaveChangesButton.Size = new System.Drawing.Size(117, 30);
+            this.UserProfile_SaveChangesButton.TabIndex = 13;
+            this.UserProfile_SaveChangesButton.Text = "Değişiklikleri Kaydet";
+            this.UserProfile_SaveChangesButton.UseVisualStyleBackColor = true;
+            this.UserProfile_SaveChangesButton.Visible = false;
+            this.UserProfile_SaveChangesButton.Click += new System.EventHandler(this.UserProfile_SaveChangesButton_Click);
+            // 
             // UserProfile_ConfirmNewPassword_CustomTextBox
             // 
             this.UserProfile_ConfirmNewPassword_CustomTextBox.CustomText = "Yeni Şifre (Tekrar)";
@@ -190,6 +202,7 @@
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(384, 261);
+            this.Controls.Add(this.UserProfile_SaveChangesButton);
             this.Controls.Add(this.UserProfile_ShowPassword_CheckBox);
             this.Controls.Add(this.UserProfile_CancelButton);
             this.Controls.Add(this.USerProfile_UpdateButton);
@@ -206,6 +219,7 @@
             this.MinimumSize = new System.Drawing.Size(400, 300);
             this.Name = "KullaniciProfili";
             this.Text = "KullaniciProfili";
+            this.FormClosing += new System.Windows.Forms.FormClosingEventHandler(this.KullaniciProfili_FormClosing);
             this.Load += new System.EventHandler(this.KullaniciProfili_Load);
             ((System.ComponentModel.ISupportInitialize)(this.UserProfile_UserPictureBox)).EndInit();
             this.ResumeLayout(false);
@@ -226,5 +240,6 @@
         private System.Windows.Forms.Button USerProfile_UpdateButton;
         private System.Windows.Forms.Button UserProfile_CancelButton;
         private System.Windows.Forms.CheckBox UserProfile_ShowPassword_CheckBox;
+        private System.Windows.Forms.Button UserProfile_SaveChangesButton;
     }
 }

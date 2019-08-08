@@ -81,12 +81,13 @@ namespace AYTO_BYS_Projesi
                     {
                         //Dosyayı server klasörüne kaydeder.
                         string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\" + FileTypeLabel.Text;
-                        FileStream fileStream = File.OpenRead(fileDirectory);
-                        byte[] contents = new byte[fileStream.Length];
-                        fileStream.Read(contents, 0, (int)fileStream.Length);
-                        fileStream.Close();
-                        File.WriteAllBytes(serverPath, contents);
-
+                        using (FileStream fileStream = File.OpenRead(fileDirectory))
+                        {
+                            byte[] contents = new byte[fileStream.Length];
+                            fileStream.Read(contents, 0, (int)fileStream.Length);
+                            fileStream.Close();
+                            File.WriteAllBytes(serverPath, contents);
+                        }
                         //Belgenin kayıt edilmesi
                         NewFileRegister(serverPath);
                         AddNewFileEventH();
@@ -139,7 +140,7 @@ namespace AYTO_BYS_Projesi
                         }
                         else
                         {
-                            this.Hide();
+                            this.Close();
                             updateFileForm.Show();
                         }
                     }

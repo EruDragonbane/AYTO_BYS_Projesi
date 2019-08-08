@@ -40,22 +40,23 @@ namespace AYTO_BYS_Projesi
             Program.dataBaseConnection.Close();
             string usersListAdapterText = "SELECT COUNT(blg.belgeNo) AS belgeToplam, klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi FROM (kullanicilar AS klnc LEFT OUTER JOIN belgelerim AS blg ON klnc.kullaniciNo = blg.kullaniciNo) LEFT OUTER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo GROUP BY klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi";
 
-            SqlDataAdapter usersListAdapter = new SqlDataAdapter(usersListAdapterText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            dataSet = new DataSet();
-            usersListAdapter.Fill(dataSet, "kullanicilar");
-            AdminPage_DataGridView.DataSource = dataSet.Tables["kullanicilar"];
-            usersListAdapter.Dispose();
-            // Data Sütun İsimlendirme
-            AdminPage_DataGridView.Columns[0].HeaderText = "Sahip Olduğu Belge Sayısı";
-            AdminPage_DataGridView.Columns[1].HeaderText = "Kullanıcı No";
-            AdminPage_DataGridView.Columns[2].HeaderText = "Ad";
-            AdminPage_DataGridView.Columns[3].HeaderText = "Soyad";
-            AdminPage_DataGridView.Columns[4].HeaderText = "Kullanıcı Durumu";
-            AdminPage_DataGridView.Columns[5].HeaderText = "Görevi";
-            AdminPage_DataGridView.Columns[6].HeaderText = "Kurum";
-            AdminPage_DataGridView.Columns[7].HeaderText = "Kayıt Tarihi";
-
+            using (SqlDataAdapter usersListAdapter = new SqlDataAdapter(usersListAdapterText, Program.dataBaseConnection))
+            {
+                Program.dataBaseConnection.Open();
+                dataSet = new DataSet();
+                usersListAdapter.Fill(dataSet, "kullanicilar");
+                AdminPage_DataGridView.DataSource = dataSet.Tables["kullanicilar"];
+                usersListAdapter.Dispose();
+                // Data Sütun İsimlendirme
+                AdminPage_DataGridView.Columns[0].HeaderText = "Sahip Olduğu Belge Sayısı";
+                AdminPage_DataGridView.Columns[1].HeaderText = "Kullanıcı No";
+                AdminPage_DataGridView.Columns[2].HeaderText = "Ad";
+                AdminPage_DataGridView.Columns[3].HeaderText = "Soyad";
+                AdminPage_DataGridView.Columns[4].HeaderText = "Kullanıcı Durumu";
+                AdminPage_DataGridView.Columns[5].HeaderText = "Görevi";
+                AdminPage_DataGridView.Columns[6].HeaderText = "Kurum";
+                AdminPage_DataGridView.Columns[7].HeaderText = "Kayıt Tarihi";
+            }
             Program.dataBaseConnection.Close();
             tableName = "kullanicilar";
             datagridColumnName = "kullaniciNo";
@@ -68,22 +69,24 @@ namespace AYTO_BYS_Projesi
             //Veritabanı bağlantısı aktif değilse aktif yap
             Program.dataBaseConnection.Close();
             string filesListAdapterText = "SELECT DISTINCT blg.belgeBasligi, blg.belgeAdi, blg.eklenmeTarihi, blg.guncellenmeTarihi, blg.guncelleyenKisiNo, drm.durumAdi, klnc.kullaniciAdi+' '+klnc.kullaniciSoyadi AS klncAdSoyad FROM belgelerim AS blg, durumlar AS drm, kullanicilar AS klnc WHERE blg.durumNo = drm.durumNo AND klnc.kullaniciNo = blg.kullaniciNo ORDER BY blg.eklenmeTarihi DESC";
-            SqlDataAdapter filesListAdapter = new SqlDataAdapter(filesListAdapterText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            dataSet = new DataSet();
-            filesListAdapter.Fill(dataSet, "belgelerim");
-            AdminPage_DataGridView.DataSource = dataSet.Tables["belgelerim"];
-            filesListAdapter.Dispose();
-            
-            // Data Sütun İsimlendirme
-            AdminPage_DataGridView.Columns[0].HeaderText = "Başlık";
-            AdminPage_DataGridView.Columns[1].HeaderText = "Belge Adı";
-            AdminPage_DataGridView.Columns[2].HeaderText = "Eklenme Tarihi";
-            AdminPage_DataGridView.Columns[3].HeaderText = "Güncellenme Tarihi";
-            AdminPage_DataGridView.Columns[4].HeaderText = "Güncelleyen Kişi";
-            AdminPage_DataGridView.Columns[5].HeaderText = "Belge Durumu";
-            AdminPage_DataGridView.Columns[6].HeaderText = "Belge Sahibi";
+            using (SqlDataAdapter filesListAdapter = new SqlDataAdapter(filesListAdapterText, Program.dataBaseConnection))
+            {
+                Program.dataBaseConnection.Open();
+                dataSet = new DataSet();
+                filesListAdapter.Fill(dataSet, "belgelerim");
+                AdminPage_DataGridView.DataSource = dataSet.Tables["belgelerim"];
+                filesListAdapter.Dispose();
 
+                // Data Sütun İsimlendirme
+                AdminPage_DataGridView.Columns[0].HeaderText = "Başlık";
+                AdminPage_DataGridView.Columns[1].HeaderText = "Belge Adı";
+                AdminPage_DataGridView.Columns[2].HeaderText = "Eklenme Tarihi";
+                AdminPage_DataGridView.Columns[3].HeaderText = "Güncellenme Tarihi";
+                AdminPage_DataGridView.Columns[4].HeaderText = "Güncelleyen Kişi";
+                AdminPage_DataGridView.Columns[5].HeaderText = "Belge Durumu";
+                AdminPage_DataGridView.Columns[6].HeaderText = "Belge Sahibi";
+
+            }
             Program.dataBaseConnection.Close();
             tableName = "belgelerim";
             datagridColumnName = "belgeAdi";
@@ -95,17 +98,18 @@ namespace AYTO_BYS_Projesi
         {
             Program.dataBaseConnection.Close();
             string fileStatusListAdapterText = "SELECT DISTINCT drm.durumNo, drm.durumAdi, COUNT(blg.belgeNo) FROM durumlar AS drm LEFT OUTER JOIN belgelerim AS blg ON drm.durumNo = blg.durumNo GROUP BY drm.durumNo, drm.durumAdi";
-            SqlDataAdapter fileStatusListAdapter = new SqlDataAdapter(fileStatusListAdapterText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            dataSet = new DataSet();
-            fileStatusListAdapter.Fill(dataSet, "durumlar");
-            AdminPage_DataGridView.DataSource = dataSet.Tables["durumlar"];
-            fileStatusListAdapter.Dispose();
-            // Data Sütun İsimlendirme
-            AdminPage_DataGridView.Columns[0].HeaderText = "Durum No";
-            AdminPage_DataGridView.Columns[1].HeaderText = "Durum Adı";
-            AdminPage_DataGridView.Columns[2].HeaderText = "Duruma Sahip Olan Belge Sayısı";
-
+            using (SqlDataAdapter fileStatusListAdapter = new SqlDataAdapter(fileStatusListAdapterText, Program.dataBaseConnection))
+            {
+                Program.dataBaseConnection.Open();
+                dataSet = new DataSet();
+                fileStatusListAdapter.Fill(dataSet, "durumlar");
+                AdminPage_DataGridView.DataSource = dataSet.Tables["durumlar"];
+                fileStatusListAdapter.Dispose();
+                // Data Sütun İsimlendirme
+                AdminPage_DataGridView.Columns[0].HeaderText = "Durum No";
+                AdminPage_DataGridView.Columns[1].HeaderText = "Durum Adı";
+                AdminPage_DataGridView.Columns[2].HeaderText = "Duruma Sahip Olan Belge Sayısı";
+            }
             Program.dataBaseConnection.Close();
             tableName = "durumlar";
             datagridColumnName = "durumAdi";
@@ -117,17 +121,18 @@ namespace AYTO_BYS_Projesi
         {
             Program.dataBaseConnection.Close();
             string positionListAdapterText = "SELECT DISTINCT grv.gorevNo, grv.gorevAdi, COUNT(klnc.kullaniciNo) FROM gorevler AS grv LEFT OUTER JOIN kullanicilar AS klnc ON grv.gorevNo = klnc.gorevNo GROUP BY grv.gorevNo, grv.gorevAdi";
-            SqlDataAdapter positionListAdapter = new SqlDataAdapter(positionListAdapterText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            dataSet = new DataSet();
-            positionListAdapter.Fill(dataSet, "gorevler");
-            AdminPage_DataGridView.DataSource = dataSet.Tables["gorevler"];
-            positionListAdapter.Dispose();
-            // Data Sütun İsimlendirme
-            AdminPage_DataGridView.Columns[0].HeaderText = "Görev No";
-            AdminPage_DataGridView.Columns[1].HeaderText = "Görev Adı";
-            AdminPage_DataGridView.Columns[2].HeaderText = "Çalışan Sayısı";
-
+            using (SqlDataAdapter positionListAdapter = new SqlDataAdapter(positionListAdapterText, Program.dataBaseConnection))
+            {
+                Program.dataBaseConnection.Open();
+                dataSet = new DataSet();
+                positionListAdapter.Fill(dataSet, "gorevler");
+                AdminPage_DataGridView.DataSource = dataSet.Tables["gorevler"];
+                positionListAdapter.Dispose();
+                // Data Sütun İsimlendirme
+                AdminPage_DataGridView.Columns[0].HeaderText = "Görev No";
+                AdminPage_DataGridView.Columns[1].HeaderText = "Görev Adı";
+                AdminPage_DataGridView.Columns[2].HeaderText = "Çalışan Sayısı";
+            }
             Program.dataBaseConnection.Close();
             tableName = "gorevler";
             datagridColumnName = "gorevAdi";
@@ -139,22 +144,22 @@ namespace AYTO_BYS_Projesi
         {
             Program.dataBaseConnection.Close();
             string deletedUserListAdapterText = "SELECT  klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLklnc.silinenKullaniciNo, SLklnc.silinenKullaniciAdi + ' ' +SLklnc.silinenKullaniciSoyadi AS SLklncAdSoyad, grv.gorevAdi, SLklnc.silinenKullaniciKurumu, SLklnc.silinmeTarihi FROM (silinenKullanicilar AS SLklnc INNER JOIN gorevler AS grv ON SLklnc.silinenGorevNo = grv.gorevNo) INNER JOIN kullanicilar AS klnc ON SLklnc.silenKisi = klnc.kullaniciNo ORDER BY SLklnc.silinenKullaniciNo";
-
-            SqlDataAdapter deletedUserListAdapter = new SqlDataAdapter(deletedUserListAdapterText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            dataSet = new DataSet();
-            deletedUserListAdapter.Fill(dataSet, "silinenKullanicilar");
-            AdminPage_DataGridView.DataSource = dataSet.Tables["silinenKullanicilar"];
-            deletedUserListAdapter.Dispose();
-            //Data Sütun
-            AdminPage_DataGridView.Columns[0].HeaderText = "Silen Yetkili";
-            AdminPage_DataGridView.Columns[1].HeaderText = "Silinen Kullanıcı No";
-            AdminPage_DataGridView.Columns[2].HeaderText = "Silinen Kullanıcı";
-            AdminPage_DataGridView.Columns[3].HeaderText = "Görevi";
-            AdminPage_DataGridView.Columns[4].HeaderText = "Kurumu";
-            AdminPage_DataGridView.Columns[5].HeaderText = "Silinme Tarihi";
-            AdminPage_DataGridView.Columns[0].HeaderCell.Style.Font = new Font("Microsoft Sans Serif",9F,FontStyle.Bold);
-
+            using (SqlDataAdapter deletedUserListAdapter = new SqlDataAdapter(deletedUserListAdapterText, Program.dataBaseConnection))
+            {
+                Program.dataBaseConnection.Open();
+                dataSet = new DataSet();
+                deletedUserListAdapter.Fill(dataSet, "silinenKullanicilar");
+                AdminPage_DataGridView.DataSource = dataSet.Tables["silinenKullanicilar"];
+                deletedUserListAdapter.Dispose();
+                //Data Sütun
+                AdminPage_DataGridView.Columns[0].HeaderText = "Silen Yetkili";
+                AdminPage_DataGridView.Columns[1].HeaderText = "Silinen Kullanıcı No";
+                AdminPage_DataGridView.Columns[2].HeaderText = "Silinen Kullanıcı";
+                AdminPage_DataGridView.Columns[3].HeaderText = "Görevi";
+                AdminPage_DataGridView.Columns[4].HeaderText = "Kurumu";
+                AdminPage_DataGridView.Columns[5].HeaderText = "Silinme Tarihi";
+                AdminPage_DataGridView.Columns[0].HeaderCell.Style.Font = new Font("Microsoft Sans Serif", 9F, FontStyle.Bold);
+            }
             Program.dataBaseConnection.Close();
             tableName = "silinenKullanicilar";
             datagridColumnName = "silinenKullaniciNo";
@@ -167,21 +172,22 @@ namespace AYTO_BYS_Projesi
             Program.dataBaseConnection.Close();
             string deletedfilesListAdapterText = "SELECT klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLblg.silinenBelgeNo, SLblg.silinenBelgeAdi, SLblg.silinenSistemEklenmeTarihi, SLblg.silinenSistemGuncellenmeTarihi, SLblg.silinmeTarihi FROM silinenBelgeler AS SLblg INNER JOIN kullanicilar AS klnc ON SLblg.silenKisi = klnc.kullaniciNo ORDER BY SLblg.silinenBelgeNo";
 
-            SqlDataAdapter deletedFilesListAdapter = new SqlDataAdapter(deletedfilesListAdapterText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            dataSet = new DataSet();
-            deletedFilesListAdapter.Fill(dataSet, "silinenBelgeler");
-            AdminPage_DataGridView.DataSource = dataSet.Tables["silinenBelgeler"];
-            deletedFilesListAdapter.Dispose();
-            //Data Sütun
-            AdminPage_DataGridView.Columns[0].HeaderText = "Silen Yetkili";
-            AdminPage_DataGridView.Columns[1].HeaderText = "Silinen Belge No";
-            AdminPage_DataGridView.Columns[2].HeaderText = "Silinen Belge Adı";
-            AdminPage_DataGridView.Columns[3].HeaderText = "Eklenme Tarihi";
-            AdminPage_DataGridView.Columns[4].HeaderText = "Güncellenme Tarihi";
-            AdminPage_DataGridView.Columns[5].HeaderText = "Silinme Tarihi";
-            AdminPage_DataGridView.Columns[0].HeaderCell.Style.Font =new Font("Microsoft Sans Seris", 9F, FontStyle.Bold);
-
+            using (SqlDataAdapter deletedFilesListAdapter = new SqlDataAdapter(deletedfilesListAdapterText, Program.dataBaseConnection))
+            {
+                Program.dataBaseConnection.Open();
+                dataSet = new DataSet();
+                deletedFilesListAdapter.Fill(dataSet, "silinenBelgeler");
+                AdminPage_DataGridView.DataSource = dataSet.Tables["silinenBelgeler"];
+                deletedFilesListAdapter.Dispose();
+                //Data Sütun
+                AdminPage_DataGridView.Columns[0].HeaderText = "Silen Kişi";
+                AdminPage_DataGridView.Columns[1].HeaderText = "Silinen Belge No";
+                AdminPage_DataGridView.Columns[2].HeaderText = "Silinen Belge Adı";
+                AdminPage_DataGridView.Columns[3].HeaderText = "Eklenme Tarihi";
+                AdminPage_DataGridView.Columns[4].HeaderText = "Güncellenme Tarihi";
+                AdminPage_DataGridView.Columns[5].HeaderText = "Silinme Tarihi";
+                AdminPage_DataGridView.Columns[0].HeaderCell.Style.Font = new Font("Microsoft Sans Seris", 9F, FontStyle.Bold);
+            }
             Program.dataBaseConnection.Close();
             tableName = "silinenBelgeler";
             datagridColumnName = "silinenBelgeNo";

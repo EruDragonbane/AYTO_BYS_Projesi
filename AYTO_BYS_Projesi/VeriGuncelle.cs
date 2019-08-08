@@ -152,24 +152,32 @@ namespace AYTO_BYS_Projesi
         {
             Program.dataBaseConnection.Close();
             string positionFillCmdText = "SELECT grv.gorevAdi FROM gorevler AS grv ORDER BY grv.gorevNo ASC";
-            SqlCommand positionFillCmd = new SqlCommand(positionFillCmdText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            SqlDataReader positionFillReader = positionFillCmd.ExecuteReader();
-            while (positionFillReader.Read())
-            {
-                UpdateUserPosition_ComboBox.Items.Add(positionFillReader["gorevAdi"]);
-            }
-            positionFillReader.Close();
-            Program.dataBaseConnection.Close();
             string authorityFillCmdText = "SELECT ytk.yetkiAdi FROM yetkiler AS ytk ORDER BY ytk.yetkiNo ASC";
-            SqlCommand authorityFillCmd = new SqlCommand(authorityFillCmdText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            SqlDataReader authorityFillReader = authorityFillCmd.ExecuteReader();
-            while (authorityFillReader.Read())
+
+            using (SqlCommand positionFillCmd = new SqlCommand(positionFillCmdText, Program.dataBaseConnection))
             {
-                UpdateUserAuthority_ComboBox.Items.Add(authorityFillReader["yetkiAdi"]);
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader positionFillReader = positionFillCmd.ExecuteReader())
+                {
+                    while (positionFillReader.Read())
+                    {
+                        UpdateUserPosition_ComboBox.Items.Add(positionFillReader["gorevAdi"]);
+                    }
+                }
             }
-            authorityFillReader.Close();
+            Program.dataBaseConnection.Close();
+
+            using (SqlCommand authorityFillCmd = new SqlCommand(authorityFillCmdText, Program.dataBaseConnection))
+            {
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader authorityFillReader = authorityFillCmd.ExecuteReader())
+                {
+                    while (authorityFillReader.Read())
+                    {
+                        UpdateUserAuthority_ComboBox.Items.Add(authorityFillReader["yetkiAdi"]);
+                    }
+                }
+            }
             Program.dataBaseConnection.Close();
         }
         private void UpdateStatusAndPositionComboBoxFillMethod()
@@ -193,28 +201,31 @@ namespace AYTO_BYS_Projesi
             {
                 Program.dataBaseConnection.Close();
                 string comboBoxStPosFillCmdText = "SELECT " + columnName + "Adi FROM " + TableName + " ORDER BY " + columnName + "No ASC";
-                SqlCommand stPosFillCmd = new SqlCommand(comboBoxStPosFillCmdText, Program.dataBaseConnection);
-                Program.dataBaseConnection.Open();
-                SqlDataReader stPosFillReader = stPosFillCmd.ExecuteReader();
-                if(TableName == "durumlar")
+                using (SqlCommand stPosFillCmd = new SqlCommand(comboBoxStPosFillCmdText, Program.dataBaseConnection))
                 {
-                    while (stPosFillReader.Read())
+                    Program.dataBaseConnection.Open();
+                    using (SqlDataReader stPosFillReader = stPosFillCmd.ExecuteReader())
                     {
-                        UpdateStatus_ComboBox.Items.Add(stPosFillReader[columnName + "Adi"]);
+                        if (TableName == "durumlar")
+                        {
+                            while (stPosFillReader.Read())
+                            {
+                                UpdateStatus_ComboBox.Items.Add(stPosFillReader[columnName + "Adi"]);
+                            }
+                        }
+                        else if (TableName == "gorevler")
+                        {
+                            while (stPosFillReader.Read())
+                            {
+                                UpdatePosition_ComboBox.Items.Add(stPosFillReader[columnName + "Adi"]);
+                            }
+                        }
+                        else
+                        {
+                            MessageBox.Show("Hata: StPosFill-ComboAddWhile");
+                        }
                     }
                 }
-                else if(TableName == "gorevler")
-                {
-                    while (stPosFillReader.Read())
-                    {
-                        UpdatePosition_ComboBox.Items.Add(stPosFillReader[columnName + "Adi"]);
-                    }
-                }
-                else
-                {
-                    MessageBox.Show("Hata: StPosFill-ComboAddWhile");
-                }
-                stPosFillReader.Close();
                 Program.dataBaseConnection.Close();
             }
             else
@@ -242,9 +253,17 @@ namespace AYTO_BYS_Projesi
             {
                 UpdateDataComboBoxFillMethod();
             }
-            else if (TableName == "durumlar" || TableName == "gorevler")
+            else if (TableName != "belgelerim" && TableName == "durumlar" || TableName == "gorevler")
             {
                 UpdateStatusAndPositionComboBoxFillMethod();
+                if (TableName == "durumlar")
+                {
+                    UpdateStatus_ComboBox.SelectedIndex = 0;
+                }
+                else
+                {
+                    UpdatePosition_ComboBox.SelectedIndex = 0;
+                }
             }
             else
             {

@@ -40,64 +40,77 @@ namespace AYTO_BYS_Projesi
             Program.dataBaseConnection.Close();
             string positionFillCmdText = "SELECT grv.gorevAdi FROM gorevler AS grv ORDER BY grv.gorevNo ASC";
             string authorityFillCmdText = "SELECT ytk.yetkiAdi FROM yetkiler AS ytk ORDER BY ytk.yetkiNo ASC";
-            SqlCommand positionFillCmd = new SqlCommand(positionFillCmdText, Program.dataBaseConnection);
-            SqlCommand authorityFillCmd = new SqlCommand(authorityFillCmdText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            SqlDataReader positionFillReader = positionFillCmd.ExecuteReader();
-            while (positionFillReader.Read())
+
+            using (SqlCommand positionFillCmd = new SqlCommand(positionFillCmdText, Program.dataBaseConnection))
             {
-                AddNewUserPosition_ComboBox.Items.Add(positionFillReader["gorevAdi"]);
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader positionFillReader = positionFillCmd.ExecuteReader())
+                {
+                    while (positionFillReader.Read())
+                    {
+                        AddNewUserPosition_ComboBox.Items.Add(positionFillReader["gorevAdi"]);
+                    }
+                }
             }
-            positionFillReader.Close();
             Program.dataBaseConnection.Close();
-            Program.dataBaseConnection.Open();
-            SqlDataReader authorityFillReader = authorityFillCmd.ExecuteReader();
-            while (authorityFillReader.Read())
+            using (SqlCommand authorityFillCmd = new SqlCommand(authorityFillCmdText, Program.dataBaseConnection))
             {
-                AddNewUserAuthority_ComboBox.Items.Add(authorityFillReader["yetkiAdi"]);
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader authorityFillReader = authorityFillCmd.ExecuteReader())
+                {
+                    while (authorityFillReader.Read())
+                    {
+                        AddNewUserAuthority_ComboBox.Items.Add(authorityFillReader["yetkiAdi"]);
+                    }
+                }
             }
             if (AddNewUserPosition_ComboBox.Items.Count != 0 || AddNewUserAuthority_ComboBox.Items.Count != 0)
             {
                 AddNewUserPosition_ComboBox.SelectedIndex = 0;
                 AddNewUserAuthority_ComboBox.SelectedIndex = 0;
             }
-            authorityFillReader.Close();
             Program.dataBaseConnection.Close();
         }
         private void NewStatusComboBoxFillMethod()
         {
             Program.dataBaseConnection.Close();
             string statusFillCmdText = "SELECT drm.durumAdi FROM durumlar AS drm ORDER BY drm.durumNo ASC";
-            SqlCommand statusFillCmd = new SqlCommand(statusFillCmdText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            SqlDataReader statusFillReader = statusFillCmd.ExecuteReader();
-            while (statusFillReader.Read())
+            using (SqlCommand statusFillCmd = new SqlCommand(statusFillCmdText, Program.dataBaseConnection))
             {
-                AddNewStatus_ComboBox.Items.Add(statusFillReader["durumAdi"]);
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader statusFillReader = statusFillCmd.ExecuteReader())
+                {
+                    while (statusFillReader.Read())
+                    {
+                        AddNewStatus_ComboBox.Items.Add(statusFillReader["durumAdi"]);
+                    }
+                }
             }
             if(AddNewStatus_ComboBox.Items.Count != 0)
             {
                 AddNewStatus_ComboBox.SelectedIndex = 0;
             }
-            statusFillReader.Close();
             Program.dataBaseConnection.Close();
         }
         private void NewPositionComboBoxFillMethod()
         {
             Program.dataBaseConnection.Close();
             string positionFillCmdText = "SELECT grv.gorevAdi FROM gorevler AS grv ORDER BY grv.gorevNo ASC";
-            SqlCommand positionFillCmd = new SqlCommand(positionFillCmdText, Program.dataBaseConnection);
-            Program.dataBaseConnection.Open();
-            SqlDataReader positionFillReader = positionFillCmd.ExecuteReader();
-            while (positionFillReader.Read())
+            using (SqlCommand positionFillCmd = new SqlCommand(positionFillCmdText, Program.dataBaseConnection))
             {
-                AddNewPosition_ComboBox.Items.Add(positionFillReader["gorevAdi"]);
+                Program.dataBaseConnection.Open();
+                using (SqlDataReader positionFillReader = positionFillCmd.ExecuteReader())
+                {
+                    while (positionFillReader.Read())
+                    {
+                        AddNewPosition_ComboBox.Items.Add(positionFillReader["gorevAdi"]);
+                    }
+                }
             }
             if(AddNewPosition_ComboBox.Items.Count != 0)
             {
                 AddNewPosition_ComboBox.SelectedIndex = 0;
             }
-            positionFillReader.Close();
             Program.dataBaseConnection.Close();
         }
         //Textboxların boş olup olmadığını kontrol eder.
