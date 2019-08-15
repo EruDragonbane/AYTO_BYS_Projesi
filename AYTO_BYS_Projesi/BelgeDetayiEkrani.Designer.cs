@@ -29,7 +29,6 @@
         private void InitializeComponent()
         {
             this.DetailFileForm_SendFileButton = new System.Windows.Forms.Button();
-            this.DetailFileForm_DownloadButton = new System.Windows.Forms.Button();
             this.DetailFile_FileTitleLabel = new System.Windows.Forms.Label();
             this.DetailFileForm_CancelButton = new System.Windows.Forms.Button();
             this.DetailFile_FileDateLabel = new System.Windows.Forms.Label();
@@ -42,7 +41,7 @@
             // 
             // DetailFileForm_SendFileButton
             // 
-            this.DetailFileForm_SendFileButton.Location = new System.Drawing.Point(663, 12);
+            this.DetailFileForm_SendFileButton.Location = new System.Drawing.Point(740, 12);
             this.DetailFileForm_SendFileButton.Name = "DetailFileForm_SendFileButton";
             this.DetailFileForm_SendFileButton.Size = new System.Drawing.Size(75, 23);
             this.DetailFileForm_SendFileButton.TabIndex = 2;
@@ -50,17 +49,6 @@
             this.DetailFileForm_SendFileButton.Text = "Gönder";
             this.DetailFileForm_SendFileButton.UseVisualStyleBackColor = true;
             this.DetailFileForm_SendFileButton.Click += new System.EventHandler(this.DetailFileForm_SendFileButton_Click);
-            // 
-            // DetailFileForm_DownloadButton
-            // 
-            this.DetailFileForm_DownloadButton.Location = new System.Drawing.Point(740, 12);
-            this.DetailFileForm_DownloadButton.Name = "DetailFileForm_DownloadButton";
-            this.DetailFileForm_DownloadButton.Size = new System.Drawing.Size(75, 23);
-            this.DetailFileForm_DownloadButton.TabIndex = 3;
-            this.DetailFileForm_DownloadButton.TabStop = false;
-            this.DetailFileForm_DownloadButton.Text = "Kaydet";
-            this.DetailFileForm_DownloadButton.UseVisualStyleBackColor = true;
-            this.DetailFileForm_DownloadButton.Click += new System.EventHandler(this.DetailFileForm_DownloadButton_Click);
             // 
             // DetailFile_FileTitleLabel
             // 
@@ -74,7 +62,7 @@
             // 
             // DetailFileForm_CancelButton
             // 
-            this.DetailFileForm_CancelButton.Location = new System.Drawing.Point(582, 12);
+            this.DetailFileForm_CancelButton.Location = new System.Drawing.Point(659, 12);
             this.DetailFileForm_CancelButton.Name = "DetailFileForm_CancelButton";
             this.DetailFileForm_CancelButton.Size = new System.Drawing.Size(75, 23);
             this.DetailFileForm_CancelButton.TabIndex = 1;
@@ -159,7 +147,6 @@
             this.Controls.Add(this.DetailFile_FileDateLabel);
             this.Controls.Add(this.DetailFileForm_CancelButton);
             this.Controls.Add(this.DetailFile_FileTitleLabel);
-            this.Controls.Add(this.DetailFileForm_DownloadButton);
             this.Controls.Add(this.DetailFileForm_SendFileButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
@@ -175,7 +162,6 @@
         #endregion
 
         private System.Windows.Forms.Button DetailFileForm_SendFileButton;
-        private System.Windows.Forms.Button DetailFileForm_DownloadButton;
         private System.Windows.Forms.Label DetailFile_FileTitleLabel;
         private System.Windows.Forms.Button DetailFileForm_CancelButton;
         private System.Windows.Forms.Label DetailFile_FileDateLabel;

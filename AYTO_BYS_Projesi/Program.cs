@@ -13,6 +13,7 @@ namespace AYTO_BYS_Projesi
         /// Uygulamanın ana girdi noktası.
         /// </summary>
         public static SqlConnection dataBaseConnection = new SqlConnection("server=ERU; Initial Catalog=deneme;Integrated Security=SSPI");
+        public const string serverFilePath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\";
 
         [STAThread]
 

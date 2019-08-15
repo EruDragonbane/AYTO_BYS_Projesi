@@ -32,6 +32,8 @@ namespace AYTO_BYS_Projesi
         public string TableName { get; set; }
         public int UpdateDataUserId { get; set; }
 
+        //Eski Veri Adı
+        string oldDataName = "";
         //Textboxların ve Combobox'un boş olması durumunda güncelle butonu pasif kalmaktadır.
         private void TextControlForButton()
         {
@@ -93,14 +95,20 @@ namespace AYTO_BYS_Projesi
                 UpdateUserPosition_ComboBox.Text = textGridTuple.Item5;
                 UpdateUserAuthority_ComboBox.Text = textGridTuple.Item6;
                 UpdateUserCorp_CustomTextBox.Text = textGridTuple.Item7;
+
+                oldDataName = textGridTuple.Item2 + ' ' + textGridTuple.Item3;
             }
             else if (TableName == "durumlar")
             {
                 UpdateStatus_CustomTextBox.Text = textGridTuple.Rest.Item1;
+
+                oldDataName = textGridTuple.Rest.Item1;
             }
             else if (TableName == "gorevler")
             {
                 UpdatePosition_CustomTextBox.Text = textGridTuple.Rest.Item2;
+
+                oldDataName = textGridTuple.Rest.Item2;
             }
             else
             {
@@ -115,7 +123,7 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Register();
 
             string status = UpdateStatus_CustomTextBox.Text.Trim();
-            string position = UpdateUserPosition_ComboBox.Text.Trim();
+            string position = UpdatePosition_CustomTextBox.Text.Trim();
             string userAuthority = UpdateUserAuthority_ComboBox.Text.Trim();
             string userName = UpdateUserName_CustomTextBox.Text.Trim();
             string userSurname = UpdateUserSurname_CustomTextBox.Text.Trim();
@@ -142,7 +150,7 @@ namespace AYTO_BYS_Projesi
             {
                 MessageBox.Show("Hata: VeriGuncelle-UpdateDataMethod");
             }
-            logDLL.UpdateDataLog(TableName, UpdateDataUserId, DataFromAdminPanel, updateDataTuple.Item1, userName, userSurname, updateDataTuple.Item2);
+            logDLL.UpdateDataLog(TableName, UpdateDataUserId, DataFromAdminPanel, updateDataTuple.Item1, userName, userSurname, updateDataTuple.Item2, oldDataName);
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
             this.Close();

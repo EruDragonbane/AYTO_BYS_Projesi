@@ -29,7 +29,8 @@ namespace AYTO_BYS_Projesi
          * En saçma yöntemlerinden biri olsa da işe yarıyor. :D
          */
         private bool updateDirectoryButtonCheck = false;
-        //private string oldFileName = "";
+        //Log'da göstermek üzere güncelleme öncesindeki dosya adını almak
+        private string oldFileName = "";
 
         //YeniBelgeEkrani formundan belgenin numara olarak geçen anahtar değerini alır.
         //AnaEkran formundan kullanıcının Id değerini alır.
@@ -68,6 +69,8 @@ namespace AYTO_BYS_Projesi
             UpdateFileExplain_RichTextBox.Text = textGridTuple.Item4;
             UpdateFileAddedDateTimePicker.Text = textGridTuple.Item5;
             UpdateFileStatus_ComboBox.SelectedIndex = UpdateFileStatus_ComboBox.Items.IndexOf(textGridTuple.Item6);
+            //Eski Belge Adı
+            oldFileName = UpdateFileName_TextBox.Text.Trim();
         }
         //Combobox'u durumlar ile doldurur.
         private void ComboboxFill()
@@ -191,7 +194,7 @@ namespace AYTO_BYS_Projesi
             MessageBox.Show("Belge Güncellendi.");
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
-            logDLL.UpdateFileLog(UserId3, BelgeNo, updateFileName);
+            logDLL.UpdateFileLog(UserId3, BelgeNo, updateFileName, oldFileName);
             this.Close();
         }
 

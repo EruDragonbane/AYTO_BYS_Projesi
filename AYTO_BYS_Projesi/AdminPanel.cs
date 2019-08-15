@@ -38,6 +38,7 @@ namespace AYTO_BYS_Projesi
         private void UsersList()
         {
             Program.dataBaseConnection.Close();
+
             string usersListAdapterText = "SELECT COUNT(blg.belgeNo) AS belgeToplam, klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi FROM (kullanicilar AS klnc LEFT OUTER JOIN belgelerim AS blg ON klnc.kullaniciNo = blg.kullaniciNo) LEFT OUTER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo GROUP BY klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi";
 
             using (SqlDataAdapter usersListAdapter = new SqlDataAdapter(usersListAdapterText, Program.dataBaseConnection))
@@ -166,6 +167,7 @@ namespace AYTO_BYS_Projesi
             columnName = "klncVeri";
             columnTitle = "Silinen Kullanıcı";
         }
+        //Silinen belgenin sahibi ile silinen kişi aynı ise "Kendisi" yazar.
         //Silinen Belgelerin Listelenmesi
         private void DeletedFilesList()
         {

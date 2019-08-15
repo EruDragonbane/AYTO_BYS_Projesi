@@ -74,7 +74,7 @@ namespace AYTO_BYS_Projesi
             UserProfile_UserNameSurnameLabel.Text = infoAboutUserTuple.Item1;
             UserProfile_UserCorpLabel.Text = infoAboutUserTuple.Item2;
             UserProfile_UserPositionLabel.Text = infoAboutUserTuple.Item3;
-            UserProfile_UserPictureBox.Image = Image.FromFile(@"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg");
+            UserProfile_UserPictureBox.Image = Image.FromFile(Program.serverFilePath + @"KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg");
         }
         //Kaydetme Öncesi kullanıcının istekleri kontrol edilir.
         private void UpdateWithPassword()
@@ -188,18 +188,26 @@ namespace AYTO_BYS_Projesi
             //Item4 = kullaniciNo 
             var userNameSurnameTuple = userProfileDLL.InformationAbourtUser(UserId6);
             //Dosyayı servere kullanıcının anahtar numarası ile kaydeder.
-            string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\KullaniciResimleri\";
+            string serverPath = Program.serverFilePath + @"KullaniciResimleri\";
             string newFileName = serverPath + userNameSurnameTuple.Item4 + ".jpg";
-            if (!Directory.Exists(serverPath))
-                Directory.CreateDirectory(serverPath);
+            //if (!Directory.Exists(serverPath))
+                //Directory.CreateDirectory(serverPath);
             lock (lockObject)
             {
-                using (FileStream fileStream = File.Open(imageLocation, FileMode.Open))
+                using (FileStream fileStream = File.OpenRead(imageLocation))
                 {
-                    byte[] contents = new byte[fileStream.Length];
-                    fileStream.Read(contents, 0, (int)fileStream.Length);
-                    //fileStream.Close();
-                    //File.WriteAllBytes(newFileName, contents);
+                    try
+                    {
+                        byte[] contents = new byte[fileStream.Length];
+                        fileStream.Read(contents, 0, (int)fileStream.Length);
+                        fileStream.Dispose();
+                        fileStream.Close();
+                        File.WriteAllBytes(newFileName, contents);
+                    }
+                    catch (IOException e)
+                    {
+                        Console.WriteLine(e.ToString());
+                    }
                 }
             }
 
@@ -210,6 +218,13 @@ namespace AYTO_BYS_Projesi
         }
         private void KullaniciProfili_Load(object sender, EventArgs e)
         {
+            //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
+            MessageBoxManager.Unregister();
+
+            MessageBoxManager.Yes = "Evet";
+            MessageBoxManager.No = "Hayır";
+            MessageBoxManager.OK = "Tamam";
+
             InformationAboutUser();
             PasswordTextBoxEnabledAndVisible(false);
             //UserProfile_UserPictureBox.Enabled = false;
@@ -238,6 +253,7 @@ namespace AYTO_BYS_Projesi
                             UserProfile_UserPictureBox.Text = imageLocation;
                             UserProfile_UserPictureBox.ImageLocation = imageLocation;
                             checkForUpdateImageButton = 1;
+                            images.Dispose();
                         }
                         else
                         {

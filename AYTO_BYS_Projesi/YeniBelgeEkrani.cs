@@ -80,7 +80,7 @@ namespace AYTO_BYS_Projesi
                     if (fileInfo.Length < (Math.Pow(10, 7) * 1.5))
                     {
                         //Dosyayı server klasörüne kaydeder.
-                        string serverPath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\" + FileTypeLabel.Text;
+                        string serverPath = Program.serverFilePath + FileTypeLabel.Text;
                         using (FileStream fileStream = File.OpenRead(fileDirectory))
                         {
                             byte[] contents = new byte[fileStream.Length];
@@ -125,25 +125,8 @@ namespace AYTO_BYS_Projesi
             {
                 if (returnChecksTuple.Item1 == "existingFile")
                 {
-                    String messageExisting = ("Böyle bir belge var. \n\nBelge Adı: " + fileName + "\n\nBelge Dizini: " + fileDirectory + "\n\nVar olan belgeyi güncellemek ister misiniz?");
-                    String titleExisting = "Uyarı!";
-                    DialogResult updateFileFormResult = MessageBox.Show(messageExisting, titleExisting, yesNoButtons);
+                    MessageBox.Show("Bu isimde bir belgeniz var. \n\nBelge Adı: " + fileName + "\n\nBelge Dizini: " + fileDirectory);
                     MessageBoxManager.Unregister();
-                    if (updateFileFormResult == DialogResult.Yes)
-                    {
-                        //Var olan belgenin anahtarını çeker.
-                        string updateForm_belgeNo = newFileDLL.UpdateFormActions(fileName);
-                        BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(updateForm_belgeNo, UserId2, UserId2);
-                        if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
-                        {
-                            MessageBox.Show("Belge güncelleme penceresi zaten açık! \n\nÖnce açık olan pencereyi kapatın.", "Uyarı");
-                        }
-                        else
-                        {
-                            this.Close();
-                            updateFileForm.Show();
-                        }
-                    }
                 }
                 else
                 {
@@ -164,8 +147,8 @@ namespace AYTO_BYS_Projesi
             string registerFileTypeLabel = FileTypeLabel.Text.Trim();
             string registerFileExplain = NewFileExplain_RichTextBox.Text.Trim();
             string registerDateTime = NewFileDateTimePicker.Text;
-
-            newFileDLL.NewFile_AddButton_Register(UserId2, registerFileTitle, registerFileName, registerFileDirectoy, registerFileTypeLabel, serverPath, registerFileExplain, registerDateTime);
+            Console.WriteLine(newFileDLL.StatusNameTableValue());
+            //newFileDLL.NewFile_AddButton_Register(UserId2, registerFileTitle, registerFileName, registerFileDirectoy, registerFileTypeLabel, serverPath, registerFileExplain, registerDateTime);
         }
 
         private void YeniBelgeEkrani_Load(object sender, EventArgs e)

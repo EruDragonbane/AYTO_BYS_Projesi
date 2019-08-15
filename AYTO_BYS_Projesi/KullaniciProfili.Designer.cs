@@ -53,7 +53,7 @@
             this.ChangePictureButton.MaximumSize = new System.Drawing.Size(100, 100);
             this.ChangePictureButton.Name = "ChangePictureButton";
             this.ChangePictureButton.Size = new System.Drawing.Size(50, 50);
-            this.ChangePictureButton.TabIndex = 3;
+            this.ChangePictureButton.TabIndex = 9;
             this.toolTip1.SetToolTip(this.ChangePictureButton, "Profil resminizi değiştirmek için tıklayın.");
             this.ChangePictureButton.UseVisualStyleBackColor = true;
             this.ChangePictureButton.Click += new System.EventHandler(this.ChangePictureButton_Click);
@@ -95,7 +95,7 @@
             this.USerProfile_UpdateButton.MinimumSize = new System.Drawing.Size(75, 30);
             this.USerProfile_UpdateButton.Name = "USerProfile_UpdateButton";
             this.USerProfile_UpdateButton.Size = new System.Drawing.Size(75, 30);
-            this.USerProfile_UpdateButton.TabIndex = 10;
+            this.USerProfile_UpdateButton.TabIndex = 5;
             this.USerProfile_UpdateButton.Text = "Güncelle";
             this.USerProfile_UpdateButton.UseVisualStyleBackColor = true;
             this.USerProfile_UpdateButton.Click += new System.EventHandler(this.UserProfile_UpdateButton_Click);
@@ -107,7 +107,7 @@
             this.UserProfile_CancelButton.MinimumSize = new System.Drawing.Size(75, 30);
             this.UserProfile_CancelButton.Name = "UserProfile_CancelButton";
             this.UserProfile_CancelButton.Size = new System.Drawing.Size(75, 30);
-            this.UserProfile_CancelButton.TabIndex = 11;
+            this.UserProfile_CancelButton.TabIndex = 8;
             this.UserProfile_CancelButton.Text = "İptal Et";
             this.UserProfile_CancelButton.UseVisualStyleBackColor = true;
             this.UserProfile_CancelButton.Click += new System.EventHandler(this.UserProfile_CancelButton_Click);
@@ -118,7 +118,7 @@
             this.UserProfile_ShowPassword_CheckBox.Location = new System.Drawing.Point(218, 195);
             this.UserProfile_ShowPassword_CheckBox.Name = "UserProfile_ShowPassword_CheckBox";
             this.UserProfile_ShowPassword_CheckBox.Size = new System.Drawing.Size(86, 17);
-            this.UserProfile_ShowPassword_CheckBox.TabIndex = 12;
+            this.UserProfile_ShowPassword_CheckBox.TabIndex = 4;
             this.UserProfile_ShowPassword_CheckBox.Text = "Şifreyi göster";
             this.UserProfile_ShowPassword_CheckBox.UseVisualStyleBackColor = true;
             this.UserProfile_ShowPassword_CheckBox.CheckedChanged += new System.EventHandler(this.PasswordTextChangedEvent);
@@ -140,7 +140,7 @@
             this.UserProfile_SaveChangesButton.Location = new System.Drawing.Point(12, 218);
             this.UserProfile_SaveChangesButton.Name = "UserProfile_SaveChangesButton";
             this.UserProfile_SaveChangesButton.Size = new System.Drawing.Size(117, 30);
-            this.UserProfile_SaveChangesButton.TabIndex = 13;
+            this.UserProfile_SaveChangesButton.TabIndex = 7;
             this.UserProfile_SaveChangesButton.Text = "Değişiklikleri Kaydet";
             this.UserProfile_SaveChangesButton.UseVisualStyleBackColor = true;
             this.UserProfile_SaveChangesButton.Visible = false;
@@ -159,7 +159,7 @@
             this.UserProfile_ConfirmNewPassword_CustomTextBox.Multiline = true;
             this.UserProfile_ConfirmNewPassword_CustomTextBox.Name = "UserProfile_ConfirmNewPassword_CustomTextBox";
             this.UserProfile_ConfirmNewPassword_CustomTextBox.Size = new System.Drawing.Size(150, 25);
-            this.UserProfile_ConfirmNewPassword_CustomTextBox.TabIndex = 8;
+            this.UserProfile_ConfirmNewPassword_CustomTextBox.TabIndex = 3;
             this.UserProfile_ConfirmNewPassword_CustomTextBox.TextChanged += new System.EventHandler(this.PasswordTextChangedEvent);
             this.UserProfile_ConfirmNewPassword_CustomTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDownEvent);
             // 
@@ -176,7 +176,7 @@
             this.UserProfile_NewPassword_CustomTextBox.Multiline = true;
             this.UserProfile_NewPassword_CustomTextBox.Name = "UserProfile_NewPassword_CustomTextBox";
             this.UserProfile_NewPassword_CustomTextBox.Size = new System.Drawing.Size(150, 25);
-            this.UserProfile_NewPassword_CustomTextBox.TabIndex = 7;
+            this.UserProfile_NewPassword_CustomTextBox.TabIndex = 2;
             this.UserProfile_NewPassword_CustomTextBox.TextChanged += new System.EventHandler(this.PasswordTextChangedEvent);
             this.UserProfile_NewPassword_CustomTextBox.KeyDown += new System.Windows.Forms.KeyEventHandler(this.KeyDownEvent);
             // 
