@@ -39,12 +39,15 @@ namespace AYTO_BYS_Projesi
         private void DisposeEvent()
         {
             if (UserProfile_UserPictureBox.Image != null)
+            {
+                UserProfile_UserPictureBox.Dispose();
                 UserProfile_UserPictureBox.Image.Dispose();
+            }
             if (ChangePictureButton.BackgroundImage != null)
                 ChangePictureButton.BackgroundImage.Dispose();
         }
         //Şifre textboxlarının görünürlük-eylem aktifliği değiştirme
-        private void PasswordTextBoxEnabledAndVisible(bool boolValue)
+        private void PasswordTextBoxesWithButtonsEnabledAndVisible(bool boolValue)
         {
             foreach(Control item in this.Controls)
             {
@@ -74,7 +77,10 @@ namespace AYTO_BYS_Projesi
             UserProfile_UserNameSurnameLabel.Text = infoAboutUserTuple.Item1;
             UserProfile_UserCorpLabel.Text = infoAboutUserTuple.Item2;
             UserProfile_UserPositionLabel.Text = infoAboutUserTuple.Item3;
-            UserProfile_UserPictureBox.Image = Image.FromFile(Program.serverFilePath + @"KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg");
+            using (FileStream fileStream = new FileStream(Program.serverFilePath + @"KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg", FileMode.Open, FileAccess.Read))
+            {
+                UserProfile_UserPictureBox.Image = Image.FromStream(fileStream);
+            }
         }
         //Kaydetme Öncesi kullanıcının istekleri kontrol edilir.
         private void UpdateWithPassword()
@@ -170,7 +176,7 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
 
-            String messageCheckFile = "Güncellemek istiyor musunuz?";
+            String messageCheckFile = "Şifrenizi güncellemek istiyor musunuz?";
             String titleCheckFile = "";
             MessageBoxButtons yesNoButtons = MessageBoxButtons.YesNo;
             DialogResult yesNoResult = MessageBox.Show(messageCheckFile, titleCheckFile, yesNoButtons);
@@ -185,6 +191,9 @@ namespace AYTO_BYS_Projesi
         //Resmi Kaydetme
         private void UpdateImage()
         {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+
             //Item4 = kullaniciNo 
             var userNameSurnameTuple = userProfileDLL.InformationAbourtUser(UserId6);
             //Dosyayı servere kullanıcının anahtar numarası ile kaydeder.
@@ -210,11 +219,10 @@ namespace AYTO_BYS_Projesi
                     }
                 }
             }
-
-
-            //File.Copy(imageLocation, newFileName, true);
-            //DisposeEvent();
-            //this.Close();
+            MessageBox.Show("Profil fotoğrafınız değiştirildi.");
+            MessageBoxManager.Unregister();
+            DisposeEvent();
+            this.Close();
         }
         private void KullaniciProfili_Load(object sender, EventArgs e)
         {
@@ -226,7 +234,7 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.OK = "Tamam";
 
             InformationAboutUser();
-            PasswordTextBoxEnabledAndVisible(false);
+            PasswordTextBoxesWithButtonsEnabledAndVisible(false);
             //UserProfile_UserPictureBox.Enabled = false;
         }
 
@@ -267,6 +275,10 @@ namespace AYTO_BYS_Projesi
 
         private void UserProfile_CancelButton_Click(object sender, EventArgs e)
         {
+            if(UserProfile_UserPictureBox.Image != null)
+            {
+                Console.WriteLine("boş deeeeeel");
+            }
             UserProfile_UserPictureBox.Controls.Remove(ChangePictureButton);
             DisposeEvent();
             this.Close();
@@ -276,7 +288,7 @@ namespace AYTO_BYS_Projesi
         {
             UserProfile_SaveChangesButton.Top = 218;
             UserProfile_SaveChangesButton.Left = 176;
-            PasswordTextBoxEnabledAndVisible(true);
+            PasswordTextBoxesWithButtonsEnabledAndVisible(true);
         }
 
         private void UserProfile_SaveChangesButton_Click(object sender, EventArgs e)

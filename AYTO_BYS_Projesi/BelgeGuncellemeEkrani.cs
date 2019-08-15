@@ -23,10 +23,12 @@ namespace AYTO_BYS_Projesi
         public event UpdateFileEventHandler UpdateFileEventH;
         /*Belge dizini değiştirme butonunun aktifliğini kontrol etmek amacıyla kullanılmaktadır. 
          * updateFileDirectory_Button_Click eventi çalıştığında true değer döner.
-         * False değer dönmesi durumunda belge dizininin değiştirilmediği ve dolayısıyla checkFileMethod metotuna gerek olmadığı anlaşılır.
-         * True değer dönmesi durumunda ise updateFileMethod metotundan önce checkFileMethod çağırılır.
-         * Belgenin dizini/adı dışındaki değiştirilmek istendiğinde checkFileMethod'unun yaratacağı sonsuz "belge var" döngüsünün önüne geçer.
+         * False değer dönmesi durumunda belge dizininin değiştirilmediği ve dolayısıyla CheckFileMethod metotuna gerek olmadığı anlaşılır.
+         * True değer dönmesi durumunda ise UpdateFileMethod metotundan önce CheckFileMethod çağırılır.
+         * Belgenin dizini/adı dışındaki değiştirilmek istendiğinde CheckFileMethod'unun yaratacağı sonsuz "belge var" döngüsünün önüne geçer.
          * En saçma yöntemlerinden biri olsa da işe yarıyor. :D
+         *https://media.giphy.com/media/d3mlE7uhX8KFgEmY/giphy.gif
+         * https://youtu.be/8gKbraVbGyQ?t=8
          */
         private bool updateDirectoryButtonCheck = false;
         //Log'da göstermek üzere güncelleme öncesindeki dosya adını almak

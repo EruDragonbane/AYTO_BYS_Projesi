@@ -35,9 +35,15 @@ namespace AYTO_BYS_Projesi
             
             DetailFile_FileTitleLabel.Text = labelGridTuple.Item1;
             DetailFile_FileNameLinkLabel.Text = labelGridTuple.Item2;
+            DetailFile_FileNameLinkLabel.AutoEllipsis = true;
             DetailFile_FileExplain_RichTextBox.Text = labelGridTuple.Item3;
             DetailFile_FileDateLabel.Text = labelGridTuple.Item4;
             DetailFile_AddedFromUserLabel.Text = labelGridTuple.Item5;
+            if(labelGridTuple.Item2.Length > 39)
+            {
+                ToolTip tt = new ToolTip();
+                tt.SetToolTip(DetailFile_FileNameLinkLabel, labelGridTuple.Item2);
+            }
         }
         private void DetailFileForm_Download()
         {

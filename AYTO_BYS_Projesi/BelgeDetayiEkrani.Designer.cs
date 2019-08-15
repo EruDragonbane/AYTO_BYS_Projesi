@@ -125,6 +125,7 @@
             this.DetailFile_FileNameLinkLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F);
             this.DetailFile_FileNameLinkLabel.LinkColor = System.Drawing.Color.Black;
             this.DetailFile_FileNameLinkLabel.Location = new System.Drawing.Point(72, 90);
+            this.DetailFile_FileNameLinkLabel.MaximumSize = new System.Drawing.Size(350, 20);
             this.DetailFile_FileNameLinkLabel.Name = "DetailFile_FileNameLinkLabel";
             this.DetailFile_FileNameLinkLabel.Size = new System.Drawing.Size(77, 20);
             this.DetailFile_FileNameLinkLabel.TabIndex = 4;
@@ -150,7 +151,9 @@
             this.Controls.Add(this.DetailFileForm_SendFileButton);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.None;
             this.MaximizeBox = false;
+            this.MaximumSize = new System.Drawing.Size(830, 450);
             this.MinimizeBox = false;
+            this.MinimumSize = new System.Drawing.Size(830, 450);
             this.Name = "BelgeDetayiEkrani";
             this.Text = "BelgeDetayiEkrani";
             this.Load += new System.EventHandler(this.BelgeDetayiEkrani_Load);

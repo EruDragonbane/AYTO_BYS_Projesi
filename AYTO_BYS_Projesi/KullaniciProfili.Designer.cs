@@ -125,7 +125,6 @@
             // 
             // UserProfile_UserPictureBox
             // 
-            this.UserProfile_UserPictureBox.Image = global::AYTO_BYS_Projesi.Properties.Resources.ayto_transparent;
             this.UserProfile_UserPictureBox.Location = new System.Drawing.Point(12, 12);
             this.UserProfile_UserPictureBox.MaximumSize = new System.Drawing.Size(200, 200);
             this.UserProfile_UserPictureBox.MinimumSize = new System.Drawing.Size(200, 200);

@@ -147,8 +147,8 @@ namespace AYTO_BYS_Projesi
             string registerFileTypeLabel = FileTypeLabel.Text.Trim();
             string registerFileExplain = NewFileExplain_RichTextBox.Text.Trim();
             string registerDateTime = NewFileDateTimePicker.Text;
-            Console.WriteLine(newFileDLL.StatusNameTableValue());
-            //newFileDLL.NewFile_AddButton_Register(UserId2, registerFileTitle, registerFileName, registerFileDirectoy, registerFileTypeLabel, serverPath, registerFileExplain, registerDateTime);
+            newFileDLL.NewFile_AddButton_Register(UserId2, registerFileTitle, registerFileName, registerFileDirectoy, registerFileTypeLabel, serverPath, registerFileExplain, registerDateTime);
+
         }
 
         private void YeniBelgeEkrani_Load(object sender, EventArgs e)
