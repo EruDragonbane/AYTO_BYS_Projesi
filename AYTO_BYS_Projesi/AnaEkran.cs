@@ -119,26 +119,22 @@ namespace AYTO_BYS_Projesi
                 }
             }
         }
-        //Formların aktifliğini kontrol ederek kapatır.
-        private void FormActivityCheck()
+        //İptal butonu için Formların aktifliğini kontrol ederek kapatır.
+        private void FormActivityCheck(string request)
         {
             //Formların aktifliği kontrol ederek kapatır.
-            if (Application.OpenForms.OfType<Form>().Any(f => f is YeniBelgeEkrani))
-            {
-                Application.OpenForms.OfType<Form>().First(f => f is YeniBelgeEkrani).Close();
-            }
-            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGondermeEkrani))
-            {
-                Application.OpenForms.OfType<Form>().First(f => f is BelgeGondermeEkrani).Close();
-            }
-            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
-            {
-                Application.OpenForms.OfType<Form>().First(f => f is BelgeGuncellemeEkrani).Close();
-            }
-            if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
-            {
-                Application.OpenForms.OfType<Form>().First(f => f is BelgeDetayiEkrani).Close();
-            }
+            if(request == "all" || request == "update")
+                if (Application.OpenForms.OfType<Form>().Any(f => f is YeniBelgeEkrani))
+                    Application.OpenForms.OfType<Form>().First(f => f is YeniBelgeEkrani).Close();
+            if (request == "all" || request == "update")
+                if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGondermeEkrani))
+                    Application.OpenForms.OfType<Form>().First(f => f is BelgeGondermeEkrani).Close();
+            if (request == "all" || request == "send")
+                if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGuncellemeEkrani))
+                    Application.OpenForms.OfType<Form>().First(f => f is BelgeGuncellemeEkrani).Close();
+            if (request == "all" || request == "update" || request == "send")
+                if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
+                    Application.OpenForms.OfType<Form>().First(f => f is BelgeDetayiEkrani).Close();
         }
         //Eylemler penceresi etkinliği --Tamamı pasif
         private void ActionsGroupBoxEnabledActivity(string enabledStatus)
@@ -389,6 +385,7 @@ namespace AYTO_BYS_Projesi
                         //Pencere konumunu ekran merkezine taşır.
                         sendFileForm.StartPosition = FormStartPosition.CenterScreen;
                         sendFileForm.Show();
+                        FormActivityCheck("send");
                     }
                 }
                 else
@@ -422,6 +419,7 @@ namespace AYTO_BYS_Projesi
                     var updateButtonClickTuple = mainPageDLL.SendUpdateButtonsClickForBelgeNo(selectedRowName);
                     if (updateButtonClickTuple.Item1 == "true")
                     {
+                        FormActivityCheck("update");
                         string selectedRowFileNo = updateButtonClickTuple.Item2;
                         BelgeGuncellemeEkrani updateFileForm = new BelgeGuncellemeEkrani(selectedRowFileNo, UserId, UserId);
                         //Pencere halihazırda aktif ise yeni pencere açmak
@@ -476,27 +474,32 @@ namespace AYTO_BYS_Projesi
                     }
                     else
                     {
-                        String deleteMessage = "Belgeyi silmek istediğinize emin misiniz?";
-                        String deleteTitle = "Uyarı!";
-                        MessageBoxButtons deleteButtons = MessageBoxButtons.YesNo;
-                        DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
-                        if (deleteResult == DialogResult.Yes)
+                        string fileName = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
+                        string returnValueForOwner = mainPageDLL.CheckFileOwner(UserId, fileName);
+                        if(returnValueForOwner == "true")
                         {
-                            string currentCellValue = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
-                            mainPageDLL.InsertFileBeforeDelete(currentCellValue, UserId);
+                            String deleteMessage = "Belgeyi silmek istediğinize emin misiniz?";
+                            String deleteTitle = "Uyarı!";
+                            MessageBoxButtons deleteButtons = MessageBoxButtons.YesNo;
+                            DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
+                            if (deleteResult == DialogResult.Yes)
+                            {
+                                string currentCellValue = MyFiles_DataGridView.CurrentRow.Cells[1].Value.ToString();
+                                mainPageDLL.InsertFileBeforeDelete(currentCellValue, UserId);
 
-                            logDLL.NormalUserLog("delete", currentCellValue, UserId);
-                            RefreshAndFillDataGrid();
-                            FormActivityCheck();
+                                logDLL.NormalUserLog("delete", currentCellValue, UserId);
+                                RefreshAndFillDataGrid();
+                                FormActivityCheck("all");
 
-                            if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
+                                if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
+                                {
+                                    ActionsGroupBoxEnabledActivity("allElementsFalse");
+                                }
+                            }
+                            else
                             {
                                 ActionsGroupBoxEnabledActivity("allElementsFalse");
                             }
-                        }
-                        else
-                        {
-                            ActionsGroupBoxEnabledActivity("allElementsFalse");
                         }
                     }
                     //return;
@@ -508,7 +511,7 @@ namespace AYTO_BYS_Projesi
         //Eylemler Penceresi İptal Etme
         private void MyFiles_FileActions_CancelButton_Click(object sender, EventArgs e)
         {
-            FormActivityCheck();
+            FormActivityCheck("all");
             //Veritabanı eylem penceresini iptal edilmesi durumunda pasifleştirir.
             ActionsGroupBoxEnabledActivity("allElementsFalse");
             FileSearch_CustomTextBox.Clear();

@@ -67,7 +67,7 @@ namespace AYTO_BYS_Projesi
             if (AddNewUserPosition_ComboBox.Items.Count != 0 || AddNewUserAuthority_ComboBox.Items.Count != 0)
             {
                 AddNewUserPosition_ComboBox.SelectedIndex = 0;
-                AddNewUserAuthority_ComboBox.SelectedIndex = 0;
+                AddNewUserAuthority_ComboBox.SelectedIndex = 1;
             }
             Program.dataBaseConnection.Close();
         }

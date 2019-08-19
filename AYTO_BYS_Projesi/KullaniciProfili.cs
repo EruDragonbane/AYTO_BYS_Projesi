@@ -77,9 +77,12 @@ namespace AYTO_BYS_Projesi
             UserProfile_UserNameSurnameLabel.Text = infoAboutUserTuple.Item1;
             UserProfile_UserCorpLabel.Text = infoAboutUserTuple.Item2;
             UserProfile_UserPositionLabel.Text = infoAboutUserTuple.Item3;
-            using (FileStream fileStream = new FileStream(Program.serverFilePath + @"KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg", FileMode.Open, FileAccess.Read))
+            if(File.Exists(Program.serverFilePath + @"KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg"))
             {
-                UserProfile_UserPictureBox.Image = Image.FromStream(fileStream);
+                using (FileStream fileStream = new FileStream(Program.serverFilePath + @"KullaniciResimleri\" + infoAboutUserTuple.Item4 + ".jpg", FileMode.Open, FileAccess.Read))
+                {
+                    UserProfile_UserPictureBox.Image = Image.FromStream(fileStream);
+                }
             }
         }
         //Kaydetme Öncesi kullanıcının istekleri kontrol edilir.
@@ -183,7 +186,6 @@ namespace AYTO_BYS_Projesi
             if (yesNoResult == DialogResult.Yes)
             {
                 userProfileDLL.ChangePassword(UserId6, newPassword);
-                MessageBox.Show("Değişiklikler kaydedildi!");
                 this.Close();
             }
             MessageBoxManager.Unregister();
@@ -219,7 +221,6 @@ namespace AYTO_BYS_Projesi
                     }
                 }
             }
-            MessageBox.Show("Profil fotoğrafınız değiştirildi.");
             MessageBoxManager.Unregister();
             DisposeEvent();
             this.Close();
@@ -236,6 +237,13 @@ namespace AYTO_BYS_Projesi
             InformationAboutUser();
             PasswordTextBoxesWithButtonsEnabledAndVisible(false);
             //UserProfile_UserPictureBox.Enabled = false;
+
+            if(UserProfile_UserPictureBox.Image == null)
+            {
+                UserProfile_SaveChangesButton.Top = 218;
+                UserProfile_SaveChangesButton.Left = 176;
+                PasswordTextBoxesWithButtonsEnabledAndVisible(true);
+            }
         }
 
         private void ChangePictureButton_Click(object sender, EventArgs e)
@@ -256,17 +264,29 @@ namespace AYTO_BYS_Projesi
                     FileInfo fileInfo = new FileInfo(imageLocation);
                     if (fileInfo.Exists)
                     {
-                        if (fileInfo.Length < (Math.Pow(10, 6)))
+                        Image checkDimension = Image.FromFile(imageLocation);
+                        int imageWidth = checkDimension.Width;
+                        int imageHeight = checkDimension.Height;
+
+                        if(imageWidth < 500 && imageHeight < 500)
                         {
-                            UserProfile_UserPictureBox.Text = imageLocation;
-                            UserProfile_UserPictureBox.ImageLocation = imageLocation;
-                            checkForUpdateImageButton = 1;
-                            images.Dispose();
+                            if (fileInfo.Length < (Math.Pow(10, 6)))
+                            {
+                                UserProfile_UserPictureBox.Text = imageLocation;
+                                UserProfile_UserPictureBox.ImageLocation = imageLocation;
+                                checkForUpdateImageButton = 1;
+                                images.Dispose();
+                            }
+                            else
+                            {
+                                MessageBox.Show("Resmin boyutu 1MB'den büyüktür.");
+                            }
                         }
                         else
                         {
-                            MessageBox.Show("Resmin boyutu 1MB'den büyüktür.");
+                            MessageBox.Show("Resmin boyutu 500x500'den büyük olmamalıdır.");
                         }
+                        checkDimension.Dispose();
                     }
                 }
             }
@@ -327,7 +347,7 @@ namespace AYTO_BYS_Projesi
 
         private void KullaniciProfili_FormClosing(object sender, FormClosingEventArgs e)
         {
-            //DisposeEvent();
+            MessageBox.Show("Değişiklikler kaydedildi!");
         }
     }
 }

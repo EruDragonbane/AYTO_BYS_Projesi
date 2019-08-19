@@ -186,6 +186,9 @@ namespace AYTO_BYS_Projesi
                     }
                 }
             }
+            UpdateUserAuthority_ComboBox.SelectedIndex = 1;
+            UpdateUserPosition_ComboBox.SelectedIndex = 0;
+
             Program.dataBaseConnection.Close();
         }
         private void UpdateStatusAndPositionComboBoxFillMethod()

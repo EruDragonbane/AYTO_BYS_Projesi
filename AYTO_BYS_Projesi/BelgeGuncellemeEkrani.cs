@@ -221,6 +221,8 @@ namespace AYTO_BYS_Projesi
             //Combobox doldurma
             ComboboxFill();
 
+            UpdateFileStatus_ComboBox.SelectedIndex = 0;
+
             MessageBoxManager.Unregister();
         }
         //Belgeyi Değiştirmek
