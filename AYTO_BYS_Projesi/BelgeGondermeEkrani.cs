@@ -9,11 +9,16 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using AYTO.SendFile;
+using System.Net;
+using System.Net.Sockets;
 
 namespace AYTO_BYS_Projesi
 {
     public partial class BelgeGondermeEkrani : Form
     {
+        private static Socket socketForSend = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private const int PORT = 52000;
+
         SendFileDLL sendFileDLL = new SendFileDLL();
         public BelgeGondermeEkrani(string sendForm_belgeNo, int send_UserId)
         {
@@ -87,6 +92,19 @@ namespace AYTO_BYS_Projesi
 
         private void SendFile_SendButton_Click(object sender, EventArgs e)
         {
+            try
+            {
+                socketForSend.Connect(new IPEndPoint(IPAddress.Parse(""), PORT));
+                Console.WriteLine("Bağlantı Tamam");
+            }
+            catch(Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+            while(true && socketForSend.Connected)
+            {
+                socketForSend.Send(Encoding.UTF8.GetBytes(""));
+            }
             this.Close();
         }
         private void SendFile_CancelButton_Click(object sender, EventArgs e)

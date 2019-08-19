@@ -32,6 +32,10 @@ namespace AYTO_BYS_Projesi
             AdminUserId = admin_UserId;
         }
         public int AdminUserId { get; set; }
+        public AdminPanel()
+        {
+            InitializeComponent();
+        }
 
         //Listeleme
         //Kullanıcıları listeleme 
@@ -39,7 +43,7 @@ namespace AYTO_BYS_Projesi
         {
             Program.dataBaseConnection.Close();
 
-            string usersListAdapterText = "SELECT COUNT(blg.belgeNo) AS belgeToplam, klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi FROM (kullanicilar AS klnc LEFT OUTER JOIN belgelerim AS blg ON klnc.kullaniciNo = blg.kullaniciNo) LEFT OUTER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo GROUP BY klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi";
+            string usersListAdapterText = "SELECT COUNT(blg.belgeNo) AS belgeToplam, klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi FROM (kullanicilar AS klnc LEFT OUTER JOIN belgelerim AS blg ON klnc.kullaniciNo = blg.kullaniciNo) LEFT OUTER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo  WHERE klnc.silinmeDurumu = " + 1 + " GROUP BY klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi ORDER BY klnc.kullaniciNo ASC";
 
             using (SqlDataAdapter usersListAdapter = new SqlDataAdapter(usersListAdapterText, Program.dataBaseConnection))
             {
@@ -121,7 +125,7 @@ namespace AYTO_BYS_Projesi
         private void PositionList()
         {
             Program.dataBaseConnection.Close();
-            string positionListAdapterText = "SELECT DISTINCT grv.gorevNo, grv.gorevAdi, COUNT(klnc.kullaniciNo) FROM gorevler AS grv LEFT OUTER JOIN kullanicilar AS klnc ON grv.gorevNo = klnc.gorevNo GROUP BY grv.gorevNo, grv.gorevAdi";
+            string positionListAdapterText = "SELECT DISTINCT grv.gorevNo, grv.gorevAdi, COUNT(klnc.kullaniciNo) FROM gorevler AS grv LEFT OUTER JOIN kullanicilar AS klnc ON grv.gorevNo = klnc.gorevNo WHERE klnc.silinmeDurumu = " + 1 + " GROUP BY grv.gorevNo, grv.gorevAdi";
             using (SqlDataAdapter positionListAdapter = new SqlDataAdapter(positionListAdapterText, Program.dataBaseConnection))
             {
                 Program.dataBaseConnection.Open();
@@ -144,7 +148,7 @@ namespace AYTO_BYS_Projesi
         private void DeletedUserList()
         {
             Program.dataBaseConnection.Close();
-            string deletedUserListAdapterText = "SELECT  klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLklnc.silinenKullaniciNo, SLklnc.silinenKullaniciAdi + ' ' +SLklnc.silinenKullaniciSoyadi AS SLklncAdSoyad, grv.gorevAdi, SLklnc.silinenKullaniciKurumu, SLklnc.silinmeTarihi FROM (silinenKullanicilar AS SLklnc INNER JOIN gorevler AS grv ON SLklnc.silinenGorevNo = grv.gorevNo) INNER JOIN kullanicilar AS klnc ON SLklnc.silenKisi = klnc.kullaniciNo ORDER BY SLklnc.silinenKullaniciNo";
+            string deletedUserListAdapterText = "SELECT silenKlnc.kullaniciAdi + ' ' + silenKlnc.kullaniciSoyadi AS silenKisi, silinenKlnc.kullaniciNo, silinenKlnc.kullaniciAdi + ' ' + silinenKlnc.kullaniciSoyadi AS silinenKlncAdSoyad, grv.gorevAdi, silinenKlnc.kullaniciKurumu, SLNklnc.silinmeTarihi FROM ((kullanicilar AS silenKlnc INNER JOIN silinenKullanicilar AS SLNklnc ON silenKlnc.kullaniciNo = SLNKlnc.silenKisi) INNER JOIN kullanicilar AS silinenKlnc ON SLNklnc.silinenKullaniciNo = silinenKlnc.kullaniciNo) INNER JOIN gorevler AS grv ON silinenKlnc.gorevNo = grv.gorevNo ORDER BY SLNklnc.silinenKullaniciNo";
             using (SqlDataAdapter deletedUserListAdapter = new SqlDataAdapter(deletedUserListAdapterText, Program.dataBaseConnection))
             {
                 Program.dataBaseConnection.Open();
@@ -171,9 +175,10 @@ namespace AYTO_BYS_Projesi
         //Silinen Belgelerin Listelenmesi
         private void DeletedFilesList()
         {
-            Program.dataBaseConnection.Close();
-            string deletedfilesListAdapterText = "SELECT klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLblg.silinenBelgeNo, SLblg.silinenBelgeAdi, SLblg.silinenSistemEklenmeTarihi, SLblg.silinenSistemGuncellenmeTarihi, SLblg.silinmeTarihi FROM silinenBelgeler AS SLblg INNER JOIN kullanicilar AS klnc ON SLblg.silenKisi = klnc.kullaniciNo ORDER BY SLblg.silinenBelgeNo";
 
+            Program.dataBaseConnection.Close();
+
+            string deletedfilesListAdapterText = "SELECT klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLblg.silinenBelgeNo, SLblg.silinenBelgeAdi, SLblg.silinenSistemEklenmeTarihi, SLblg.silinenSistemGuncellenmeTarihi, SLblg.silinmeTarihi FROM silinenBelgeler AS SLblg INNER JOIN kullanicilar AS klnc ON SLblg.silenKisi = klnc.kullaniciNo ORDER BY SLblg.silinenBelgeNo";
             using (SqlDataAdapter deletedFilesListAdapter = new SqlDataAdapter(deletedfilesListAdapterText, Program.dataBaseConnection))
             {
                 Program.dataBaseConnection.Open();
@@ -253,11 +258,11 @@ namespace AYTO_BYS_Projesi
             string searchData = AdminPanelSearch_CustomTextBox.Text.Trim().ToUpper();
             if(AdminPanelSearch_ComboBox.Text == "Tümü")
             {
-                (AdminPage_DataGridView.DataSource as DataTable).DefaultView.RowFilter = string.Format("SLklncAdSoyad LIKE '%{0}%' OR silenKisi LIKE '%{0}%'", searchData);
+                (AdminPage_DataGridView.DataSource as DataTable).DefaultView.RowFilter = string.Format("silinenKlncAdSoyad LIKE '%{0}%' OR silenKisi LIKE '%{0}%'", searchData);
             }
             else if (AdminPanelSearch_ComboBox.Text == "Ad Soyad")
             {
-                (AdminPage_DataGridView.DataSource as DataTable).DefaultView.RowFilter = string.Format("SLklncAdSoyad LIKE '%{0}%'", searchData);
+                (AdminPage_DataGridView.DataSource as DataTable).DefaultView.RowFilter = string.Format("silinenKlncAdSoyad LIKE '%{0}%'", searchData);
             }
             else //if(AdminPanelSearch_ComboBox.Text == "Silen Kişi")
             {
@@ -754,7 +759,6 @@ namespace AYTO_BYS_Projesi
         }
         private void AdminPanel_DeleteButton_Click(object sender, EventArgs e)
         {
-
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
             AdminPage_DataGridView.ClearSelection();
@@ -809,7 +813,21 @@ namespace AYTO_BYS_Projesi
                             }
                             else // false
                             {
-                                if(tableName == "kullanicilar" || tableName == "belgelerim")
+                                if (tableName == "kullanicilar")
+                                {
+                                    string adminColumn = AdminPage_DataGridView.CurrentRow.Cells[5].Value.ToString();
+                                    string countAdminPosition = adminPageDLL.CheckCountAdminPosition();
+                                    if (countAdminPosition == "1" && adminColumn == "Admin")
+                                    {
+                                        MessageBox.Show("Sistemde tek yetkili var. Silme işlemi iptal edildi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                                    }
+                                    else
+                                    {
+                                        adminPageDLL.InsertDataToDatabaseBeforeDelete(currentCellValue, tableName, AdminUserId);
+                                        RefreshLogAndDeleteEvent();
+                                    }
+                                }
+                                else if (tableName == "belgelerim")
                                 {
                                     adminPageDLL.InsertDataToDatabaseBeforeDelete(currentCellValue, tableName, AdminUserId);
                                     RefreshLogAndDeleteEvent();

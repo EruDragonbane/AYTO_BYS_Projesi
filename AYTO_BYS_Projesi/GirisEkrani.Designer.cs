@@ -33,6 +33,7 @@
             this.LoginPage_ExitButton = new System.Windows.Forms.Button();
             this.LoginPage_LoginButton = new System.Windows.Forms.Button();
             this.passwordView_CheckBox = new System.Windows.Forms.CheckBox();
+            this.WrongLoginLabel = new System.Windows.Forms.Label();
             this.LoginPassword_CustomTextBox = new AYTO_BYS_Projesi.CustomTextBox();
             this.LoginId_CustomTextBox = new AYTO_BYS_Projesi.CustomTextBox();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
@@ -66,6 +67,13 @@
             this.passwordView_CheckBox.UseVisualStyleBackColor = true;
             this.passwordView_CheckBox.CheckedChanged += new System.EventHandler(this.LoginPassword_CustomTextBox_TextChanged);
             // 
+            // WrongLoginLabel
+            // 
+            resources.ApplyResources(this.WrongLoginLabel, "WrongLoginLabel");
+            this.WrongLoginLabel.BackColor = System.Drawing.SystemColors.Control;
+            this.WrongLoginLabel.ForeColor = System.Drawing.Color.Red;
+            this.WrongLoginLabel.Name = "WrongLoginLabel";
+            // 
             // LoginPassword_CustomTextBox
             // 
             this.LoginPassword_CustomTextBox.CustomText = "PAROLA";
@@ -82,6 +90,7 @@
             resources.ApplyResources(this.LoginId_CustomTextBox, "LoginId_CustomTextBox");
             this.LoginId_CustomTextBox.ForeColor = System.Drawing.Color.Black;
             this.LoginId_CustomTextBox.Name = "LoginId_CustomTextBox";
+            this.LoginId_CustomTextBox.TextChanged += new System.EventHandler(this.TextChangedForLabel);
             // 
             // GirisEkrani
             // 
@@ -89,6 +98,7 @@
             resources.ApplyResources(this, "$this");
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.BackColor = System.Drawing.SystemColors.Control;
+            this.Controls.Add(this.WrongLoginLabel);
             this.Controls.Add(this.passwordView_CheckBox);
             this.Controls.Add(this.LoginPage_LoginButton);
             this.Controls.Add(this.LoginPassword_CustomTextBox);
@@ -115,5 +125,6 @@
         private CustomTextBox LoginPassword_CustomTextBox;
         private System.Windows.Forms.Button LoginPage_LoginButton;
         private System.Windows.Forms.CheckBox passwordView_CheckBox;
+        private System.Windows.Forms.Label WrongLoginLabel;
     }
 }

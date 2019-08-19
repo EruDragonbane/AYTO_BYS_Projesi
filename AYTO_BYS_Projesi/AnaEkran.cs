@@ -28,6 +28,7 @@ namespace AYTO_BYS_Projesi
         {
             InitializeComponent();
             UserId = LoginId;
+            var topLeftHeaderCell = MyFiles_DataGridView.TopLeftHeaderCell;
         }
         public int UserId { get; set; }
         //Belgelerim veritabanını çağırmak için bir metottur.Aynı zamanda veritabanını yeniler.
@@ -196,9 +197,6 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Yes = "Evet";
             MessageBoxManager.No = "Hayır";
             MessageBoxManager.OK = "Tamam";
-            //Mesajlar Penceresi Pasif
-            groupBox1.Visible = false;
-            button1.Enabled = false;
             //Veritabanını çağırma
             RefreshAndFillDataGrid();
             //Eylemler penceresi, veritabanı içindeki herhangi
@@ -336,20 +334,7 @@ namespace AYTO_BYS_Projesi
             }
             MessageBoxManager.Unregister();
         }
-        //Mesajlar penceresi ve butonları aktif eder.
-        private void MessagesToolStripMenuItem_Click(object sender, EventArgs e)
-        {
-            groupBox1.Visible = true;
-            button1.Enabled = true;
-        }
-        //Mesajlar penceresini gizler ve butonları pasifleştirir.
         //İstemsiz eylemlerin engellenmesi sağlanmaktadır. 
-        /////////////////////DÜZENLE
-        private void button1_Click(object sender, EventArgs e)
-        {
-            groupBox1.Visible = false;
-            button1.Enabled = false;
-        }
         //EYLEMLER (Yeni Belge, Belge Gönderme, Belge Güncelleme, Belge Silme, Eylem Penceresi İptali)
         //Yeni Belge Ekranı
         private void MyFiles_NewFileButton_Click(object sender, EventArgs e)

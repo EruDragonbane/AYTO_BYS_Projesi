@@ -145,13 +145,13 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;pictureBox1.ZOrder" xml:space="preserve">
-    <value>5</value>
+    <value>6</value>
   </data>
   <data name="LoginPage_ExitButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="LoginPage_ExitButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>320, 380</value>
+    <value>320, 390</value>
   </data>
   <data name="LoginPage_ExitButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>55, 25</value>
@@ -172,13 +172,13 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;LoginPage_ExitButton.ZOrder" xml:space="preserve">
-    <value>4</value>
+    <value>5</value>
   </data>
   <data name="LoginPage_LoginButton.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
     <value>NoControl</value>
   </data>
   <data name="LoginPage_LoginButton.Location" type="System.Drawing.Point, System.Drawing">
-    <value>259, 380</value>
+    <value>259, 390</value>
   </data>
   <data name="LoginPage_LoginButton.Size" type="System.Drawing.Size, System.Drawing">
     <value>55, 25</value>
@@ -199,7 +199,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;LoginPage_LoginButton.ZOrder" xml:space="preserve">
-    <value>1</value>
+    <value>2</value>
   </data>
   <data name="passwordView_CheckBox.AutoSize" type="System.Boolean, mscorlib">
     <value>True</value>
@@ -208,7 +208,7 @@
     <value>NoControl</value>
   </data>
   <data name="passwordView_CheckBox.Location" type="System.Drawing.Point, System.Drawing">
-    <value>125, 385</value>
+    <value>125, 395</value>
   </data>
   <data name="passwordView_CheckBox.Size" type="System.Drawing.Size, System.Drawing">
     <value>88, 17</value>
@@ -229,6 +229,39 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;passwordView_CheckBox.ZOrder" xml:space="preserve">
+    <value>1</value>
+  </data>
+  <data name="WrongLoginLabel.AutoSize" type="System.Boolean, mscorlib">
+    <value>True</value>
+  </data>
+  <data name="WrongLoginLabel.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
+  </data>
+  <data name="WrongLoginLabel.Location" type="System.Drawing.Point, System.Drawing">
+    <value>122, 373</value>
+  </data>
+  <data name="WrongLoginLabel.Size" type="System.Drawing.Size, System.Drawing">
+    <value>183, 13</value>
+  </data>
+  <data name="WrongLoginLabel.TabIndex" type="System.Int32, mscorlib">
+    <value>6</value>
+  </data>
+  <data name="WrongLoginLabel.Text" xml:space="preserve">
+    <value>*Kullanıcı adınız veya parolanız yanlış!</value>
+  </data>
+  <data name="WrongLoginLabel.Visible" type="System.Boolean, mscorlib">
+    <value>False</value>
+  </data>
+  <data name="&gt;&gt;WrongLoginLabel.Name" xml:space="preserve">
+    <value>WrongLoginLabel</value>
+  </data>
+  <data name="&gt;&gt;WrongLoginLabel.Type" xml:space="preserve">
+    <value>System.Windows.Forms.Label, System.Windows.Forms, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089</value>
+  </data>
+  <data name="&gt;&gt;WrongLoginLabel.Parent" xml:space="preserve">
+    <value>$this</value>
+  </data>
+  <data name="&gt;&gt;WrongLoginLabel.ZOrder" xml:space="preserve">
     <value>0</value>
   </data>
   <data name="LoginPassword_CustomTextBox.Font" type="System.Drawing.Font, System.Drawing">
@@ -265,7 +298,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;LoginPassword_CustomTextBox.ZOrder" xml:space="preserve">
-    <value>2</value>
+    <value>3</value>
   </data>
   <data name="LoginId_CustomTextBox.Font" type="System.Drawing.Font, System.Drawing">
     <value>Microsoft Sans Serif, 12pt</value>
@@ -301,7 +334,7 @@
     <value>$this</value>
   </data>
   <data name="&gt;&gt;LoginId_CustomTextBox.ZOrder" xml:space="preserve">
-    <value>3</value>
+    <value>4</value>
   </data>
   <metadata name="$this.Localizable" type="System.Boolean, mscorlib, Version=4.0.0.0, Culture=neutral, PublicKeyToken=b77a5c561934e089">
     <value>True</value>
@@ -311,6 +344,9 @@
   </data>
   <data name="$this.ClientSize" type="System.Drawing.Size, System.Drawing">
     <value>500, 450</value>
+  </data>
+  <data name="$this.ImeMode" type="System.Windows.Forms.ImeMode, System.Windows.Forms">
+    <value>NoControl</value>
   </data>
   <data name="$this.MaximumSize" type="System.Drawing.Size, System.Drawing">
     <value>500, 450</value>

@@ -26,7 +26,9 @@ namespace AYTO_BYS_Projesi
             {
                 Application.EnableVisualStyles();
                 Application.SetCompatibleTextRenderingDefault(false);
-                Application.Run(new GirisEkrani());
+                var loginForm = new GirisEkrani();
+                loginForm.Show();
+                Application.Run();
             }
             else
             {
