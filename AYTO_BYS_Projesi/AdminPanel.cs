@@ -41,6 +41,8 @@ namespace AYTO_BYS_Projesi
         //Kullanıcıları listeleme 
         private void UsersList()
         {
+            AdminPage_DataGridView.DataSource = null;
+            AdminPage_DataGridView.Refresh();
             Program.dataBaseConnection.Close();
 
             string usersListAdapterText = "SELECT COUNT(blg.belgeNo) AS belgeToplam, klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi FROM (kullanicilar AS klnc LEFT OUTER JOIN belgelerim AS blg ON klnc.kullaniciNo = blg.kullaniciNo) LEFT OUTER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo  WHERE klnc.silinmeDurumu = " + 1 + " GROUP BY klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi ORDER BY klnc.kullaniciNo ASC";
@@ -71,6 +73,8 @@ namespace AYTO_BYS_Projesi
         //Belgeleri Listeleme
         private void FilesList()
         {
+            AdminPage_DataGridView.DataSource = null;
+            AdminPage_DataGridView.Refresh();
             //Veritabanı bağlantısı aktif değilse aktif yap
             Program.dataBaseConnection.Close();
             string filesListAdapterText = "SELECT DISTINCT blg.belgeBasligi, blg.belgeAdi, blg.eklenmeTarihi, blg.guncellenmeTarihi, blg.guncelleyenKisiNo, drm.durumAdi, klnc.kullaniciAdi+' '+klnc.kullaniciSoyadi AS klncAdSoyad FROM belgelerim AS blg, durumlar AS drm, kullanicilar AS klnc WHERE blg.durumNo = drm.durumNo AND klnc.kullaniciNo = blg.kullaniciNo ORDER BY blg.eklenmeTarihi DESC";
@@ -101,6 +105,8 @@ namespace AYTO_BYS_Projesi
         //Belge durumları listelmee
         private void FileStatusList()
         {
+            AdminPage_DataGridView.DataSource = null;
+            AdminPage_DataGridView.Refresh();
             Program.dataBaseConnection.Close();
             string fileStatusListAdapterText = "SELECT DISTINCT drm.durumNo, drm.durumAdi, COUNT(blg.belgeNo) FROM durumlar AS drm LEFT OUTER JOIN belgelerim AS blg ON drm.durumNo = blg.durumNo GROUP BY drm.durumNo, drm.durumAdi";
             using (SqlDataAdapter fileStatusListAdapter = new SqlDataAdapter(fileStatusListAdapterText, Program.dataBaseConnection))
@@ -124,8 +130,10 @@ namespace AYTO_BYS_Projesi
         //Görevler Listeleme
         private void PositionList()
         {
+            AdminPage_DataGridView.DataSource = null;
+            AdminPage_DataGridView.Refresh();
             Program.dataBaseConnection.Close();
-            string positionListAdapterText = "SELECT DISTINCT grv.gorevNo, grv.gorevAdi, COUNT(klnc.kullaniciNo) FROM gorevler AS grv LEFT OUTER JOIN kullanicilar AS klnc ON grv.gorevNo = klnc.gorevNo WHERE klnc.silinmeDurumu = " + 1 + " GROUP BY grv.gorevNo, grv.gorevAdi";
+            string positionListAdapterText = "SELECT grv.gorevNo, grv.gorevAdi, COUNT(klnc.kullaniciNo) FROM gorevler AS grv LEFT OUTER JOIN kullanicilar AS klnc ON grv.gorevNo = klnc.gorevNo WHERE klnc.silinmeDurumu = " + 1 + " GROUP BY grv.gorevNo, grv.gorevAdi";
             using (SqlDataAdapter positionListAdapter = new SqlDataAdapter(positionListAdapterText, Program.dataBaseConnection))
             {
                 Program.dataBaseConnection.Open();
@@ -147,6 +155,8 @@ namespace AYTO_BYS_Projesi
         //Silinen Kullanıcıların Listelemesi
         private void DeletedUserList()
         {
+            AdminPage_DataGridView.DataSource = null;
+            AdminPage_DataGridView.Refresh();
             Program.dataBaseConnection.Close();
             string deletedUserListAdapterText = "SELECT silenKlnc.kullaniciAdi + ' ' + silenKlnc.kullaniciSoyadi AS silenKisi, silinenKlnc.kullaniciNo, silinenKlnc.kullaniciAdi + ' ' + silinenKlnc.kullaniciSoyadi AS silinenKlncAdSoyad, grv.gorevAdi, silinenKlnc.kullaniciKurumu, SLNklnc.silinmeTarihi FROM ((kullanicilar AS silenKlnc INNER JOIN silinenKullanicilar AS SLNklnc ON silenKlnc.kullaniciNo = SLNKlnc.silenKisi) INNER JOIN kullanicilar AS silinenKlnc ON SLNklnc.silinenKullaniciNo = silinenKlnc.kullaniciNo) INNER JOIN gorevler AS grv ON silinenKlnc.gorevNo = grv.gorevNo ORDER BY SLNklnc.silinenKullaniciNo";
             using (SqlDataAdapter deletedUserListAdapter = new SqlDataAdapter(deletedUserListAdapterText, Program.dataBaseConnection))
@@ -175,7 +185,8 @@ namespace AYTO_BYS_Projesi
         //Silinen Belgelerin Listelenmesi
         private void DeletedFilesList()
         {
-
+            AdminPage_DataGridView.DataSource = null;
+            AdminPage_DataGridView.Refresh();
             Program.dataBaseConnection.Close();
 
             string deletedfilesListAdapterText = "SELECT klnc.kullaniciAdi + ' ' + klnc.kullaniciSoyadi AS silenKisi, SLblg.silinenBelgeNo, SLblg.silinenBelgeAdi, SLblg.silinenSistemEklenmeTarihi, SLblg.silinenSistemGuncellenmeTarihi, SLblg.silinmeTarihi FROM silinenBelgeler AS SLblg INNER JOIN kullanicilar AS klnc ON SLblg.silenKisi = klnc.kullaniciNo ORDER BY SLblg.silinenBelgeNo";
@@ -327,8 +338,7 @@ namespace AYTO_BYS_Projesi
             AdminPage_DataGridView.ClearSelection();
             MessageBoxManager.Unregister();
         }
-        //Arama ve Filtreleme Metotları
-        
+        //Arama ve Filtreleme Metotları        
         //YeniVeriEkle Form
         private void CallYeniVeriEkleForm()
         {

@@ -130,30 +130,39 @@ namespace AYTO_BYS_Projesi
             string userID = UpdateUserID_CustomTextBox.Text.Trim();
             string userCorp = UpdateUserCorp_CustomTextBox.Text.Trim();
 
-            //Item1 = updateTitle, Item2 = comboBoxValue
-            var updateDataTuple = updateDataDLL.UpdateData(TableName, status, position, userName, userSurname, userID, userAuthority, userCorp, DataFromAdminPanel);
-            if (TableName == "kullanicilar")
+            string checkUserReturnValue = updateDataDLL.CheckUserNameBeforeUpdate(userID);
+            
+            if(checkUserReturnValue == "false")
             {
-                //Refresh
-                UpdateDataEventH();
-                MessageBox.Show(userID + " kullanıcısı güncellendi.");
-            }
-            else if(TableName == "durumlar" || TableName == "gorevler")
-            {
-                //Refresh
-                UpdateDataEventH();
-                MessageBox.Show(updateDataTuple.Item1 + " güncellendi.");
-                Program.dataBaseConnection.Close();
+                //Item1 = updateTitle, Item2 = comboBoxValue
+                var updateDataTuple = updateDataDLL.UpdateData(TableName, status, position, userName, userSurname, userID, userAuthority, userCorp, DataFromAdminPanel);
+                if (TableName == "kullanicilar")
+                {
+                    //Refresh
+                    UpdateDataEventH();
+                    MessageBox.Show(userID + " kullanıcısı güncellendi.");
+                }
+                else if (TableName == "durumlar" || TableName == "gorevler")
+                {
+                    //Refresh
+                    UpdateDataEventH();
+                    MessageBox.Show(updateDataTuple.Item1 + " güncellendi.");
+                    Program.dataBaseConnection.Close();
 
+                }
+                else
+                {
+                    MessageBox.Show("Hata: VeriGuncelle-UpdateDataMethod");
+                }
+                logDLL.UpdateDataLog(TableName, UpdateDataUserId, DataFromAdminPanel, updateDataTuple.Item1, userName, userSurname, updateDataTuple.Item2, oldDataName);
+                this.Close();
             }
             else
             {
-                MessageBox.Show("Hata: VeriGuncelle-UpdateDataMethod");
+                MessageBox.Show("Böyle bir kullanıcı adı zaten var!");
             }
-            logDLL.UpdateDataLog(TableName, UpdateDataUserId, DataFromAdminPanel, updateDataTuple.Item1, userName, userSurname, updateDataTuple.Item2, oldDataName);
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
-            this.Close();
         }
         //Comboboxları doldurmak amacıyla oluşturulmuş metotlardır.
         private void UpdateDataComboBoxFillMethod()

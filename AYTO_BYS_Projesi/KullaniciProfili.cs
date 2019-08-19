@@ -186,6 +186,8 @@ namespace AYTO_BYS_Projesi
             if (yesNoResult == DialogResult.Yes)
             {
                 userProfileDLL.ChangePassword(UserId6, newPassword);
+                if(imageLocation == "")
+                    MessageBox.Show("Değişiklikler kaydedildi!");
                 this.Close();
             }
             MessageBoxManager.Unregister();
@@ -347,7 +349,10 @@ namespace AYTO_BYS_Projesi
 
         private void KullaniciProfili_FormClosing(object sender, FormClosingEventArgs e)
         {
-            MessageBox.Show("Değişiklikler kaydedildi!");
+            if(imageLocation != "")
+            {
+                MessageBox.Show("Değişiklikler kaydedildi!");
+            }
         }
     }
 }

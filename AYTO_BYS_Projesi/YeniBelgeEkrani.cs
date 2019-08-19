@@ -192,23 +192,26 @@ namespace AYTO_BYS_Projesi
                 NewFileName_TextBox.Text = Path.GetFileNameWithoutExtension(files.FileName);
                 FileTypeLabel.Text = files.SafeFileName;
             }
-            FileInfo fileInfoForSize = new FileInfo(NewFileDirectory_TextBox.Text.Trim());
-            NewFileSize_Label.Visible = true;
-            if (fileInfoForSize.Length < (Math.Pow(10, 7) * 1.5))
+            if(NewFileDirectory_TextBox.Text.Trim() != "")
             {
-                NewFileSize_Label.ForeColor = Color.Green;
-            }
-            else
-            {
-                NewFileSize_Label.ForeColor = Color.Red;
-            }
-            if(fileInfoForSize.Length < 1024000)
-            {
-                NewFileSize_Label.Text = "Belge Boyutu: " + (fileInfoForSize.Length / 1024) + "KB";
-            }
-            else
-            {
-                NewFileSize_Label.Text = "Belge Boyutu: " + (fileInfoForSize.Length / 1024 / 1024) + "MB";
+                FileInfo fileInfoForSize = new FileInfo(NewFileDirectory_TextBox.Text.Trim());
+                NewFileSize_Label.Visible = true;
+                if (fileInfoForSize.Length < (Math.Pow(10, 7) * 1.5))
+                {
+                    NewFileSize_Label.ForeColor = Color.Green;
+                }
+                else
+                {
+                    NewFileSize_Label.ForeColor = Color.Red;
+                }
+                if (fileInfoForSize.Length < 1024000)
+                {
+                    NewFileSize_Label.Text = "Belge Boyutu: " + (fileInfoForSize.Length / 1024) + "KB";
+                }
+                else
+                {
+                    NewFileSize_Label.Text = "Belge Boyutu: " + (fileInfoForSize.Length / 1024 / 1024) + "MB";
+                }
             }
             MessageBoxManager.Unregister();
         }
