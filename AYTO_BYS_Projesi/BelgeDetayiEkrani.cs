@@ -20,29 +20,61 @@ namespace AYTO_BYS_Projesi
         FileDetailDLL fileDetailDLL = new FileDetailDLL();
         LogDLL logDLL = new LogDLL();
 
-        public BelgeDetayiEkrani(string mainForm_belgeNo, int detailForm_UserId)
+        private string fileNameWithFormat = "";
+
+        public BelgeDetayiEkrani(string mainForm_belgeNo, string mainForm_userName, int detailForm_UserId, string PurposeForDetail)
         {
             InitializeComponent();
             BelgeNo = mainForm_belgeNo;
+            ReceivedUserName = mainForm_userName;
             UserId5 = detailForm_UserId;
+            DetailPurpose = PurposeForDetail;
+
         }
         public string BelgeNo { get; set; }
+        public string ReceivedUserName { get; set; }
         public int UserId5 { get; set; }
+        public string DetailPurpose { get; set; }
         private void LabelGridFromDataGridView()
         {
-            //Item1 = fileTitle, Item2 = fileName, Item3 = fileExplain, Item4 = fileDate, Item5 = addedFromUser
-            var labelGridTuple = fileDetailDLL.LabelGridFromDataGridView(BelgeNo);
-            
-            DetailFile_FileTitleLabel.Text = labelGridTuple.Item1;
-            DetailFile_FileNameLinkLabel.Text = labelGridTuple.Item2;
-            DetailFile_FileNameLinkLabel.AutoEllipsis = true;
-            DetailFile_FileExplain_RichTextBox.Text = labelGridTuple.Item3;
-            DetailFile_FileDateLabel.Text = labelGridTuple.Item4;
-            DetailFile_AddedFromUserLabel.Text = labelGridTuple.Item5;
-            if(labelGridTuple.Item2.Length > 39)
+            if(DetailPurpose == "owner")
             {
-                ToolTip tt = new ToolTip();
-                tt.SetToolTip(DetailFile_FileNameLinkLabel, labelGridTuple.Item2);
+                //Item1 = fileTitle, Item2 = fileName, Item3 = fileExplain, Item4 = fileDate, Item5 = addedFromUser
+                var ownerLabelGridTuple = fileDetailDLL.LabelGridFromDataGridViewForOwner(BelgeNo);
+
+                DetailFile_FileTitleLabel.Text = ownerLabelGridTuple.Item1;
+                DetailFile_FileNameLinkLabel.Text = ownerLabelGridTuple.Item2;
+                fileNameWithFormat = ownerLabelGridTuple.Item2;
+                DetailFile_FileNameLinkLabel.AutoEllipsis = true;
+                DetailFile_FileExplain_RichTextBox.Text = ownerLabelGridTuple.Item3;
+                DetailFile_FileDateLabel.Text = ownerLabelGridTuple.Item4;
+                DetailFile_AddedFromUserLabel.Text = ownerLabelGridTuple.Item5;
+                if (ownerLabelGridTuple.Item2.Length > 39)
+                {
+                    ToolTip tt = new ToolTip();
+                    tt.SetToolTip(DetailFile_FileNameLinkLabel, ownerLabelGridTuple.Item2);
+                }
+            }
+            else if(DetailPurpose == "received")
+            {
+                //Item1 = receivedTitle, Item2 = receivedFileName, Item3 = receivedExplain, Item4 = receivedDate, Item5 = addedFromUser
+                var receivedLabelGridTuple = fileDetailDLL.LabelGridFromDataGridViewForReceived(BelgeNo, ReceivedUserName);
+                DetailFile_FileTitleLabel.Text = receivedLabelGridTuple.Item1;
+                DetailFile_FileNameLinkLabel.Text = receivedLabelGridTuple.Item2;
+                fileNameWithFormat = receivedLabelGridTuple.Item2;
+                DetailFile_FileNameLinkLabel.AutoEllipsis = true;
+                DetailFile_FileExplain_RichTextBox.Text = receivedLabelGridTuple.Item3;
+                DetailFile_FileDateLabel.Text = receivedLabelGridTuple.Item4;
+                DetailFile_AddedFromUserLabel.Text = receivedLabelGridTuple.Item5;
+                if (receivedLabelGridTuple.Item2.Length > 39)
+                {
+                    ToolTip tt = new ToolTip();
+                    tt.SetToolTip(DetailFile_FileNameLinkLabel, receivedLabelGridTuple.Item2);
+                }
+            }
+            else
+            {
+                Console.WriteLine("Mesaj Gelmedi");
             }
         }
         private void DetailFileForm_Download()

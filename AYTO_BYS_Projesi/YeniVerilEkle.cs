@@ -258,7 +258,7 @@ namespace AYTO_BYS_Projesi
                 AddNewUserPass_CustomTextBox.Clear();
                 AddNewUserCorp_CustomTextBox.Clear();
                 AddNewUserPosition_ComboBox.SelectedIndex = 0;
-                AddNewUserAuthority_ComboBox.SelectedIndex = 0;
+                AddNewUserAuthority_ComboBox.SelectedIndex = 1;
             }
             MessageBoxManager.Unregister();
         }

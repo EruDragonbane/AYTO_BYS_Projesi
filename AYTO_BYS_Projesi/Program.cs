@@ -5,6 +5,7 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Data.SqlClient;
 using System.Threading;
+
 namespace AYTO_BYS_Projesi
 {
     static class Program
@@ -12,7 +13,7 @@ namespace AYTO_BYS_Projesi
         /// <summary>
         /// Uygulamanın ana girdi noktası.
         /// </summary>
-        public static SqlConnection dataBaseConnection = new SqlConnection("server=ERU; Initial Catalog=deneme;Integrated Security=SSPI");
+        public static SqlConnection dataBaseConnection = new SqlConnection("Data Source = ERU; Initial Catalog = deneme; Integrated Security = SSPI");
         public const string serverFilePath = @"C:\Users\Fatih\Desktop\ServerDosyaOrnegi\";
 
         [STAThread]
@@ -34,7 +35,6 @@ namespace AYTO_BYS_Projesi
             {
                 MessageBox.Show("Uygulama zaten çalışıyor.", "Uyarı", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
-
         }
     }
 }

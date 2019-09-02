@@ -31,7 +31,7 @@ namespace AYTO_BYS_Projesi
         }
         public int UserId2 { get; set;}
 
-        //Yeni belgenin eklenmesi sonrası AnaEkran formunu yeniler. registerMethod metotunda 18. satırdan (metot sonunda) döndürür.
+        //Yeni belgenin eklenmesi sonrası AnaEkran formunu yeniler.
         public delegate void AddNewFileEventHandler();
         public event AddNewFileEventHandler AddNewFileEventH;
 

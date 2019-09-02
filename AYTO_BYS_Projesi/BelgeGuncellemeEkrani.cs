@@ -11,6 +11,8 @@ using System.IO;
 using System.Data.SqlClient;
 using AYTO.UpdateFile;
 using AYTO.Log;
+using System.Net;
+using System.Net.Sockets;
 
 namespace AYTO_BYS_Projesi
 {
@@ -18,6 +20,9 @@ namespace AYTO_BYS_Projesi
     {
         UpdateFileDLL updateFileDLL = new UpdateFileDLL();
         LogDLL logDLL = new LogDLL();
+
+        private static Socket listenerSocket = new Socket(AddressFamily.InterNetwork, SocketType.Stream, ProtocolType.Tcp);
+        private const int PORT = 52000;
         //Belgenin güncellenmesi sonrası AnaEkran formunu yeniler. UpdateFileMethod metotunda sonunda döndürür.
         public delegate void UpdateFileEventHandler();
         public event UpdateFileEventHandler UpdateFileEventH;
@@ -199,7 +204,30 @@ namespace AYTO_BYS_Projesi
             logDLL.UpdateFileLog(UserId3, BelgeNo, updateFileName, oldFileName);
             this.Close();
         }
+        //Belge Gönderme Bağlantısı
+        private void FileAcceptanceOtherUser()
+        {
+            TcpListener listener = new TcpListener(IPAddress.Any, PORT);
+            listener.Start();
+            listenerSocket = listener.AcceptSocket();
+            Console.WriteLine("Bağlantı Geldi Hömşerim!");
+            while (true)
+            {
+                try
+                {
+                    byte[] inputData = new byte[15728640];
+                    listenerSocket.Receive(inputData);
 
+                    string message = Encoding.UTF8.GetString(inputData).Split('\0')[0];
+                    MessageBox.Show(" " + message);
+                }
+                catch
+                {
+                    Console.WriteLine("Hata");
+                    break;
+                }
+            }
+        }
         private void BelgeGuncellemeEkrani_Load(object sender, EventArgs e)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.

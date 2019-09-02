@@ -20,6 +20,7 @@ namespace AYTO_BYS_Projesi
         private const int PORT = 52000;
 
         SendFileDLL sendFileDLL = new SendFileDLL();
+
         public BelgeGondermeEkrani(string sendForm_belgeNo, int send_UserId)
         {
             InitializeComponent();
@@ -28,6 +29,9 @@ namespace AYTO_BYS_Projesi
         }
         public string BelgeNo { get; set; }
         public int UserId4 { get; set; }
+
+        public delegate void SentFileDataEventHandler();
+        public event SentFileDataEventHandler SentFileDataEventH;
         //TextBoxların boş olması durumunda ekle butonu pasif kalmaktadır.
         private void TextControlForButton()
         {
@@ -43,8 +47,10 @@ namespace AYTO_BYS_Projesi
         //CheckComboBox doldurma
         private void CheckComboBoxFillMethod()
         {
+            int rowValue = 0;
+
             Program.dataBaseConnection.Close();
-            string checkComboCmdText = "SELECT klnc.kullaniciAdi, klnc.kullaniciSoyadi FROM kullanicilar AS klnc ORDER BY klnc.kullaniciNo";
+            string checkComboCmdText = "SELECT klnc.kullaniciGiris, klnc.kullaniciAdi, klnc.kullaniciSoyadi FROM kullanicilar AS klnc WHERE klnc.silinmeDurumu = 'True' ORDER BY klnc.kullaniciNo";
             using (SqlCommand checkComboCmd = new SqlCommand(checkComboCmdText, Program.dataBaseConnection))
             {
                 Program.dataBaseConnection.Open();
@@ -52,11 +58,64 @@ namespace AYTO_BYS_Projesi
                 {
                     while (checkComboReader.Read())
                     {
-                        SendFilePerson_CheckComboBox.Items.Add(checkComboReader["kullaniciAdi"] + " " + checkComboReader["kullaniciSoyadi"]);
+                        SendFilePerson_CheckComboBox.Items.Add(checkComboReader["kullaniciAdi"] + " " + checkComboReader["kullaniciSoyadi"] + "(" + checkComboReader["kullaniciGiris"] + ")");
                     }
+                    rowValue++;
                 }
             }
             Program.dataBaseConnection.Close();
+        }
+        //Kullanıcının Anahtar değerini çeker
+        private void FindCheckedUsersNoAndInsertToTable()
+        {
+            string inboxFileTitle = SendFileTitle_CustomTextBox.Text.Trim();
+            string inboxFileExplain = SendFileExplain_CustomTextBox.Text.Trim();
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+            //Seçili kullanıcıların isimleri
+            string[] splitText = SendFilePerson_CheckComboBox.Text.Split(',');
+            //Kullanıcıların Id değerlerinin toplanacağı dizi
+            string[] usersWithId = new string[splitText.Length];
+            //Seçili kullanıcıların Idlerini ( ) arasından çıkarır
+            for (int i = 0; i < splitText.Length; i++)
+            {
+                int firstIndex = splitText[i].IndexOf("(") + "(".Length;
+                int lastIndex = splitText[i].LastIndexOf(")");
+                usersWithId[i] = splitText[i].Substring(firstIndex, lastIndex - firstIndex);
+            }
+            //Seçili kullanıcıların anahtar verilerinin depolanacağı Dizi
+            string[] usersNoArray = new string[splitText.Length];
+
+            string usersNoCmdText = "SELECT klnc.kullaniciNo FROM kullanicilar AS klnc WHERE klnc.kullaniciGiris = @gonderilenKisi";
+            for (int j = 0; j < splitText.Length; j++)
+            {
+                using (SqlCommand usersNoCmd = new SqlCommand(usersNoCmdText, Program.dataBaseConnection))
+                {
+                    //usersNoCmd.Parameters.Clear();
+                    usersNoCmd.Parameters.AddWithValue("@gonderilenKisi", usersWithId[j]);
+                    Program.dataBaseConnection.Open();
+                    using (SqlDataReader usersNoReader = usersNoCmd.ExecuteReader())
+                    {
+                        if (usersNoReader.Read())
+                        {
+                            usersNoArray[j] = usersNoReader["kullaniciNo"].ToString();
+                        }
+                    }
+                }
+                Program.dataBaseConnection.Close();
+            }
+            //Verilerin kaydedilmesi
+            if(usersNoArray != null && usersNoArray.Length != 0)
+            {
+                for(int k = 0; k<usersNoArray.Length; k++)
+                {
+                    sendFileDLL.InsertTheValuesToTableForSend(BelgeNo, UserId4, usersNoArray[k]);
+                    sendFileDLL.InsertTheValuesToTableForInbox(BelgeNo, usersNoArray[k], UserId4, inboxFileTitle, inboxFileExplain);
+                }
+                MessageBox.Show("Belge gönderildi.");
+                this.Close();
+            }
+            MessageBoxManager.Unregister();
         }
 
         private void BelgeGondermeEkrani_Load(object sender, EventArgs e)
@@ -92,20 +151,26 @@ namespace AYTO_BYS_Projesi
 
         private void SendFile_SendButton_Click(object sender, EventArgs e)
         {
-            try
-            {
-                socketForSend.Connect(new IPEndPoint(IPAddress.Parse(""), PORT));
-                Console.WriteLine("Bağlantı Tamam");
-            }
-            catch(Exception ex)
-            {
-                Console.WriteLine(ex.Message);
-            }
-            while(true && socketForSend.Connected)
-            {
-                socketForSend.Send(Encoding.UTF8.GetBytes(""));
-            }
-            this.Close();
+            FindCheckedUsersNoAndInsertToTable();
+
+            //try
+            //{
+            //    socketForSend.Connect(new IPEndPoint(IPAddress.Parse("192.168.244.128"), PORT));
+            //    Console.WriteLine("Bağlantı Tamam");
+            //}
+            //catch(Exception ex)
+            //{
+            //    Console.WriteLine(ex.Message);
+            //}
+            //while(true && socketForSend.Connected)
+            //{
+            //    string fileWithFormat = sendFileDLL.FileNameWithFormat(BelgeNo);
+            //    string sendFilePath = Program.serverFilePath + fileWithFormat;
+            //    socketForSend.Send(Encoding.UTF8.GetBytes(sendFilePath));
+            //}
+            //Console.WriteLine("Bir tuşa basın");
+            //Console.Read();
+            //this.Close();
         }
         private void SendFile_CancelButton_Click(object sender, EventArgs e)
         {

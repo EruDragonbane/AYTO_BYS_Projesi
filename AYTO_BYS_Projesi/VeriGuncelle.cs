@@ -19,6 +19,7 @@ namespace AYTO_BYS_Projesi
         UpdateDataDLL updateDataDLL = new UpdateDataDLL();
         LogDLL logDLL = new LogDLL();
 
+        private string oldUserName = "";
         public delegate void AddUpdateDataEventHandler();
         public event AddUpdateDataEventHandler UpdateDataEventH;
         public VeriGuncelle(string adminPanel_dataName, string adminPanel_tableName, int AdminUserId)
@@ -97,6 +98,8 @@ namespace AYTO_BYS_Projesi
                 UpdateUserCorp_CustomTextBox.Text = textGridTuple.Item7;
 
                 oldDataName = textGridTuple.Item2 + ' ' + textGridTuple.Item3;
+
+                oldUserName = textGridTuple.Item4;
             }
             else if (TableName == "durumlar")
             {
@@ -119,6 +122,7 @@ namespace AYTO_BYS_Projesi
 
         private void UpdateDataMethod()
         {
+            Console.WriteLine(oldUserName);
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
 
@@ -129,18 +133,32 @@ namespace AYTO_BYS_Projesi
             string userSurname = UpdateUserSurname_CustomTextBox.Text.Trim();
             string userID = UpdateUserID_CustomTextBox.Text.Trim();
             string userCorp = UpdateUserCorp_CustomTextBox.Text.Trim();
-
-            string checkUserReturnValue = updateDataDLL.CheckUserNameBeforeUpdate(userID);
-            
-            if(checkUserReturnValue == "false")
+            //Item1 = updateTitle, Item2 = comboBoxValue
+            var updateDataTuple = updateDataDLL.UpdateData(TableName, status, position, userName, userSurname, userID, userAuthority, userCorp, DataFromAdminPanel);
+            try
             {
-                //Item1 = updateTitle, Item2 = comboBoxValue
-                var updateDataTuple = updateDataDLL.UpdateData(TableName, status, position, userName, userSurname, userID, userAuthority, userCorp, DataFromAdminPanel);
                 if (TableName == "kullanicilar")
                 {
-                    //Refresh
-                    UpdateDataEventH();
-                    MessageBox.Show(userID + " kullanıcısı güncellendi.");
+                    if (oldUserName != userID)
+                    {
+                        string checkUserReturnValue = updateDataDLL.CheckUserNameBeforeUpdate(userID);
+                        if (checkUserReturnValue == "false")
+                        {
+                            //Refresh
+                            UpdateDataEventH();
+                            MessageBox.Show(userID + " kullanıcısı güncellendi.");
+                        }
+                        else
+                        {
+                            MessageBox.Show("Böyle bir kullanıcı adı zaten var!");
+                        }
+                    }
+                    else
+                    {
+                        //Refresh
+                        UpdateDataEventH();
+                        MessageBox.Show(userID + " kullanıcısı güncellendi.");
+                    }
                 }
                 else if (TableName == "durumlar" || TableName == "gorevler")
                 {
@@ -157,10 +175,11 @@ namespace AYTO_BYS_Projesi
                 logDLL.UpdateDataLog(TableName, UpdateDataUserId, DataFromAdminPanel, updateDataTuple.Item1, userName, userSurname, updateDataTuple.Item2, oldDataName);
                 this.Close();
             }
-            else
+            catch(Exception e)
             {
-                MessageBox.Show("Böyle bir kullanıcı adı zaten var!");
+                Console.WriteLine(e.ToString());
             }
+
             MessageBoxManager.Unregister();
             this.DialogResult = DialogResult.OK;
         }

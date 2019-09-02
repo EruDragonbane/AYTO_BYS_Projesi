@@ -35,6 +35,7 @@
             this.profileToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.signOutToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.exitToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.refreshToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.MainPageTableLayoutPanel1 = new System.Windows.Forms.TableLayoutPanel();
             this.MyFiles_Groupbox = new System.Windows.Forms.GroupBox();
             this.BYS_ActionsTableLayoutPanel3 = new System.Windows.Forms.TableLayoutPanel();
@@ -51,18 +52,8 @@
             this.MainPageTableLayoutPanel2 = new System.Windows.Forms.TableLayoutPanel();
             this.SentFiles_GroupBox = new System.Windows.Forms.GroupBox();
             this.SentFiles_DataGridView = new System.Windows.Forms.DataGridView();
-            this.SendFile_Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SendFile_FileName = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SendFile_SentDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SendFile_SentPerson = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.SendFile_Status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.ReceivedFiles_GroupBox = new System.Windows.Forms.GroupBox();
             this.ReceivedFiles_DataGridView = new System.Windows.Forms.DataGridView();
-            this.ReceivedFile_Title = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ReceivedFile_Name = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ReceivedFile_ReceiveDate = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ReceivedFile_ReceivedFrom = new System.Windows.Forms.DataGridViewTextBoxColumn();
-            this.ReceivedFile_Status = new System.Windows.Forms.DataGridViewTextBoxColumn();
             this.contextMenuStrip1 = new System.Windows.Forms.ContextMenuStrip(this.components);
             this.aytoMainPage_MenuStrip.SuspendLayout();
             this.MainPageTableLayoutPanel1.SuspendLayout();
@@ -81,7 +72,8 @@
             // aytoMainPage_MenuStrip
             // 
             this.aytoMainPage_MenuStrip.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.menuToolStripMenuItem1});
+            this.menuToolStripMenuItem1,
+            this.refreshToolStripMenuItem});
             this.aytoMainPage_MenuStrip.Location = new System.Drawing.Point(0, 0);
             this.aytoMainPage_MenuStrip.Name = "aytoMainPage_MenuStrip";
             this.aytoMainPage_MenuStrip.Size = new System.Drawing.Size(1423, 24);
@@ -101,23 +93,30 @@
             // profileToolStripMenuItem
             // 
             this.profileToolStripMenuItem.Name = "profileToolStripMenuItem";
-            this.profileToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.profileToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.profileToolStripMenuItem.Text = "Profil";
             this.profileToolStripMenuItem.Click += new System.EventHandler(this.profileToolStripMenuItem_Click);
             // 
             // signOutToolStripMenuItem
             // 
             this.signOutToolStripMenuItem.Name = "signOutToolStripMenuItem";
-            this.signOutToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.signOutToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.signOutToolStripMenuItem.Text = "Oturumu Kapat";
             this.signOutToolStripMenuItem.Click += new System.EventHandler(this.SignOutToolStripMenuItem_Click);
             // 
             // exitToolStripMenuItem
             // 
             this.exitToolStripMenuItem.Name = "exitToolStripMenuItem";
-            this.exitToolStripMenuItem.Size = new System.Drawing.Size(180, 22);
+            this.exitToolStripMenuItem.Size = new System.Drawing.Size(156, 22);
             this.exitToolStripMenuItem.Text = "Çıkış";
             this.exitToolStripMenuItem.Click += new System.EventHandler(this.ExitToolStripMenuItem_Click);
+            // 
+            // refreshToolStripMenuItem
+            // 
+            this.refreshToolStripMenuItem.Name = "refreshToolStripMenuItem";
+            this.refreshToolStripMenuItem.Size = new System.Drawing.Size(51, 20);
+            this.refreshToolStripMenuItem.Text = "Yenile";
+            this.refreshToolStripMenuItem.Click += new System.EventHandler(this.refreshToolStripMenuItem_Click);
             // 
             // MainPageTableLayoutPanel1
             // 
@@ -366,12 +365,6 @@
             this.SentFiles_DataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.SentFiles_DataGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
             this.SentFiles_DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.SentFiles_DataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.SendFile_Title,
-            this.SendFile_FileName,
-            this.SendFile_SentDate,
-            this.SendFile_SentPerson,
-            this.SendFile_Status});
             this.SentFiles_DataGridView.Location = new System.Drawing.Point(6, 19);
             this.SentFiles_DataGridView.Name = "SentFiles_DataGridView";
             this.SentFiles_DataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
@@ -379,31 +372,7 @@
             this.SentFiles_DataGridView.Size = new System.Drawing.Size(688, 289);
             this.SentFiles_DataGridView.TabIndex = 2;
             this.SentFiles_DataGridView.TabStop = false;
-            // 
-            // SendFile_Title
-            // 
-            this.SendFile_Title.HeaderText = "Başlık";
-            this.SendFile_Title.Name = "SendFile_Title";
-            // 
-            // SendFile_FileName
-            // 
-            this.SendFile_FileName.HeaderText = "Belge Adı";
-            this.SendFile_FileName.Name = "SendFile_FileName";
-            // 
-            // SendFile_SentDate
-            // 
-            this.SendFile_SentDate.HeaderText = "Tarih";
-            this.SendFile_SentDate.Name = "SendFile_SentDate";
-            // 
-            // SendFile_SentPerson
-            // 
-            this.SendFile_SentPerson.HeaderText = "Kime";
-            this.SendFile_SentPerson.Name = "SendFile_SentPerson";
-            // 
-            // SendFile_Status
-            // 
-            this.SendFile_Status.HeaderText = "Durum";
-            this.SendFile_Status.Name = "SendFile_Status";
+            this.SentFiles_DataGridView.CellClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.SentFiles_DataGridView_CellClick);
             // 
             // ReceivedFiles_GroupBox
             // 
@@ -428,12 +397,6 @@
             this.ReceivedFiles_DataGridView.CellBorderStyle = System.Windows.Forms.DataGridViewCellBorderStyle.None;
             this.ReceivedFiles_DataGridView.ColumnHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
             this.ReceivedFiles_DataGridView.ColumnHeadersHeightSizeMode = System.Windows.Forms.DataGridViewColumnHeadersHeightSizeMode.AutoSize;
-            this.ReceivedFiles_DataGridView.Columns.AddRange(new System.Windows.Forms.DataGridViewColumn[] {
-            this.ReceivedFile_Title,
-            this.ReceivedFile_Name,
-            this.ReceivedFile_ReceiveDate,
-            this.ReceivedFile_ReceivedFrom,
-            this.ReceivedFile_Status});
             this.ReceivedFiles_DataGridView.Location = new System.Drawing.Point(6, 19);
             this.ReceivedFiles_DataGridView.Name = "ReceivedFiles_DataGridView";
             this.ReceivedFiles_DataGridView.RowHeadersBorderStyle = System.Windows.Forms.DataGridViewHeaderBorderStyle.Sunken;
@@ -441,31 +404,7 @@
             this.ReceivedFiles_DataGridView.Size = new System.Drawing.Size(688, 289);
             this.ReceivedFiles_DataGridView.TabIndex = 1;
             this.ReceivedFiles_DataGridView.TabStop = false;
-            // 
-            // ReceivedFile_Title
-            // 
-            this.ReceivedFile_Title.HeaderText = "Başlık";
-            this.ReceivedFile_Title.Name = "ReceivedFile_Title";
-            // 
-            // ReceivedFile_Name
-            // 
-            this.ReceivedFile_Name.HeaderText = "Belge Adı";
-            this.ReceivedFile_Name.Name = "ReceivedFile_Name";
-            // 
-            // ReceivedFile_ReceiveDate
-            // 
-            this.ReceivedFile_ReceiveDate.HeaderText = "Tarih";
-            this.ReceivedFile_ReceiveDate.Name = "ReceivedFile_ReceiveDate";
-            // 
-            // ReceivedFile_ReceivedFrom
-            // 
-            this.ReceivedFile_ReceivedFrom.HeaderText = "Kimden";
-            this.ReceivedFile_ReceivedFrom.Name = "ReceivedFile_ReceivedFrom";
-            // 
-            // ReceivedFile_Status
-            // 
-            this.ReceivedFile_Status.HeaderText = "Durum";
-            this.ReceivedFile_Status.Name = "ReceivedFile_Status";
+            this.ReceivedFiles_DataGridView.CellDoubleClick += new System.Windows.Forms.DataGridViewCellEventHandler(this.ReceivedFiles_DataGridView_CellDoubleClick);
             // 
             // contextMenuStrip1
             // 
@@ -526,20 +465,11 @@
         private System.Windows.Forms.DataGridView SentFiles_DataGridView;
         private System.Windows.Forms.GroupBox ReceivedFiles_GroupBox;
         private System.Windows.Forms.DataGridView ReceivedFiles_DataGridView;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SendFile_Title;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SendFile_FileName;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SendFile_SentDate;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SendFile_SentPerson;
-        private System.Windows.Forms.DataGridViewTextBoxColumn SendFile_Status;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ReceivedFile_Title;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ReceivedFile_Name;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ReceivedFile_ReceiveDate;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ReceivedFile_ReceivedFrom;
-        private System.Windows.Forms.DataGridViewTextBoxColumn ReceivedFile_Status;
         private System.Windows.Forms.TableLayoutPanel BYS_SearchTableLayoutPanel4;
         private CustomTextBox FileSearch_CustomTextBox;
         private System.Windows.Forms.ComboBox FileSearch_ComboBox;
         private System.Windows.Forms.ContextMenuStrip contextMenuStrip1;
+        private System.Windows.Forms.ToolStripMenuItem refreshToolStripMenuItem;
     }
 }
 

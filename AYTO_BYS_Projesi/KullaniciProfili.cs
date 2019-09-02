@@ -266,29 +266,30 @@ namespace AYTO_BYS_Projesi
                     FileInfo fileInfo = new FileInfo(imageLocation);
                     if (fileInfo.Exists)
                     {
-                        Image checkDimension = Image.FromFile(imageLocation);
-                        int imageWidth = checkDimension.Width;
-                        int imageHeight = checkDimension.Height;
-
-                        if(imageWidth < 500 && imageHeight < 500)
+                        using (Image checkDimension = Image.FromFile(imageLocation))
                         {
-                            if (fileInfo.Length < (Math.Pow(10, 6)))
+                            int imageWidth = checkDimension.Width;
+                            int imageHeight = checkDimension.Height;
+
+                            if (imageWidth < 500 && imageHeight < 500)
                             {
-                                UserProfile_UserPictureBox.Text = imageLocation;
-                                UserProfile_UserPictureBox.ImageLocation = imageLocation;
-                                checkForUpdateImageButton = 1;
-                                images.Dispose();
+                                if (fileInfo.Length < (Math.Pow(10, 6)))
+                                {
+                                    UserProfile_UserPictureBox.Text = imageLocation;
+                                    UserProfile_UserPictureBox.ImageLocation = imageLocation;
+                                    checkForUpdateImageButton = 1;
+                                    images.Dispose();
+                                }
+                                else
+                                {
+                                    MessageBox.Show("Resmin boyutu 1MB'den büyüktür.");
+                                }
                             }
                             else
                             {
-                                MessageBox.Show("Resmin boyutu 1MB'den büyüktür.");
+                                MessageBox.Show("Resmin boyutu 500x500'den büyük olmamalıdır.");
                             }
                         }
-                        else
-                        {
-                            MessageBox.Show("Resmin boyutu 500x500'den büyük olmamalıdır.");
-                        }
-                        checkDimension.Dispose();
                     }
                 }
             }
@@ -297,10 +298,10 @@ namespace AYTO_BYS_Projesi
 
         private void UserProfile_CancelButton_Click(object sender, EventArgs e)
         {
-            if(UserProfile_UserPictureBox.Image != null)
-            {
-                Console.WriteLine("boş deeeeeel");
-            }
+            //if(UserProfile_UserPictureBox.Image != null)
+            //{
+            //    Console.WriteLine("");
+            //}
             UserProfile_UserPictureBox.Controls.Remove(ChangePictureButton);
             DisposeEvent();
             this.Close();

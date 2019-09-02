@@ -374,7 +374,7 @@
             this.MaximizeBox = false;
             this.MinimizeBox = false;
             this.Name = "YeniVerilEkle";
-            this.Text = "KullaniciEkleme";
+            this.Text = "Yeni Veri Ekleme";
             this.Load += new System.EventHandler(this.KullaniciEkleme_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.newUserGroupBox.ResumeLayout(false);

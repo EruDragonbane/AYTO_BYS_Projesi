@@ -19,10 +19,6 @@ namespace AYTO_BYS_Projesi
         MainPageDLL mainPageDLL = new MainPageDLL();
         LogDLL logDLL = new LogDLL();
 
-        //OleDbConnection dataBaseCon;
-        SqlDataAdapter dataBaseAdapter;
-        //SqlCommand dataBaseCmd;
-        DataSet dataSet;
         //Giriş ekranında kullanıcının kullaniciGiris anahtarını alır.
         public AnaEkran(int LoginId)
         {
@@ -32,19 +28,19 @@ namespace AYTO_BYS_Projesi
         }
         public int UserId { get; set; }
         //Belgelerim veritabanını çağırmak için bir metottur.Aynı zamanda veritabanını yeniler.
-        private void RefreshAndFillDataGrid()
+        private void RefreshAndFillMyFilesDataGrid()
         {
             //Veritabanı bağlantısı aktif değilse aktif yap
             Program.dataBaseConnection.Close();
-            string dataBaseAdapterText = "SELECT DISTINCT blg.belgeBasligi, blg.belgeAdi, blg.eklenmeTarihi, blg.guncellenmeTarihi, drm.durumAdi, klnc.kullaniciAdi+' '+klnc.kullaniciSoyadi AS klncAdSoyad FROM belgelerim AS blg, durumlar AS drm, kullanicilar AS klnc WHERE blg.durumNo = drm.durumNo AND klnc.kullaniciNo = blg.kullaniciNo ORDER BY blg.eklenmeTarihi DESC";
-            using (dataBaseAdapter = new SqlDataAdapter(dataBaseAdapterText, Program.dataBaseConnection))
+            string dataBaseAdapterTextMyFiles = "SELECT DISTINCT blg.belgeBasligi, blg.belgeAdi, blg.eklenmeTarihi, blg.guncellenmeTarihi, drm.durumAdi, klnc.kullaniciAdi+' '+klnc.kullaniciSoyadi AS klncAdSoyad FROM belgelerim AS blg, durumlar AS drm, kullanicilar AS klnc WHERE blg.durumNo = drm.durumNo AND klnc.kullaniciNo = blg.kullaniciNo ORDER BY blg.eklenmeTarihi DESC";
+            using (SqlDataAdapter dataBaseAdapter = new SqlDataAdapter(dataBaseAdapterTextMyFiles, Program.dataBaseConnection))
             {
                 Program.dataBaseConnection.Open();
-                dataSet = new DataSet();
+                DataSet dataSet = new DataSet();
                 dataBaseAdapter.Fill(dataSet, "belgelerim");
                 MyFiles_DataGridView.DataSource = dataSet.Tables["belgelerim"];
                 dataBaseAdapter.Dispose();
-                // Data Sutün İsimlendirme
+                // Data Sütun İsimlendirme
                 MyFiles_DataGridView.Columns[0].HeaderText = "Başlık";
                 MyFiles_DataGridView.Columns[1].HeaderText = "Belge Adı";
                 MyFiles_DataGridView.Columns[2].HeaderText = "Eklenme Tarihi";
@@ -66,6 +62,56 @@ namespace AYTO_BYS_Projesi
                 Program.dataBaseConnection.Close();
             }
 
+        }
+        //Kullanıcının göndermiş olduğu belgeleri listeler ve veritabanını yeniler.
+        private void RefreshAndFillSentFilesDataGrid()
+        {
+            //SentFiles_DataGridView.DataSource = null;
+            //SentFiles_DataGridView.Refresh();
+            Program.dataBaseConnection.Close();
+            string dataBaseAdapterTextSent = "SELECT DISTINCT blg.belgeAdi, gonderilenKlnc.kullaniciAdi + ' ' + gonderilenKlnc.kullaniciSoyadi AS gonderilenKlncAdSoyad, gonderilmisBelge.gonderilmeTarihi FROM (gonderilmisBelgeler AS gonderilmisBelge INNER JOIN kullanicilar AS gonderilenKlnc ON gonderilmisBelge.gonderilenKisiNo = gonderilenKlnc.kullaniciNo) INNER JOIN belgelerim AS blg ON gonderilmisBelge.gonderilmisBelgeNo = blg.belgeNo WHERE gonderenKisiNo = @gonderenKisi ORDER BY gonderilmisBelge.gonderilmeTarihi DESC";
+            using (SqlDataAdapter sentFileAdapter = new SqlDataAdapter(dataBaseAdapterTextSent, Program.dataBaseConnection))
+            {
+                sentFileAdapter.SelectCommand.Parameters.AddWithValue("@gonderenKisi", UserId);
+                Program.dataBaseConnection.Open();
+                DataSet dataSetSent = new DataSet();
+                sentFileAdapter.Fill(dataSetSent, "gonderilmisBelgeler");
+                SentFiles_DataGridView.DataSource = dataSetSent.Tables["gonderilmisBelgeler"];
+                sentFileAdapter.Dispose();
+                //Data Sütun İsimlendirme
+                SentFiles_DataGridView.Columns[0].HeaderText = "Belge Adı";
+                SentFiles_DataGridView.Columns[1].HeaderText = "Gönderilen Kişi";
+                SentFiles_DataGridView.Columns[2].HeaderText = "Gonderilme Tarihi";
+
+                ActionsGroupBoxEnabledActivity("allElementsFalse");
+            }
+            SentFiles_DataGridView.ClearSelection();
+            Program.dataBaseConnection.Close();
+        }
+        //Kullanıcıya gelen belgeleri listeler ve veritabanını yeniler
+        private void RefreshAndFillReceivedFilesDataGrid()
+        {
+            Program.dataBaseConnection.Close();
+            string dataBaseAdapterTextReceived = "SELECT DISTINCT blg.belgeAdi, gonderenKlnc.kullaniciAdi + ' ' + gonderenKlnc.kullaniciSoyadi AS gonderenKlncAdSoyad, gelenBelge.gelmeTarihi, gelenBelge.gelenVeriNo FROM (gelenBelgeler AS gelenBelge INNER JOIN kullanicilar AS gonderenKlnc ON gelenBelge.gelenGonderenKisiNo = gonderenKlnc.kullaniciNo) INNER JOIN belgelerim AS blg ON gelenBelge.gelenBelgeNo = blg.belgeNo WHERE gelenKisiNo = @gelenKisi ORDER BY gelenBelge.gelmeTarihi DESC";
+            using(SqlDataAdapter receivedFileAdapter = new SqlDataAdapter(dataBaseAdapterTextReceived, Program.dataBaseConnection))
+            {
+                receivedFileAdapter.SelectCommand.Parameters.AddWithValue("@gelenKisi", UserId);
+                Program.dataBaseConnection.Open();
+                DataSet dataSetReceived = new DataSet();
+                receivedFileAdapter.Fill(dataSetReceived, "gelenBelgeler");
+                ReceivedFiles_DataGridView.DataSource = dataSetReceived.Tables["gelenBelgeler"];
+                receivedFileAdapter.Dispose();
+                //Data Sütun İsimlendirme
+                ReceivedFiles_DataGridView.Columns[0].HeaderText = "Belge Adı";
+                ReceivedFiles_DataGridView.Columns[1].HeaderText = "Gönderen Kişi";
+                ReceivedFiles_DataGridView.Columns[2].HeaderText = "Gönderilme Tarihi";
+                ReceivedFiles_DataGridView.Columns[3].HeaderText = "Veri No";
+                ReceivedFiles_DataGridView.Columns[3].Visible = false;
+
+
+                ActionsGroupBoxEnabledActivity("allElementsFalse");
+            }
+            Program.dataBaseConnection.Close();
         }
         //Belgeler veritabanında arama ve listeleme amacıyla kullanılır.
         private void SearchAndFillDataGrid()
@@ -185,6 +231,7 @@ namespace AYTO_BYS_Projesi
                 Application.Exit();
             }
         }
+
         private void AnaEkran_Load(object sender, EventArgs e)
         {
             //MessageBoxManager yerelleştirme çevirileri kayıt altına alır. UnRegister ile bu silinir.
@@ -194,7 +241,9 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.No = "Hayır";
             MessageBoxManager.OK = "Tamam";
             //Veritabanını çağırma
-            RefreshAndFillDataGrid();
+            RefreshAndFillMyFilesDataGrid();
+            RefreshAndFillSentFilesDataGrid();
+            RefreshAndFillReceivedFilesDataGrid();
             //Eylemler penceresi, veritabanı içindeki herhangi
             //bir veriye tıklanıldığı zaman aktif olmaktadır.
             //Başlangıçta pasiftir.
@@ -207,11 +256,12 @@ namespace AYTO_BYS_Projesi
             FileSearch_ComboBox.SelectedIndex = 0;
 
             MyFiles_DataGridView.ClearSelection();
+            SentFiles_DataGridView.ClearSelection();
         }
 
         private void MyFiles_DataGridView_CellMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
-
+            SentFiles_DataGridView.ClearSelection();
             if (MyFiles_DataGridView.Rows.Count == 0 || MyFiles_DataGridView.Rows == null)
             {
                 ActionsGroupBoxEnabledActivity("allElementsFalse");
@@ -228,7 +278,7 @@ namespace AYTO_BYS_Projesi
         {
             MessageBoxManager.Unregister();
             MessageBoxManager.Register();
-
+            SentFiles_DataGridView.ClearSelection();
             if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)
             {
                 MessageBox.Show("Herhangi bir veri yok!");
@@ -242,7 +292,50 @@ namespace AYTO_BYS_Projesi
                 if (cellDoubleClickTuple.Item1 == "true")
                 {
                     string selectedRowFileNo = cellDoubleClickTuple.Item2;
-                    BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, UserId);
+                    BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, "", UserId, "owner");
+                    //Pencere halihazırda aktif ise yeni pencere açmak
+                    //yerine varolan pencereyi açar.
+                    if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
+                    {
+                        Application.OpenForms.OfType<Form>().First(f => f is BelgeDetayiEkrani).Activate();
+                    }
+                    else
+                    {
+                        //Pencere konumunu ekran merkezine taşır.
+                        updateFileForm.StartPosition = FormStartPosition.CenterScreen;
+                        updateFileForm.Show();
+                        this.Show();
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Belge Seçilemedi");
+                }
+            }
+            MessageBoxManager.Unregister();
+        }
+
+        private void ReceivedFiles_DataGridView_CellDoubleClick(object sender, DataGridViewCellEventArgs e)
+        {
+            MessageBoxManager.Unregister();
+            MessageBoxManager.Register();
+            ReceivedFiles_DataGridView.ClearSelection();
+            if(ReceivedFiles_DataGridView.Rows == null ||ReceivedFiles_DataGridView.Rows.Count == 0)
+            {
+                MessageBox.Show("Herhangi bir veri yok!");
+                //return;
+            }
+            else
+            {
+                string selectedRowName = ReceivedFiles_DataGridView.CurrentRow.Cells[0].Value.ToString();
+                string selectedRowDataNo = ReceivedFiles_DataGridView.CurrentRow.Cells[3].Value.ToString();
+                Console.WriteLine(selectedRowDataNo);
+                //Item1 = returnValue, Item2 = fileNo
+                var cellDoubleClickTuple = mainPageDLL.CellDoubleClick(selectedRowName);
+                if(cellDoubleClickTuple.Item1 == "true")
+                {
+                    string selectedRowFileNo = cellDoubleClickTuple.Item2;
+                    BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, selectedRowDataNo, UserId, "received");
                     //Pencere halihazırda aktif ise yeni pencere açmak
                     //yerine varolan pencereyi açar.
                     if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
@@ -267,6 +360,7 @@ namespace AYTO_BYS_Projesi
         //Columheader'a tıklandığında eylemler penceresi pasif olmaktadır.
         private void MyFiles_DataGridView_ColumnHeaderMouseClick(object sender, DataGridViewCellMouseEventArgs e)
         {
+            SentFiles_DataGridView.ClearSelection();
             if (e.RowIndex != -1 || e.ColumnIndex == -1)
             {
 
@@ -287,6 +381,12 @@ namespace AYTO_BYS_Projesi
             {
                 ActionsGroupBoxEnabledActivity("allElementsFalse");
             }
+        }
+        private void SentFiles_DataGridView_CellClick(object sender, DataGridViewCellEventArgs e)
+        {
+            MyFiles_DataGridView.ClearSelection();
+            ActionsGroupBoxEnabledActivity("allElementsFalse");
+            RefreshAndFillSentFilesDataGrid();
         }
         //Çıkış Eylemi
         private void ExitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -330,6 +430,16 @@ namespace AYTO_BYS_Projesi
             }
             MessageBoxManager.Unregister();
         }
+        //DataGridView leri yeniler
+        public void refreshToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            RefreshAndFillMyFilesDataGrid();
+            RefreshAndFillSentFilesDataGrid();
+            RefreshAndFillReceivedFilesDataGrid();
+            MyFiles_DataGridView.ClearSelection();
+            SentFiles_DataGridView.ClearSelection();
+            ReceivedFiles_DataGridView.ClearSelection();
+        }
         //İstemsiz eylemlerin engellenmesi sağlanmaktadır. 
         //EYLEMLER (Yeni Belge, Belge Gönderme, Belge Güncelleme, Belge Silme, Eylem Penceresi İptali)
         //Yeni Belge Ekranı
@@ -348,7 +458,7 @@ namespace AYTO_BYS_Projesi
                 FileSearch_CustomTextBox.Clear();
                 //Pencere konumunu ekran merkezine taşır.
                 newFileForm.StartPosition = FormStartPosition.CenterScreen;
-                newFileForm.AddNewFileEventH += RefreshAndFillDataGrid;
+                newFileForm.AddNewFileEventH += RefreshAndFillMyFilesDataGrid;
                 newFileForm.Show();
                 this.Show();
             }
@@ -372,8 +482,7 @@ namespace AYTO_BYS_Projesi
                 {
                     string selectedRowFileNo = sendButtonClickTuple.Item2;
                     BelgeGondermeEkrani sendFileForm = new BelgeGondermeEkrani(selectedRowFileNo, UserId);
-                    //Pencere halihazırda aktif ise yeni pencere açmak
-                    //yerine varolan pencereyi açar.
+                    //Pencere halihazırda aktif ise yeni pencere açmak yerine varolan pencereyi açar.
                     if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeGondermeEkrani))
                     {
                         FileSearch_CustomTextBox.Clear();
@@ -385,6 +494,7 @@ namespace AYTO_BYS_Projesi
                         //Pencere konumunu ekran merkezine taşır.
                         sendFileForm.StartPosition = FormStartPosition.CenterScreen;
                         sendFileForm.Show();
+                        this.Show();
                         FormActivityCheck("send");
                     }
                 }
@@ -434,7 +544,7 @@ namespace AYTO_BYS_Projesi
                             FileSearch_CustomTextBox.Clear();
                             //Pencere konumunu ekran merkezine taşır.
                             updateFileForm.StartPosition = FormStartPosition.CenterScreen;
-                            updateFileForm.UpdateFileEventH += RefreshAndFillDataGrid;
+                            updateFileForm.UpdateFileEventH += RefreshAndFillMyFilesDataGrid;
                             updateFileForm.Show();
                             this.Show();
                         }
@@ -488,7 +598,7 @@ namespace AYTO_BYS_Projesi
                                 mainPageDLL.InsertFileBeforeDelete(currentCellValue, UserId);
 
                                 logDLL.NormalUserLog("delete", currentCellValue, UserId);
-                                RefreshAndFillDataGrid();
+                                RefreshAndFillMyFilesDataGrid();
                                 FormActivityCheck("all");
 
                                 if (MyFiles_DataGridView.Rows == null || MyFiles_DataGridView.Rows.Count == 0)

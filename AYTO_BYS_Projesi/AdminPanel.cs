@@ -45,7 +45,7 @@ namespace AYTO_BYS_Projesi
             AdminPage_DataGridView.Refresh();
             Program.dataBaseConnection.Close();
 
-            string usersListAdapterText = "SELECT COUNT(blg.belgeNo) AS belgeToplam, klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi FROM (kullanicilar AS klnc LEFT OUTER JOIN belgelerim AS blg ON klnc.kullaniciNo = blg.kullaniciNo) LEFT OUTER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo  WHERE klnc.silinmeDurumu = " + 1 + " GROUP BY klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi ORDER BY klnc.kullaniciNo ASC";
+            string usersListAdapterText = "SELECT COUNT(blg.belgeNo) AS belgeToplam, klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, ytk.yetkiAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi FROM ((kullanicilar AS klnc LEFT OUTER JOIN belgelerim AS blg ON klnc.kullaniciNo = blg.kullaniciNo) LEFT OUTER JOIN gorevler AS grv ON klnc.gorevNo = grv.gorevNo) LEFT OUTER JOIN yetkiler AS ytk ON klnc.yetkiNo = ytk.yetkiNo WHERE klnc.silinmeDurumu = " + 1 + " GROUP BY klnc.kullaniciNo, klnc.kullaniciAdi, klnc.kullaniciSoyadi, klnc.kullaniciAktifligi, grv.gorevAdi, ytk.yetkiAdi, klnc.kullaniciKurumu, klnc.sistemKayitTarihi ORDER BY klnc.kullaniciNo ASC";
 
             using (SqlDataAdapter usersListAdapter = new SqlDataAdapter(usersListAdapterText, Program.dataBaseConnection))
             {
@@ -61,8 +61,9 @@ namespace AYTO_BYS_Projesi
                 AdminPage_DataGridView.Columns[3].HeaderText = "Soyad";
                 AdminPage_DataGridView.Columns[4].HeaderText = "Kullanıcı Durumu";
                 AdminPage_DataGridView.Columns[5].HeaderText = "Görevi";
-                AdminPage_DataGridView.Columns[6].HeaderText = "Kurum";
-                AdminPage_DataGridView.Columns[7].HeaderText = "Kayıt Tarihi";
+                AdminPage_DataGridView.Columns[6].HeaderText = "Yetkisi";
+                AdminPage_DataGridView.Columns[7].HeaderText = "Kurum";
+                AdminPage_DataGridView.Columns[8].HeaderText = "Kayıt Tarihi";
             }
             Program.dataBaseConnection.Close();
             tableName = "kullanicilar";
@@ -507,7 +508,7 @@ namespace AYTO_BYS_Projesi
                     if (cellDoubleClickTuple.Item1 == "true")
                     {
                         string selectedRowFileNo = cellDoubleClickTuple.Item2;
-                        BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, AdminUserId);
+                        BelgeDetayiEkrani updateFileForm = new BelgeDetayiEkrani(selectedRowFileNo, "", AdminUserId, "owner");
                         //Pencere halihazırda aktif ise yeni pencere açmak
                         //yerine varolan pencereyi açar.
                         if (Application.OpenForms.OfType<Form>().Any(f => f is BelgeDetayiEkrani))
@@ -841,7 +842,7 @@ namespace AYTO_BYS_Projesi
                             {
                                 if (tableName == "kullanicilar")
                                 {
-                                    string adminColumn = AdminPage_DataGridView.CurrentRow.Cells[5].Value.ToString();
+                                    string adminColumn = AdminPage_DataGridView.CurrentRow.Cells[6].Value.ToString();
                                     string countAdminPosition = adminPageDLL.CheckCountAdminPosition();
                                     if (countAdminPosition == "1" && adminColumn == "Admin")
                                     {
@@ -877,17 +878,27 @@ namespace AYTO_BYS_Projesi
             MessageBoxManager.Register();
             string currentCellValue = AdminPage_DataGridView.CurrentRow.Cells[1].Value.ToString();
             string selectedData = AdminPage_DataGridView.CurrentRow.Cells[4].Value.ToString();
+
             if (selectedData == "True")
             {
-                String deleteMessage = "Kullanıcıyı pasifleştirmek istediğinize emin misiniz?";
-                String deleteTitle = "Uyarı!";
-                MessageBoxButtons deleteButtons = MessageBoxButtons.YesNo;
-                DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
-                if (deleteResult == DialogResult.Yes)
+                string adminColumn = AdminPage_DataGridView.CurrentRow.Cells[6].Value.ToString();
+                string countAdminPosition = adminPageDLL.CheckCountAdminPosition();
+                if (countAdminPosition == "1" && adminColumn == "Admin")
                 {
-                    adminPageDLL.InactiveOrActiveUser(currentCellValue, 0);
-                    logDLL.AdminLog("active", columnTitle, currentCellValue, AdminUserId, tableName, datagridColumnName);
-                    UsersList();
+                    MessageBox.Show("Sistemde tek yetkili var. İşlem iptal edildi.", "Uyarı!", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                }
+                else
+                {
+                    String deleteMessage = "Kullanıcıyı pasifleştirmek istediğinize emin misiniz?";
+                    String deleteTitle = "Uyarı!";
+                    MessageBoxButtons deleteButtons = MessageBoxButtons.YesNo;
+                    DialogResult deleteResult = MessageBox.Show(deleteMessage, deleteTitle, deleteButtons);
+                    if (deleteResult == DialogResult.Yes)
+                    {
+                        adminPageDLL.InactiveOrActiveUser(currentCellValue, 0);
+                        logDLL.AdminLog("active", columnTitle, currentCellValue, AdminUserId, tableName, datagridColumnName);
+                        UsersList();
+                    }
                 }
             }
             else if (selectedData == "False")
